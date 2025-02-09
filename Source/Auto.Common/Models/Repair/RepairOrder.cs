@@ -17,6 +17,11 @@ public class RepairOrder
     public int RepairOrderId { get; set; }
 
     /// <summary>
+    /// Id chủ xe.
+    /// </summary>
+    public int OwnerId { get; set; }
+
+    /// <summary>
     /// Ngày lập đơn.
     /// </summary>
     public DateTime OrderDate { get; set; } = DateTime.Now;
@@ -27,11 +32,6 @@ public class RepairOrder
     public RepairOrderStatus Status { get; set; } = RepairOrderStatus.Pending;
 
     /// <summary>
-    /// Khách hàng liên quan đến đơn sửa chữa.
-    /// </summary>
-    public Customer Customer { get; set; }
-
-    /// <summary>
     /// Xe liên quan đến đơn sửa chữa.
     /// </summary>
     public Car Car { get; set; }
@@ -39,12 +39,12 @@ public class RepairOrder
     /// <summary>
     /// Danh sách công việc sửa chữa liên quan.
     /// </summary>
-    public List<RepairTask> RepairTaskList { get; set; }
+    public virtual List<RepairTask> RepairTaskList { get; set; }
 
     /// <summary>
     /// Danh sách phụ tùng thay thế liên quan.
     /// </summary>
-    public List<ReplacementPart> ReplacementPartList { get; set; }
+    public virtual List<ReplacementPart> ReplacementPartList { get; set; }
 
     /// <summary>
     /// Tổng chi phí sửa chữa.

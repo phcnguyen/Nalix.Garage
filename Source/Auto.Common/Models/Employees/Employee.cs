@@ -24,10 +24,11 @@ public class Employee
     public string FullName { get; set; }
 
     /// <summary>
-    /// Ngày sinh của nhân viên.
+    /// Email của nhân viên.
     /// </summary>
-    [Required(ErrorMessage = "Birth date is required.")]
-    public DateTime BirthDate { get; set; }
+    [EmailAddress(ErrorMessage = "Invalid email format.")]
+    [StringLength(100, ErrorMessage = "Email must not exceed 100 characters.")]
+    public string Email { get; set; } // Optional email field
 
     /// <summary>
     /// Số điện thoại của nhân viên.
@@ -38,14 +39,15 @@ public class Employee
     public string PhoneNumber { get; set; }
 
     /// <summary>
+    /// Ngày sinh của nhân viên.
+    /// </summary>
+    [Required(ErrorMessage = "Birth date is required.")]
+    public DateTime BirthDate { get; set; }
+
+    /// <summary>
     /// Vị trí công việc của nhân viên.
     /// </summary>
     public Position Position { get; set; } = Position.None;
-
-    /// <summary>
-    /// Danh sách công việc sửa chữa của nhân viên.
-    /// </summary>
-    public List<RepairTask> TaskList { get; set; } = [];
 
     /// <summary>
     /// Mức lương của nhân viên.
@@ -54,16 +56,14 @@ public class Employee
     public decimal Salary { get; set; }
 
     /// <summary>
-    /// Email của nhân viên.
+    /// Danh sách công việc sửa chữa của nhân viên.
     /// </summary>
-    [EmailAddress(ErrorMessage = "Invalid email format.")]
-    [StringLength(100, ErrorMessage = "Email must not exceed 100 characters.")]
-    public string Email { get; set; } // Optional email field
+    public virtual List<RepairTask> TaskList { get; set; } = [];
 
     /// <summary>
     /// Danh sách lịch làm việc của nhân viên.
     /// </summary>
-    public List<WorkSchedule> WorkSchedules { get; set; } = [];
+    public virtual List<WorkSchedule> WorkSchedules { get; set; } = [];
 
     /// <summary>
     /// Thêm một lịch làm việc cho nhân viên.

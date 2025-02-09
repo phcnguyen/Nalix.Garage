@@ -1,5 +1,4 @@
-﻿using Auto.Common.Models.Employees;
-using System;
+﻿using System;
 using System.ComponentModel.DataAnnotations;
 
 namespace Auto.Common.Models.Repair;
@@ -15,6 +14,11 @@ public class RepairTask
     public int RepairTaskId { get; set; }
 
     /// <summary>
+    /// Nhân viên thực hiện công việc sửa chữa.
+    /// </summary>
+    public int EmployeeId { get; set; }
+
+    /// <summary>
     /// Mô tả công việc sửa chữa.
     /// </summary>
     [StringLength(500, ErrorMessage = "Description must not exceed 500 characters.")]
@@ -25,11 +29,6 @@ public class RepairTask
     /// </summary>
     [Range(0.01, double.MaxValue, ErrorMessage = "Unit price must be greater than zero.")]
     public decimal UnitPrice { get; set; }
-
-    /// <summary>
-    /// Nhân viên thực hiện công việc sửa chữa.
-    /// </summary>
-    public Employee PerformingEmployee { get; set; }
 
     /// <summary>
     /// Thời gian hoàn thành công việc sửa chữa (tùy chọn).

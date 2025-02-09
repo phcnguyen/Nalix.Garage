@@ -15,6 +15,11 @@ public class Car
     public int CarId { get; set; }
 
     /// <summary>
+    /// Id chủ xe.
+    /// </summary>
+    public int OwnerId { get; set; }
+
+    /// <summary>
     /// Biển số xe.
     /// </summary>
     [StringLength(10, ErrorMessage = "License plate must not exceed 10 characters.")]
@@ -49,12 +54,7 @@ public class Car
     public string EngineNumber { get; set; }
 
     /// <summary>
-    /// Chủ xe.
-    /// </summary>
-    public Customer Owner { get; set; }
-
-    /// <summary>
     /// Lịch sử sửa chữa của xe.
     /// </summary>
-    public List<RepairHistory> RepairHistory { get; set; }
+    public virtual List<RepairHistory> RepairHistory { get; set; }
 }

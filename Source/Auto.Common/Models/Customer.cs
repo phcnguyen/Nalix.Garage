@@ -46,12 +46,12 @@ public class Customer
     /// <summary>
     /// Danh sách xe của khách hàng.
     /// </summary>
-    public List<Car> CarList { get; set; }
+    public virtual List<Car> CarList { get; set; }
 
     /// <summary>
     /// Lịch sử sửa chữa của khách hàng.
     /// </summary>
-    public List<RepairHistory> RepairHistory { get; set; }
+    public virtual List<RepairHistory> RepairHistory { get; set; }
 
     /// <summary>
     /// Công nợ của khách hàng.

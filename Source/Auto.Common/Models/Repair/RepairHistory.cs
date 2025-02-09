@@ -27,5 +27,5 @@ public class RepairHistory
     /// <summary>
     /// Danh sách công việc sửa chữa liên quan.
     /// </summary>
-    public List<RepairTask> RepairTaskList { get; set; }
+    public virtual List<RepairTask> RepairTaskList { get; set; }
 }
