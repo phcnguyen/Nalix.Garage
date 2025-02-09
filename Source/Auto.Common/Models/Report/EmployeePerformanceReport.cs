@@ -1,4 +1,6 @@
-﻿namespace Auto.Common.Models.Report;
+﻿using Auto.Common.Models.Employees;
+
+namespace Auto.Common.Models.Report;
 
 /// <summary>
 /// Lớp đại diện cho báo cáo hiệu suất nhân viên.

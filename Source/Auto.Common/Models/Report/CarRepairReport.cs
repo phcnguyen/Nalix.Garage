@@ -10,7 +10,7 @@ public class CarRepairReport
     /// <summary>
     /// Thời gian báo cáo.
     /// </summary>
-    public DateTime Time { get; set; }
+    public DateTime Time { get; set; } = DateTime.Now;
 
     /// <summary>
     /// Số lượng xe đã sửa chữa.

@@ -6,6 +6,11 @@
 public enum PaymentStatus
 {
     /// <summary>
+    /// Hóa đơn chưa thanh toán.
+    /// </summary>
+    Unpaid,
+
+    /// <summary>
     /// Đã thanh toán
     /// </summary>
     Paid,
@@ -18,5 +23,10 @@ public enum PaymentStatus
     /// <summary>
     /// Quá hạn
     /// </summary>
-    Overdue
+    Overdue,
+
+    /// <summary>
+    /// Hóa đơn bị hủy.
+    /// </summary>
+    Canceled
 }

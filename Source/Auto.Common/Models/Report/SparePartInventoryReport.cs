@@ -1,4 +1,6 @@
-﻿namespace Auto.Common.Models.Report;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Auto.Common.Models.Report;
 
 /// <summary>
 /// Lớp đại diện cho báo cáo tồn kho phụ tùng.
@@ -8,6 +10,7 @@ public class SparePartInventoryReport
     /// <summary>
     /// Tên phụ tùng.
     /// </summary>
+    [StringLength(100, ErrorMessage = "Part name must not exceed 100 characters.")]
     public string PartName { get; set; }
 
     /// <summary>

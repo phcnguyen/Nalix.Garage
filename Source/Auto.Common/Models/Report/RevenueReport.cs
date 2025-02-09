@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace Auto.Common.Models.Report;
 
@@ -15,5 +16,6 @@ public class RevenueReport
     /// <summary>
     /// Doanh thu.
     /// </summary>
+    [Range(0.01, double.MaxValue, ErrorMessage = "Unit price must be greater than zero.")]
     public decimal Revenue { get; set; }
 }

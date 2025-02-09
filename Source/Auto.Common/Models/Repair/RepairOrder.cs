@@ -1,6 +1,8 @@
-﻿using Auto.Common.Models.Part;
+﻿using Auto.Common.Models.Cars;
+using Auto.Common.Models.Part;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace Auto.Common.Models.Repair;
 
@@ -17,12 +19,12 @@ public class RepairOrder
     /// <summary>
     /// Ngày lập đơn.
     /// </summary>
-    public DateTime OrderDate { get; set; }
+    public DateTime OrderDate { get; set; } = DateTime.Now;
 
     /// <summary>
     /// Trạng thái của đơn sửa chữa.
     /// </summary>
-    public string Status { get; set; }
+    public RepairOrderStatus Status { get; set; } = RepairOrderStatus.Pending;
 
     /// <summary>
     /// Khách hàng liên quan đến đơn sửa chữa.
@@ -47,5 +49,6 @@ public class RepairOrder
     /// <summary>
     /// Tổng chi phí sửa chữa.
     /// </summary>
+    [Range(0.01, double.MaxValue, ErrorMessage = "Selling price must be greater than zero.")]
     public decimal TotalRepairCost { get; set; }
 }
