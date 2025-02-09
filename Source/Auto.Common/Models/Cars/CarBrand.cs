@@ -7,6 +7,7 @@ public enum CarBrand
 {
     None,
 
+    Audi,
     Abarth,
     Acura,
     AlfaRomeo,
@@ -20,6 +21,7 @@ public enum CarBrand
     Brilliance,
     Bugatti,
     Buick,
+    Borgward,
 
     CarbonMotors,
     Cadillac,
@@ -28,6 +30,7 @@ public enum CarBrand
     Chevrolet,
     Chrysler,
     Citroen,
+    Chery,
 
     Daewoo,
     Dacia,
@@ -45,11 +48,13 @@ public enum CarBrand
 
     Ferrari,
 
+    Gac,
     Gaz,
     GMC,
     Gonow,
     GreatWall,
     Gumpert,
+    Geely,
 
     Hafei,
     Hawtai,
@@ -57,6 +62,7 @@ public enum CarBrand
     Honda,
     Hummer,
     Hyundai,
+    Haval,
 
     IKCO,
     Infiniti,
@@ -65,8 +71,11 @@ public enum CarBrand
     Jaguar,
     Jac,
     Jeep,
+    Jiangling,
 
     Koenigsegg,
+    KIA,
+    Karma,
 
     Genesis,
 
@@ -81,6 +90,7 @@ public enum CarBrand
     LIFAN,
     Lotus,
 
+    Maxus,
     Mazda,
     McLaren,
     MercedesBenz,
@@ -88,6 +98,9 @@ public enum CarBrand
     Mini,
     Mitsubishi,
     Maserati,
+    Maybach,
+    Mahindra,
+    Mastretta,
 
     Nissan,
 
@@ -99,22 +112,28 @@ public enum CarBrand
     Porsche,
     Proton,
     Polestar,
+    Pontiac,
 
     Qoros,
 
     RAM,
+    RANZ,
     Renault,
     RileyMotor,
     Rover,
     RollsRoyce,
     Rivian,
+    Roewe,
 
+    SAIC,
     Saab,
     Seat,
     Skoda,
     Smart,
     Subaru,
     Suzuki,
+    SOUEAST,
+    SsangYong,
 
     Tata,
     Tesla,
@@ -125,6 +144,7 @@ public enum CarBrand
     VENUCIA,
     Volvo,
     Volkswagen,
+    VAZ,
 
     Wuling,
 
@@ -135,4 +155,6 @@ public enum CarBrand
     ZHONGTAI,
     Zenvo,
     Zotye,
+
+    Xinkai
 }
