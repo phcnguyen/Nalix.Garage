@@ -3,12 +3,12 @@
 	<!-- Common settings for all projects in the solution -->
 	<PropertyGroup>
 		<!-- Common versioning settings -->
-		<Version>0.2.19</Version>
-		<PackageVersion>0.2.19</PackageVersion>
-		<Authors>Phuc Nguyen</Authors>
+		<Version>0.1.0</Version>
+		<PackageVersion>0.1.0</PackageVersion>
+		<Authors>PhcNguyen</Authors>
 		<Copyright>Copyright © 2025</Copyright>
-		<PackageProjectUrl>https://github.com/phcnguyen/Notio</PackageProjectUrl>
-		<RepositoryUrl>https://github.com/phcnguyen/Notio</RepositoryUrl>
+		<PackageProjectUrl>https://github.com/phcnguyen/Auto</PackageProjectUrl>
+		<RepositoryUrl>https://github.com/phcnguyen/Auto</RepositoryUrl>
 
 		<!-- Target framework setting for all projects -->
 		<DebugType>none</DebugType>

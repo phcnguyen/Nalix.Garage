@@ -8,7 +8,7 @@ public enum Position
     /// <summary>
     /// Vị trí không xác định.
     /// </summary>
-    None,
+    None = 0,
 
     /// <summary>
     /// Vị trí học việc.
@@ -46,17 +46,27 @@ public enum Position
     Receptionist = 7,
 
     /// <summary>
+    /// Vị trí tư vấn.
+    /// </summary>
+    Advisor = 8,
+
+    /// <summary>
+    /// Vị trí hỗ trợ.
+    /// </summary>
+    Support = 9,
+
+    /// <summary>
     /// Vị trí kế toán.
     /// </summary>
-    Accountant = 8,
+    Accountant = 10,
 
     /// <summary>
     /// Vị trí quản lý.
     /// </summary>
-    Manager = 9,
+    Manager = 11,
 
     /// <summary>
     /// Vị trí nhân viên bảo trì.
     /// </summary>
-    MaintenanceStaff = 10
+    MaintenanceStaff = 12
 }

@@ -2,7 +2,18 @@
 
 public enum DiscountType
 {
-    None,        // No discount
-    Percentage,  // Discount is a percentage
-    Amount       // Discount is a fixed amount
+    /// <summary>
+    /// No discount
+    /// </summary>
+    None,
+
+    /// <summary>
+    /// Discount is a percentage
+    /// </summary>
+    Percentage,
+
+    /// <summary>
+    ///  Discount is a fixed amount
+    /// </summary>
+    Amount
 }

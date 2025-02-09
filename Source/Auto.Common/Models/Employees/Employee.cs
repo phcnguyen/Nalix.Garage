@@ -45,7 +45,7 @@ public class Employee
     /// <summary>
     /// Danh sách công việc sửa chữa của nhân viên.
     /// </summary>
-    public List<RepairTask> TaskList { get; set; } = []; // Lazy initialization
+    public List<RepairTask> TaskList { get; set; } = [];
 
     /// <summary>
     /// Mức lương của nhân viên.
