@@ -12,9 +12,16 @@ namespace Auto.Common.Models.Employees;
 public class Employee
 {
     /// <summary>
-    /// Mã nhân viên.
+    /// Id nhân viên.
     /// </summary>
     public int EmployeeId { get; set; }
+
+    /// <summary>
+    /// Mã nhân viên.
+    /// </summary>
+    [Required(ErrorMessage = "Employee code is required.")]
+    [StringLength(20, ErrorMessage = "Employee code must not exceed 20 characters.")]
+    public string EmployeeCode { get; set; }
 
     /// <summary>
     /// Họ và tên nhân viên.
@@ -43,6 +50,11 @@ public class Employee
     /// </summary>
     [Required(ErrorMessage = "Birth date is required.")]
     public DateTime BirthDate { get; set; }
+
+    /// <summary>
+    /// NGiới tính của nhân viên.
+    /// </summary>
+    public Gender Gender { get; set; } = Gender.Unknown;
 
     /// <summary>
     /// Vị trí công việc của nhân viên.

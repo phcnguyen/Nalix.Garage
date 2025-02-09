@@ -1,4 +1,4 @@
-﻿using Auto.Common.Models.Employees;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace Auto.Common.Models.Report;
 
@@ -8,9 +8,15 @@ namespace Auto.Common.Models.Report;
 public class EmployeePerformanceReport
 {
     /// <summary>
-    /// Nhân viên liên quan đến báo cáo.
+    /// Id nhân viên liên quan đến báo cáo.
     /// </summary>
-    public Employee Employee { get; set; }
+    public int EmployeeId { get; set; }
+
+    /// <summary>
+    /// Tên nhân viên liên quan đến báo cáo.
+    /// </summary>
+    [StringLength(100, ErrorMessage = "Full name must not exceed 100 characters.")]
+    public string EmployeeName { get; set; }
 
     /// <summary>
     /// Số lượng công việc đã hoàn thành.

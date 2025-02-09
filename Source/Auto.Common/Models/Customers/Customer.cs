@@ -1,9 +1,10 @@
 ﻿using Auto.Common.Models.Cars;
 using Auto.Common.Models.Repair;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace Auto.Common.Models;
+namespace Auto.Common.Models.Customers;
 
 /// <summary>
 /// Lớp đại diện cho khách hàng.
@@ -44,6 +45,33 @@ public class Customer
     public string Address { get; set; }
 
     /// <summary>
+    /// Sinh nhật của khách hàng.
+    /// </summary>
+    public DateTime? DateOfBirth { get; set; }
+
+    /// <summary>
+    /// Loại khách hàng.
+    /// </summary>
+    public CustomerType Type { get; set; } = CustomerType.Individual;
+
+    /// <summary>
+    /// Cấp độ thành viên.
+    /// </summary>
+    public MembershipLevel Membership { get; set; } = MembershipLevel.Standard;
+
+    /// <summary>
+    /// Chi tiêu của khách hàng.
+    /// </summary>
+    [StringLength(20, ErrorMessage = "Tax code must not exceed 20 characters.")]
+    public string TaxCode { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Công nợ của khách hàng.
+    /// </summary>
+    [Range(0, double.MaxValue, ErrorMessage = "Debt cannot be negative.")]
+    public decimal Debt { get; set; }
+
+    /// <summary>
     /// Danh sách xe của khách hàng.
     /// </summary>
     public virtual List<Car> CarList { get; set; }
@@ -52,10 +80,4 @@ public class Customer
     /// Lịch sử sửa chữa của khách hàng.
     /// </summary>
     public virtual List<RepairHistory> RepairHistory { get; set; }
-
-    /// <summary>
-    /// Công nợ của khách hàng.
-    /// </summary>
-    [Range(0, double.MaxValue, ErrorMessage = "Debt cannot be negative.")]
-    public decimal Debt { get; set; }
 }
