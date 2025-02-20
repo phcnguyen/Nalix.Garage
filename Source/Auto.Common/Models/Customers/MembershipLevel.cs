@@ -6,22 +6,27 @@
 public enum MembershipLevel
 {
     /// <summary>
+    /// Không xác định hoặc chưa đăng ký.
+    /// </summary>
+    None = 0,
+
+    /// <summary>
     /// Khách thường.
     /// </summary>
-    Standard,
+    Standard = 1,
 
     /// <summary>
     /// Thành viên bạc.
     /// </summary>
-    Silver,
+    Silver = 2,
 
     /// <summary>
     /// Thành viên vàng.
     /// </summary>
-    Gold,
+    Gold = 3,
 
     /// <summary>
     /// Thành viên cao cấp.
     /// </summary>
-    Platinum
+    Platinum = 4
 }

@@ -1,4 +1,4 @@
-﻿namespace Auto.Common.Models.Suppliers;
+﻿namespace Auto.Common.Models.Payments;
 
 /// <summary>
 /// Enum đại diện cho các điều khoản thanh toán.

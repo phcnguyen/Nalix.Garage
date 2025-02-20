@@ -14,4 +14,8 @@
 		<Deterministic>true</Deterministic>
 		<UseCompression>true</UseCompression>
 	</PropertyGroup>
+
+	<ItemGroup>
+	  <Folder Include="Internal\" />
+	</ItemGroup>
 </Project>

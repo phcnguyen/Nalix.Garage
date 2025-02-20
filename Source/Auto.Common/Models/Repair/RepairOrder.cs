@@ -1,8 +1,7 @@
-﻿using Auto.Common.Models.Cars;
-using Auto.Common.Models.Part;
+﻿using Auto.Common.Models.Part;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+using System.Linq;
 
 namespace Auto.Common.Models.Repair;
 
@@ -22,33 +21,29 @@ public class RepairOrder
     public int OwnerId { get; set; }
 
     /// <summary>
+    /// Mã xe liên quan đến đơn sửa chữa.
+    /// </summary>
+    public int CarId { get; set; }
+
+    /// <summary>
     /// Ngày lập đơn.
     /// </summary>
     public DateTime OrderDate { get; set; } = DateTime.Now;
 
     /// <summary>
-    /// Trạng thái của đơn sửa chữa.
-    /// </summary>
-    public RepairOrderStatus Status { get; set; } = RepairOrderStatus.Pending;
-
-    /// <summary>
-    /// Xe liên quan đến đơn sửa chữa.
-    /// </summary>
-    public Car Car { get; set; }
-
-    /// <summary>
     /// Danh sách công việc sửa chữa liên quan.
     /// </summary>
-    public virtual List<RepairTask> RepairTaskList { get; set; }
+    public List<RepairTask> RepairTaskList { get; set; } = [];
 
     /// <summary>
     /// Danh sách phụ tùng thay thế liên quan.
     /// </summary>
-    public virtual List<ReplacementPart> ReplacementPartList { get; set; }
+    public List<ReplacementPart> ReplacementPartList { get; set; } = [];
 
     /// <summary>
     /// Tổng chi phí sửa chữa.
     /// </summary>
-    [Range(0.01, double.MaxValue, ErrorMessage = "Selling price must be greater than zero.")]
-    public decimal TotalRepairCost { get; set; }
+    public decimal TotalRepairCost() =>
+        (RepairTaskList?.Sum(task => task.UnitPrice) ?? 0) +
+        (ReplacementPartList?.Sum(part => part.UnitPrice) ?? 0);
 }

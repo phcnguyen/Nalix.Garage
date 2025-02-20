@@ -22,7 +22,7 @@ public class RepairTask
     /// Mô tả công việc sửa chữa.
     /// </summary>
     [StringLength(500, ErrorMessage = "Description must not exceed 500 characters.")]
-    public string Description { get; set; }
+    public string Description { get; set; } = string.Empty;
 
     /// <summary>
     /// Đơn giá của công việc sửa chữa.
@@ -31,7 +31,23 @@ public class RepairTask
     public decimal UnitPrice { get; set; }
 
     /// <summary>
-    /// Thời gian hoàn thành công việc sửa chữa (tùy chọn).
+    /// Ngày bắt đầu công việc.
+    /// </summary>
+    public DateTime? StartDate { get; set; }
+
+    /// <summary>
+    /// Ngày hoàn thành công việc sửa chữa (nếu đã xong).
     /// </summary>
     public DateTime? CompletionDate { get; set; }
+
+    /// <summary>
+    /// Thời gian ước tính để hoàn thành công việc (tính bằng giờ).
+    /// </summary>
+    [Range(0, double.MaxValue, ErrorMessage = "Duration must be positive.")]
+    public double EstimatedDuration { get; set; }
+
+    /// <summary>
+    /// Trạng thái công việc sửa chữa.
+    /// </summary>
+    public RepairOrderStatus Status { get; set; } = RepairOrderStatus.Pending;
 }

@@ -1,192 +1,194 @@
 ﻿namespace Auto.Common.Models.Employees;
 
 /// <summary>
-/// Enum định nghĩa các vị trí công việc của nhân viên.
+/// Đại diện cho các vị trí công việc trong hệ thống quản lý gara ô tô.
+/// Được sử dụng để phân loại nhân viên theo vai trò cụ thể.
 /// </summary>
 public enum Position
 {
     /// <summary>
-    /// Vị trí không xác định.
+    /// Không có vị trí cụ thể.
+    /// Sử dụng khi nhân viên chưa được phân công vị trí.
     /// </summary>
     None = 0,
 
     /// <summary>
-    /// Vị trí học việc.
+    /// Nhân viên học việc, đang trong quá trình đào tạo.
     /// </summary>
     Apprentice = 1,
 
     /// <summary>
-    /// Vị trí thợ rửa xe.
+    /// Thợ rửa xe, chịu trách nhiệm vệ sinh xe ô tô.
     /// </summary>
     CarWasher = 2,
 
     /// <summary>
-    /// Vị trí thợ điện ô tô.
+    /// Thợ điện ô tô, chuyên sửa chữa hệ thống điện của xe.
     /// </summary>
     AutoElectrician = 3,
 
     /// <summary>
-    /// Vị trí thợ máy gầm.
+    /// Thợ máy gầm, chuyên bảo trì và sửa chữa hệ thống khung gầm xe.
     /// </summary>
     UnderCarMechanic = 4,
 
     /// <summary>
-    /// Vị trí thợ đồng.
+    /// Thợ đồng, chịu trách nhiệm sửa chữa khung vỏ xe.
     /// </summary>
     BodyworkMechanic = 5,
 
     /// <summary>
-    /// Vị trí nhân viên kỹ thuật sửa chữa.
+    /// Kỹ thuật viên sửa chữa chung.
     /// </summary>
     Technician = 6,
 
     /// <summary>
-    /// Vị trí nhân viên tiếp nhận.
+    /// Nhân viên tiếp nhận xe và làm thủ tục cho khách hàng.
     /// </summary>
     Receptionist = 7,
 
     /// <summary>
-    /// Vị trí tư vấn.
+    /// Nhân viên tư vấn dịch vụ sửa chữa cho khách hàng.
     /// </summary>
     Advisor = 8,
 
     /// <summary>
-    /// Vị trí hỗ trợ.
+    /// Nhân viên hỗ trợ kỹ thuật hoặc khách hàng.
     /// </summary>
     Support = 9,
 
     /// <summary>
-    /// Vị trí kế toán.
+    /// Nhân viên kế toán, quản lý tài chính và thu chi.
     /// </summary>
     Accountant = 10,
 
     /// <summary>
-    /// Vị trí quản lý.
+    /// Quản lý gara, giám sát hoạt động kinh doanh và kỹ thuật.
     /// </summary>
     Manager = 11,
 
     /// <summary>
-    /// Vị trí nhân viên bảo trì.
+    /// Nhân viên bảo trì trang thiết bị của gara.
     /// </summary>
     MaintenanceStaff = 12,
 
     /// <summary>
-    /// Vị trí điều phối kho.
+    /// Điều phối viên kho, chịu trách nhiệm quản lý xuất nhập phụ tùng.
     /// </summary>
     InventoryCoordinator = 13,
 
     /// <summary>
-    /// Vị trí giám sát kho.
+    /// Giám sát kho, kiểm soát hàng tồn kho và quy trình kho bãi.
     /// </summary>
     WarehouseSupervisor = 14,
 
     /// <summary>
-    /// Vị trí thợ sơn.
+    /// Thợ sơn xe, chuyên về sơn và hoàn thiện bề mặt xe.
     /// </summary>
     Painter = 15,
 
     /// <summary>
-    /// Vị trí chuyên viên chẩn đoán.
+    /// Chuyên viên chẩn đoán, sử dụng thiết bị kiểm tra lỗi trên xe.
     /// </summary>
     DiagnosticSpecialist = 16,
 
     /// <summary>
-    /// Vị trí chuyên viên động cơ.
+    /// Chuyên viên sửa chữa và bảo trì động cơ xe.
     /// </summary>
     EngineSpecialist = 17,
 
     /// <summary>
-    /// Vị trí chuyên viên hộp số.
+    /// Chuyên viên sửa chữa và bảo trì hộp số xe.
     /// </summary>
     TransmissionSpecialist = 18,
 
     /// <summary>
-    /// Vị trí chuyên viên điều hòa.
+    /// Chuyên viên sửa chữa hệ thống điều hòa ô tô.
     /// </summary>
     ACSpecialist = 19,
 
     /// <summary>
-    /// Vị trí thợ mài.
+    /// Thợ mài, chuyên gia xử lý bề mặt kim loại trước khi sơn.
     /// </summary>
     Grinder = 20,
 
     /// <summary>
-    /// Vị trí nhân viên bảo hiểm.
+    /// Nhân viên bảo hiểm, hỗ trợ xử lý thủ tục bảo hiểm xe.
     /// </summary>
     InsuranceStaff = 21,
 
     /// <summary>
-    /// Vị trí nhân viên bán phụ tùng.
+    /// Nhân viên tư vấn và bán phụ tùng xe.
     /// </summary>
     PartsConsultant = 22,
 
     /// <summary>
-    /// Vị trí nhân viên giao nhận xe.
+    /// Nhân viên giao nhận xe sau khi sửa chữa hoặc bảo dưỡng.
     /// </summary>
     VehicleDeliveryStaff = 23,
 
     /// <summary>
-    /// Vị trí nhân viên vệ sinh.
+    /// Nhân viên vệ sinh, duy trì môi trường sạch sẽ trong gara.
     /// </summary>
     CleaningStaff = 24,
 
     /// <summary>
-    /// Vị trí bảo vệ.
+    /// Nhân viên bảo vệ, đảm bảo an ninh cho gara.
     /// </summary>
     Security = 25,
 
     /// <summary>
-    /// Vị trí nhân viên marketing.
+    /// Nhân viên marketing, thực hiện quảng bá và tiếp thị dịch vụ gara.
     /// </summary>
     MarketingStaff = 26,
 
     /// <summary>
-    /// Vị trí nhân viên chăm sóc khách hàng.
+    /// Nhân viên chăm sóc khách hàng, hỗ trợ giải đáp thắc mắc.
     /// </summary>
     CustomerService = 27,
 
     /// <summary>
-    /// Vị trí giám đốc kỹ thuật.
+    /// Giám đốc kỹ thuật, phụ trách các vấn đề liên quan đến công nghệ và sửa chữa.
     /// </summary>
     TechnicalDirector = 28,
 
     /// <summary>
-    /// Vị trí giám đốc dịch vụ.
+    /// Giám đốc dịch vụ, quản lý dịch vụ khách hàng và kỹ thuật.
     /// </summary>
     ServiceDirector = 29,
 
     /// <summary>
-    /// Vị trí giám đốc điều hành.
+    /// Giám đốc điều hành, quản lý toàn bộ hoạt động của gara.
     /// </summary>
     ExecutiveDirector = 30,
 
     /// <summary>
-    /// Vị trí thợ điện tử và lập trình.
+    /// Thợ điện tử và lập trình, chuyên sửa chữa hệ thống điện tử ô tô.
     /// </summary>
     ElectronicsAndProgrammingTechnician = 31,
 
     /// <summary>
-    /// Vị trí chuyên viên kiểm tra chất lượng.
+    /// Chuyên viên kiểm tra chất lượng, đảm bảo tiêu chuẩn sửa chữa.
     /// </summary>
     QualityControlSpecialist = 32,
 
     /// <summary>
-    /// Vị trí nhân viên đặt hàng phụ tùng.
+    /// Nhân viên đặt hàng phụ tùng, quản lý việc nhập hàng từ nhà cung cấp.
     /// </summary>
     PartsOrderingStaff = 33,
 
     /// <summary>
-    /// Vị trí chuyên viên bảo hành.
+    /// Chuyên viên bảo hành, xử lý các yêu cầu bảo hành xe.
     /// </summary>
     WarrantySpecialist = 34,
 
     /// <summary>
-    /// Vị trí nhân viên thu ngân.
+    /// Nhân viên thu ngân, xử lý thanh toán của khách hàng.
     /// </summary>
     Cashier = 35,
 
     /// <summary>
-    /// Vị trí trưởng ca.
+    /// Trưởng ca, giám sát hoạt động trong ca làm việc.
     /// </summary>
     ShiftSupervisor = 36
 }

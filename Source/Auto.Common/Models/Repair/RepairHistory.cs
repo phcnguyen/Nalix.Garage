@@ -1,6 +1,6 @@
-﻿using Auto.Common.Models.Cars;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Auto.Common.Models.Repair;
 
@@ -15,17 +15,22 @@ public class RepairHistory
     public int HistoryId { get; set; }
 
     /// <summary>
-    /// Xe liên quan đến lịch sử sửa chữa.
+    /// Mã xe liên quan đến lịch sử sửa chữa.
     /// </summary>
-    public Car Car { get; set; }
+    public int CarId { get; set; }
 
     /// <summary>
     /// Ngày sửa chữa.
     /// </summary>
-    public DateTime RepairDate { get; set; }
+    public DateTime RepairDate { get; set; } = DateTime.Now;
 
     /// <summary>
     /// Danh sách công việc sửa chữa liên quan.
     /// </summary>
-    public virtual List<RepairTask> RepairTaskList { get; set; }
+    public List<RepairTask> RepairTaskList { get; set; } = [];
+
+    /// <summary>
+    /// Tổng chi phí sửa chữa.
+    /// </summary>
+    public decimal TotalCost() => RepairTaskList.Sum(task => task.UnitPrice);
 }

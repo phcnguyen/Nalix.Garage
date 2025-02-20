@@ -1,4 +1,4 @@
-﻿namespace Auto.Common.Models.Cars;
+﻿namespace Auto.Common.Models.Vehicles;
 
 /// <summary>
 /// Enum định nghĩa các màu xe phổ biến.

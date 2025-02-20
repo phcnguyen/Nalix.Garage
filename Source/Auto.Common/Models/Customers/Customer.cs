@@ -1,4 +1,4 @@
-﻿using Auto.Common.Models.Cars;
+﻿using Auto.Common.Models.Vehicles;
 using Auto.Common.Models.Repair;
 using System;
 using System.Collections.Generic;

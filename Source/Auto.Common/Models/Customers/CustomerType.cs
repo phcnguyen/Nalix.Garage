@@ -6,17 +6,27 @@
 public enum CustomerType
 {
     /// <summary>
+    /// Không xác định hoặc chưa được phân loại.
+    /// </summary>
+    Unknown = 0,
+
+    /// <summary>
     /// Cá nhân.
     /// </summary>
-    Individual,
+    Individual = 1,
 
     /// <summary>
     /// Doanh nghiệp.
     /// </summary>
-    Business,
+    Business = 2,
 
     /// <summary>
     /// Chính phủ.
     /// </summary>
-    Government
+    Government = 3,
+
+    /// <summary>
+    /// Loại khách hàng khác.
+    /// </summary>
+    Other = 4
 }

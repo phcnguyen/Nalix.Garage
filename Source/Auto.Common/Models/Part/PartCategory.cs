@@ -4,6 +4,8 @@ namespace Auto.Common.Models.Part;
 
 public enum PartCategory
 {
+    None,
+
     [Display(Name = "Phụ tùng động cơ")]
     Engine,
 

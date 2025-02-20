@@ -6,22 +6,32 @@
 public enum RepairOrderStatus
 {
     /// <summary>
-    /// Chờ xác nhận
+    /// Chờ xác nhận.
     /// </summary>
     Pending = 1,
 
     /// <summary>
-    /// Đang sửa chữa
+    /// Đang chờ phụ tùng.
     /// </summary>
-    InProgress = 2,
+    WaitingForParts = 2,
 
     /// <summary>
-    /// Hoàn thành
+    /// Đang sửa chữa.
     /// </summary>
-    Completed = 3,
+    InProgress = 3,
 
     /// <summary>
-    /// Đã thanh toán
+    /// Hoàn thành nhưng chưa thanh toán.
     /// </summary>
-    Paid = 4
+    Completed = 4,
+
+    /// <summary>
+    /// Đã thanh toán.
+    /// </summary>
+    Paid = 5,
+
+    /// <summary>
+    /// Đơn đã bị hủy.
+    /// </summary>
+    Canceled = 6
 }

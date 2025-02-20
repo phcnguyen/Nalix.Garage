@@ -1,8 +1,9 @@
 ﻿using Auto.Common.Models.Repair;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace Auto.Common.Models.Cars;
+namespace Auto.Common.Models.Vehicles;
 
 /// <summary>
 /// Lớp đại diện cho xe.
@@ -56,5 +57,26 @@ public class Car
     /// <summary>
     /// Lịch sử sửa chữa của xe.
     /// </summary>
-    public virtual List<RepairHistory> RepairHistory { get; set; }
+    public virtual List<RepairHistory> RepairHistory { get; set; } = [];
+
+    /// <summary>
+    /// Loại xe (Sedan, SUV, Hatchback, ...).
+    /// </summary>
+    public CarType CarType { get; set; } = CarType.Sedan;
+
+    /// <summary>
+    /// Ngày đăng ký xe.
+    /// </summary>
+    public DateTime RegistrationDate { get; set; } = DateTime.Now;
+
+    /// <summary>
+    /// Quá trình lái xe (Km đã đi).
+    /// </summary>
+    [Range(0, double.MaxValue, ErrorMessage = "Mileage must be a positive value.")]
+    public double Mileage { get; set; } = 0;
+
+    /// <summary>
+    /// Ngày hết hạn bảo hiểm.
+    /// </summary>
+    public DateTime InsuranceExpiryDate { get; set; }
 }

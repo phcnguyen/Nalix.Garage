@@ -14,27 +14,27 @@ public class ReplacementPart
     public int PartId { get; set; }
 
     /// <summary>
-    /// Theo dõi thay đổi trong kho.
+    /// Ngày nhập kho.
     /// </summary>
-    public DateTime DateAdded { get; set; } = DateTime.Now;
+    public DateOnly DateAdded { get; set; } = DateOnly.FromDateTime(DateTime.UtcNow);
 
     /// <summary>
-    /// Phụ tùng có mã hoặc SKU (Stock Keeping Unit).
+    /// Mã SKU (Stock Keeping Unit) hoặc mã phụ tùng.
     /// </summary>
-    [StringLength(100, ErrorMessage = "Part name must not exceed 100 characters.")]
+    [Required, StringLength(100, ErrorMessage = "Part code must not exceed 100 characters.")]
     public string PartCode { get; set; } = string.Empty;
 
     /// <summary>
     /// Tên phụ tùng.
     /// </summary>
-    [StringLength(100, ErrorMessage = "Part name must not exceed 100 characters.")]
-    public string PartName { get; set; }
+    [Required, StringLength(100, ErrorMessage = "Part name must not exceed 100 characters.")]
+    public string PartName { get; set; } = string.Empty;
 
     /// <summary>
-    /// Số lượng phụ tùng.
+    /// Số lượng phụ tùng trong kho.
     /// </summary>
-    [Range(1, int.MaxValue, ErrorMessage = "Quantity must be greater than zero.")]
-    public int Quantity { get; set; }
+    [Range(0, int.MaxValue, ErrorMessage = "Quantity must be at least zero.")]
+    public int Quantity { get; set; } = 0;
 
     /// <summary>
     /// Đơn giá của phụ tùng.
@@ -43,22 +43,23 @@ public class ReplacementPart
     public decimal UnitPrice { get; set; }
 
     /// <summary>
-    /// Thông tin nhà sản xuất/nhãn hiệu.
+    /// Nhà sản xuất/nhãn hiệu phụ tùng.
     /// </summary>
+    [Required, StringLength(100, ErrorMessage = "Manufacturer must not exceed 100 characters.")]
     public string Manufacturer { get; set; } = string.Empty;
 
     /// <summary>
-    /// Nếu phụ tùng có lỗi xử lý việc trả lại hàng.
+    /// Phụ tùng có bị lỗi hay không.
     /// </summary>
-    public bool IsReturned { get; set; } = false;
+    public bool IsDefective { get; set; } = false;
 
     /// <summary>
-    /// Nếu phụ tùng có hạn sử dụng.
+    /// Ngày hết hạn của phụ tùng (nếu có).
     /// </summary>
-    public DateTime? ExpiryDate { get; set; }
+    public DateOnly? ExpiryDate { get; set; }
 
     /// <summary>
-    /// Tổng giá trị phụ tùng thay thế (Quantity * UnitPrice).
+    /// Tổng giá trị phụ tùng (Quantity * UnitPrice).
     /// </summary>
-    public decimal TotalPrice => Quantity * UnitPrice;
+    public decimal TotalValue() => Quantity * UnitPrice;
 }

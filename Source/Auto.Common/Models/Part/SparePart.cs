@@ -1,4 +1,4 @@
-﻿using Auto.Common.Models.Cars;
+﻿using Auto.Common.Models.Vehicles;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
@@ -27,14 +27,8 @@ public class SparePart
     /// <summary>
     /// Tên phụ tùng.
     /// </summary>
-    [StringLength(100, ErrorMessage = "Part name must not exceed 100 characters.")]
+    [Required, StringLength(100, ErrorMessage = "Part name must not exceed 100 characters.")]
     public string PartName { get; set; } = string.Empty;
-
-    /// <summary>
-    /// Loại phụ tùng.
-    /// </summary>
-    [StringLength(50, ErrorMessage = "Part type must not exceed 50 characters.")]
-    public string PartType { get; set; } = string.Empty;
 
     /// <summary>
     /// Giá nhập phụ tùng.
@@ -43,7 +37,7 @@ public class SparePart
     public decimal PurchasePrice { get; set; }
 
     /// <summary>
-    /// Giá bán của phụ tùng.
+    /// Giá bán của phụ tùng (phải lớn hơn hoặc bằng giá nhập).
     /// </summary>
     [Range(0.01, double.MaxValue, ErrorMessage = "Selling price must be greater than 0.")]
     public decimal SellingPrice { get; set; }
@@ -51,7 +45,7 @@ public class SparePart
     /// <summary>
     /// Số lượng tồn kho của phụ tùng.
     /// </summary>
-    [Range(0, int.MaxValue, ErrorMessage = "Inventory quantity must be a positive integer.")]
+    [Range(0, int.MaxValue, ErrorMessage = "Inventory quantity must be a non-negative integer.")]
     public int InventoryQuantity { get; set; }
 
     /// <summary>
@@ -60,12 +54,29 @@ public class SparePart
     public bool IsDiscontinued { get; set; } = false;
 
     /// <summary>
-    ///  Phụ tùng phù hợp với hãng xe nào.
+    /// Phụ tùng phù hợp với các hãng xe.
     /// </summary>
-    public List<CarBrand> CompatibleBrands { get; set; } = [];
+    public HashSet<CarBrand> CompatibleBrands { get; set; } = [];
 
     /// <summary>
-    ///  Phụ tùng dùng được cho xe nào.
+    /// Phụ tùng dùng được cho các dòng xe cụ thể.
     /// </summary>
-    public List<string> CompatibleModels { get; set; } = [];
+    public HashSet<string> CompatibleModels { get; set; } = [];
+
+    /// <summary>
+    /// Kiểm tra hợp lệ khi khởi tạo hoặc cập nhật phụ tùng.
+    /// </summary>
+    /// <returns>Danh sách lỗi (nếu có).</returns>
+    public List<string> Validate()
+    {
+        List<string> errors = [];
+
+        if (SellingPrice < PurchasePrice)
+            errors.Add("Selling price cannot be lower than purchase price.");
+
+        if (InventoryQuantity < 0)
+            errors.Add("Inventory quantity cannot be negative.");
+
+        return errors;
+    }
 }
