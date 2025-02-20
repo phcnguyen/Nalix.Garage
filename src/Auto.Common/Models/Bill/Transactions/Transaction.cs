@@ -17,10 +17,9 @@ public class Transaction
 
     /// <summary>
     /// Mã hóa đơn liên quan đến giao dịch (nếu có)
-    /// - Null nếu không liên kết với hóa đơn cụ thể.
+    /// - (-1) nếu không liên kết với hóa đơn cụ thể.
     /// </summary>
-    [Key]
-    public int? InvoiceId { get; set; }
+    public int InvoiceId { get; set; } = -1;
 
     /// <summary>
     /// Loại giao dịch

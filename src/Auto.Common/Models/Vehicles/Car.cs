@@ -19,7 +19,7 @@ public class Car
     /// <summary>
     /// Id chủ xe.
     /// </summary>
-    [Key]
+    [Required]
     public int OwnerId { get; set; }
 
     /// <summary>

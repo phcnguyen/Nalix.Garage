@@ -18,7 +18,7 @@ public class SparePart
     /// <summary>
     /// Id nhà cung cấp của phụ tùng.
     /// </summary>
-    [Key]
+    [Required]
     public int SupplierId { get; set; }
 
     /// <summary>

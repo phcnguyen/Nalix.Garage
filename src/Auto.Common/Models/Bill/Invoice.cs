@@ -25,8 +25,14 @@ public class Invoice
     /// <summary>
     /// Id chủ xe.
     /// </summary>
-    [Key]
+    [Required]
     public int OwnerId { get; set; }
+
+    /// <summary>
+    /// Mã xe liên quan đến lịch sử sửa chữa.
+    /// </summary>
+    [Required]
+    public int CarId { get; set; }
 
     /// <summary>
     /// Số hóa đơn (mã duy nhất).

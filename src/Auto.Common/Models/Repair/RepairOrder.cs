@@ -20,19 +20,19 @@ public class RepairOrder
     /// <summary>
     /// Id hóa đơn.
     /// </summary>
-    [Key]
+    [Required]
     public int InvoiceId { get; set; }
 
     /// <summary>
     /// Id chủ xe.
     /// </summary>
-    [Key]
+    [Required]
     public int OwnerId { get; set; }
 
     /// <summary>
     /// Mã xe liên quan đến đơn sửa chữa.
     /// </summary>
-    [Key]
+    [Required]
     public int CarId { get; set; }
 
     /// <summary>

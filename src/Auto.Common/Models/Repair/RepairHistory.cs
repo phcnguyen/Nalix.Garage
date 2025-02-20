@@ -19,7 +19,7 @@ public class RepairHistory
     /// <summary>
     /// Mã xe liên quan đến lịch sử sửa chữa.
     /// </summary>
-    [Key]
+    [Required]
     public int CarId { get; set; }
 
     /// <summary>
