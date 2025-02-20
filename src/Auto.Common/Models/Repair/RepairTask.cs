@@ -17,6 +17,7 @@ public class RepairTask
     /// <summary>
     /// Nhân viên thực hiện công việc sửa chữa.
     /// </summary>
+    [Required]
     public int EmployeeId { get; set; }
 
     /// <summary>
