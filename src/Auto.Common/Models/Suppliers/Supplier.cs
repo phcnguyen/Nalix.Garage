@@ -39,7 +39,7 @@ public class Supplier
     /// <summary>
     /// Danh sách số điện thoại của nhà cung cấp.
     /// </summary>
-    public List<string> PhoneNumbers { get; set; } = new();
+    public List<string> PhoneNumbers { get; set; } = [];
 
     /// <summary>
     /// Tài khoản ngân hàng để thanh toán.

@@ -28,13 +28,13 @@ public class ServiceItem
     /// Số lượng dịch vụ.
     /// </summary>
     [Range(1, int.MaxValue, ErrorMessage = "Quantity must be at least 1.")]
-    public int Quantity { get; set; }
+    public int Quantity { get; set; } = 1;
 
     /// <summary>
     /// Đơn giá của dịch vụ.
     /// </summary>
     [Range(0.01, double.MaxValue, ErrorMessage = "Unit price must be greater than zero.")]
-    public decimal UnitPrice { get; set; }
+    public decimal UnitPrice { get; set; } = 50_000;
 
     /// <summary>
     /// Tính tổng giá của dịch vụ.

@@ -28,7 +28,7 @@ public class RepairTask
     /// Đơn giá của công việc sửa chữa.
     /// </summary>
     [Range(0.01, double.MaxValue, ErrorMessage = "Unit price must be greater than zero.")]
-    public decimal UnitPrice { get; set; }
+    public decimal UnitPrice { get; set; } = 100_000;
 
     /// <summary>
     /// Ngày bắt đầu công việc.
@@ -44,7 +44,7 @@ public class RepairTask
     /// Thời gian ước tính để hoàn thành công việc (tính bằng giờ).
     /// </summary>
     [Range(0, double.MaxValue, ErrorMessage = "Duration must be positive.")]
-    public double EstimatedDuration { get; set; }
+    public double EstimatedDuration { get; set; } = TimeSpan.FromHours(1).TotalHours;
 
     /// <summary>
     /// Trạng thái công việc sửa chữa.

@@ -1,5 +1,5 @@
-﻿using Auto.Common.Models.Vehicles;
-using Auto.Common.Models.Repair;
+﻿using Auto.Common.Models.Repair;
+using Auto.Common.Models.Vehicles;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -24,13 +24,6 @@ public class Customer
     public string FullName { get; set; }
 
     /// <summary>
-    /// Email của khách hàng.
-    /// </summary>
-    [EmailAddress(ErrorMessage = "Invalid email format.")]
-    [StringLength(100, ErrorMessage = "Email must not exceed 100 characters.")]
-    public string Email { get; set; } // Optional email field
-
-    /// <summary>
     /// Số điện thoại của khách hàng.
     /// </summary>
     [Required(ErrorMessage = "Phone number is required.")]
@@ -39,10 +32,17 @@ public class Customer
     public string PhoneNumber { get; set; }
 
     /// <summary>
+    /// Email của khách hàng.
+    /// </summary>
+    [EmailAddress(ErrorMessage = "Invalid email format.")]
+    [StringLength(100, ErrorMessage = "Email must not exceed 100 characters.")]
+    public string Email { get; set; } = string.Empty;
+
+    /// <summary>
     /// Địa chỉ của khách hàng.
     /// </summary>
     [StringLength(255, ErrorMessage = "Address must not exceed 255 characters.")]
-    public string Address { get; set; }
+    public string Address { get; set; } = string.Empty;
 
     /// <summary>
     /// Sinh nhật của khách hàng.
@@ -69,15 +69,15 @@ public class Customer
     /// Công nợ của khách hàng.
     /// </summary>
     [Range(0, double.MaxValue, ErrorMessage = "Debt cannot be negative.")]
-    public decimal Debt { get; set; }
+    public decimal Debt { get; set; } = 0;
 
     /// <summary>
     /// Danh sách xe của khách hàng.
     /// </summary>
-    public virtual List<Car> CarList { get; set; }
+    public virtual List<Car> CarList { get; set; } = [];
 
     /// <summary>
     /// Lịch sử sửa chữa của khách hàng.
     /// </summary>
-    public virtual List<RepairHistory> RepairHistory { get; set; }
+    public virtual List<RepairHistory> RepairHistory { get; set; } = [];
 }

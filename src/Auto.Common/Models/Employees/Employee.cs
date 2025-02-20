@@ -32,13 +32,6 @@ public class Employee
     public string FullName { get; set; }
 
     /// <summary>
-    /// Địa chỉ email của nhân viên.
-    /// </summary>
-    [EmailAddress(ErrorMessage = "Invalid email format.")]
-    [StringLength(100, ErrorMessage = "Email must not exceed 100 characters.")]
-    public string Email { get; set; } // Optional email field
-
-    /// <summary>
     /// Số điện thoại của nhân viên.
     /// </summary>
     [Phone(ErrorMessage = "Invalid phone number format.")]
@@ -47,10 +40,17 @@ public class Employee
     public string PhoneNumber { get; set; }
 
     /// <summary>
+    /// Địa chỉ email của nhân viên.
+    /// </summary>
+    [EmailAddress(ErrorMessage = "Invalid email format.")]
+    [StringLength(100, ErrorMessage = "Email must not exceed 100 characters.")]
+    public string Email { get; set; } = string.Empty;
+
+    /// <summary>
     /// Ngày sinh của nhân viên.
     /// </summary>
     [Required(ErrorMessage = "Birth date is required.")]
-    public DateTime BirthDate { get; set; }
+    public DateTime? BirthDate { get; set; }
 
     /// <summary>
     /// NGiới tính của nhân viên.

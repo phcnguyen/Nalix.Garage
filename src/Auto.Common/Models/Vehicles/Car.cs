@@ -24,7 +24,7 @@ public class Car
     /// Biển số xe.
     /// </summary>
     [StringLength(10, ErrorMessage = "License plate must not exceed 10 characters.")]
-    public string LicensePlate { get; set; }
+    public string LicensePlate { get; set; } = "72G-00000";
 
     /// <summary>
     /// Hãng xe.
@@ -35,7 +35,7 @@ public class Car
     /// Model xe.
     /// </summary>
     [StringLength(50, ErrorMessage = "Car model must not exceed 50 characters.")]
-    public string CarModel { get; set; }
+    public string CarModel { get; set; } = "Unknown";
 
     /// <summary>
     /// Màu sắc.
@@ -46,13 +46,13 @@ public class Car
     /// Số khung.
     /// </summary>
     [StringLength(20, ErrorMessage = "Frame number must not exceed 20 characters.")]
-    public string FrameNumber { get; set; }
+    public string FrameNumber { get; set; } = "Unknown";
 
     /// <summary>
     /// Số máy.
     /// </summary>
     [StringLength(20, ErrorMessage = "Engine number must not exceed 20 characters.")]
-    public string EngineNumber { get; set; }
+    public string EngineNumber { get; set; } = "Unknown";
 
     /// <summary>
     /// Lịch sử sửa chữa của xe.
@@ -78,5 +78,5 @@ public class Car
     /// <summary>
     /// Ngày hết hạn bảo hiểm.
     /// </summary>
-    public DateTime InsuranceExpiryDate { get; set; }
+    public DateTime? InsuranceExpiryDate { get; set; }
 }
