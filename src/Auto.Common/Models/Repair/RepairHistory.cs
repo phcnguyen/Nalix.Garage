@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 
 namespace Auto.Common.Models.Repair;
@@ -12,11 +13,13 @@ public class RepairHistory
     /// <summary>
     /// Mã lịch sử sửa chữa.
     /// </summary>
+    [Key]
     public int HistoryId { get; set; }
 
     /// <summary>
     /// Mã xe liên quan đến lịch sử sửa chữa.
     /// </summary>
+    [Key]
     public int CarId { get; set; }
 
     /// <summary>

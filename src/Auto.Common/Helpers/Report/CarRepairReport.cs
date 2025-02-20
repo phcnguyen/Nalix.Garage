@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Auto.Common.Models.Report;
+namespace Auto.Common.Helpers.Report;
 
 /// <summary>
 /// Lớp đại diện cho báo cáo sửa chữa xe.

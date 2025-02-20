@@ -11,11 +11,13 @@ public class RepairTask
     /// <summary>
     /// Mã công việc sửa chữa.
     /// </summary>
+    [Key]
     public int RepairTaskId { get; set; }
 
     /// <summary>
     /// Nhân viên thực hiện công việc sửa chữa.
     /// </summary>
+    [Key]
     public int EmployeeId { get; set; }
 
     /// <summary>

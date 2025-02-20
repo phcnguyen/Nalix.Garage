@@ -1,7 +1,8 @@
-﻿using Auto.Common.Models.Part;
+﻿using Auto.Common.Models.Bill.Transactions;
+using Auto.Common.Models.Part;
 using Auto.Common.Models.Payments;
+using Auto.Common.Models.Repair;
 using Auto.Common.Models.Service;
-using Auto.Common.Models.Transactions;
 using Auto.Common.Models.Vehicles;
 using System;
 using System.Collections.Generic;
@@ -18,11 +19,13 @@ public class Invoice
     /// <summary>
     /// Mã hóa đơn.
     /// </summary>
+    [Key]
     public int InvoiceId { get; set; }
 
     /// <summary>
     /// Id chủ xe.
     /// </summary>
+    [Key]
     public int OwnerId { get; set; }
 
     /// <summary>
@@ -99,6 +102,11 @@ public class Invoice
     public virtual List<SparePart> SpareParts { get; set; } = [];
 
     /// <summary>
+    /// Danh sách cho đơn sửa chữa.
+    /// </summary>
+    public virtual List<RepairOrder> RepairOrder { get; set; } = [];
+
+    /// <summary>
     /// Danh sách dịch vụ thực hiện.
     /// </summary>
     public virtual List<ServiceItem> ServiceItems { get; set; } = [];
@@ -111,33 +119,27 @@ public class Invoice
     /// <summary>
     /// Tổng tiền trước thuế và giảm giá.
     /// </summary>
-    public decimal GetSubtotal() =>
-        Math.Max(0, (ServiceItems?.Sum(s => s.GetTotalPrice()) ?? 0) +
-                    (SpareParts?.Sum(p => p.SellingPrice) ?? 0));
-
-    public decimal GetTaxRate() => (decimal)TaxRate / 100;
-
-    /// <summary>
-    /// Số tiền giảm giá thực tế.
-    /// </summary>
-    public decimal DiscountAmount()
-    {
-        decimal subtotal = GetSubtotal();
-        if (DiscountType == DiscountType.Percentage)
-            return Math.Clamp(Discount, 0, 100) * subtotal / 100;
-
-        return Math.Min(Discount, subtotal);
-    }
+    public decimal Subtotal { get; set; }
 
     /// <summary>
     /// Số tiền thuế thực tế.
     /// </summary>
-    public decimal TaxAmount() => Math.Max(0, (GetSubtotal() - DiscountAmount()) * GetTaxRate());
+    public decimal TaxAmount { get; set; }
+
+    /// <summary>
+    /// Số tiền giảm giá thực tế.
+    /// </summary>
+    public decimal DiscountAmount { get; set; }
 
     /// <summary>
     /// Tổng số tiền cần thanh toán sau thuế và giảm giá.
     /// </summary>
-    public decimal TotalDue() => Math.Max(0, GetSubtotal() - DiscountAmount() + TaxAmount());
+    public decimal TotalAmount { get; set; }
+
+    /// <summary>
+    /// Số tiền còn nợ.
+    /// </summary>
+    public decimal BalanceDue => TotalAmount - TransactionList.Sum(t => t.Amount);
 
     /// <summary>
     /// Số tiền khách đã thanh toán.
@@ -146,8 +148,13 @@ public class Invoice
         .Where(t => t.Type == TransactionType.Revenue)
         .Sum(t => t.Amount) ?? 0);
 
-    /// <summary>
-    /// Số tiền còn nợ.
-    /// </summary>
-    public decimal BalanceDue() => Math.Max(0, TotalDue() - AmountPaid());
+    public void UpdateTotals()
+    {
+        Subtotal = (ServiceItems?.Sum(s => s.UnitPrice * s.Quantity) ?? 0) +
+                   (SpareParts?.Sum(p => p.SellingPrice) ?? 0);
+
+        DiscountAmount = DiscountType == DiscountType.Percentage ? Subtotal * Discount : Discount;
+        TaxAmount = (Subtotal - DiscountAmount) * ((decimal)TaxRate / 100);
+        TotalAmount = Subtotal - DiscountAmount + TaxAmount;
+    }
 }

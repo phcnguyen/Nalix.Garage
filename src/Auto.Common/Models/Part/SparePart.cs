@@ -12,11 +12,13 @@ public class SparePart
     /// <summary>
     /// Mã phụ tùng.
     /// </summary>
+    [Key]
     public int PartId { get; set; }
 
     /// <summary>
     /// Id nhà cung cấp của phụ tùng.
     /// </summary>
+    [Key]
     public int SupplierId { get; set; }
 
     /// <summary>

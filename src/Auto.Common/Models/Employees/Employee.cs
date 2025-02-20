@@ -15,6 +15,7 @@ public class Employee
     /// <summary>
     /// Mã định danh duy nhất của nhân viên.
     /// </summary>
+    [Key]
     public int EmployeeId { get; set; }
 
     /// <summary>

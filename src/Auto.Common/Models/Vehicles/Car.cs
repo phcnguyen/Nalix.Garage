@@ -13,11 +13,13 @@ public class Car
     /// <summary>
     /// Mã xe.
     /// </summary>
+    [Key]
     public int CarId { get; set; }
 
     /// <summary>
     /// Id chủ xe.
     /// </summary>
+    [Key]
     public int OwnerId { get; set; }
 
     /// <summary>

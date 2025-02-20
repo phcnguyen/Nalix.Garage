@@ -14,6 +14,7 @@ public class Supplier
     /// <summary>
     /// Mã nhà cung cấp (Unique identifier).
     /// </summary>
+    [Key]
     public int SupplierId { get; set; }
 
     /// <summary>

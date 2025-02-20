@@ -10,6 +10,7 @@ public class ServiceItem
     /// <summary>
     /// Mã dịch vụ (Unique Identifier).
     /// </summary>
+    [Key]
     public int ServiceId { get; set; }
 
     /// <summary>

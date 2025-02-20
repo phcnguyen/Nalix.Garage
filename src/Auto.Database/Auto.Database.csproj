@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<Platforms>AnyCPU</Platforms>
+		<OutputType>Library</OutputType>
+		<TargetFramework>net9.0</TargetFramework>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+		<Optimize>true</Optimize>
+		<Deterministic>true</Deterministic>
+		<UseCompression>true</UseCompression>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\Auto.Common\Auto.Common.csproj" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.2" />
+	</ItemGroup>
+</Project>

@@ -3,6 +3,7 @@ using Auto.Common.Models.Vehicles;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Auto.Common.Models.Customers;
 
@@ -14,6 +15,8 @@ public class Customer
     /// <summary>
     /// Mã khách hàng.
     /// </summary>
+    [Key]
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int CustomerId { get; set; }
 
     /// <summary>

@@ -1,6 +1,7 @@
 ﻿using Auto.Common.Models.Part;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 
 namespace Auto.Common.Models.Repair;
@@ -13,16 +14,25 @@ public class RepairOrder
     /// <summary>
     /// Mã đơn sửa chữa.
     /// </summary>
+    [Key]
     public int RepairOrderId { get; set; }
+
+    /// <summary>
+    /// Id hóa đơn.
+    /// </summary>
+    [Key]
+    public int InvoiceId { get; set; }
 
     /// <summary>
     /// Id chủ xe.
     /// </summary>
+    [Key]
     public int OwnerId { get; set; }
 
     /// <summary>
     /// Mã xe liên quan đến đơn sửa chữa.
     /// </summary>
+    [Key]
     public int CarId { get; set; }
 
     /// <summary>

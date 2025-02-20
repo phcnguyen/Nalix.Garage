@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Auto.Common.Models.Report;
+namespace Auto.Common.Helpers.Report;
 
 /// <summary>
 /// Lớp đại diện cho báo cáo tồn kho phụ tùng.

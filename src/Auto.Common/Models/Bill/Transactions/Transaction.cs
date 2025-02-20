@@ -2,7 +2,7 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace Auto.Common.Models.Transactions;
+namespace Auto.Common.Models.Bill.Transactions;
 
 /// <summary>
 /// Đại diện cho một giao dịch tài chính, bao gồm các thông tin về số tiền, phương thức thanh toán và trạng thái.
@@ -12,12 +12,14 @@ public class Transaction
     /// <summary>
     /// Mã giao dịch duy nhất trong hệ thống.
     /// </summary>
+    [Key]
     public int TransactionId { get; set; }
 
     /// <summary>
     /// Mã hóa đơn liên quan đến giao dịch (nếu có)
     /// - Null nếu không liên kết với hóa đơn cụ thể.
     /// </summary>
+    [Key]
     public int? InvoiceId { get; set; }
 
     /// <summary>

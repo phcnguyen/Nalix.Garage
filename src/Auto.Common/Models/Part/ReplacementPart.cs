@@ -11,6 +11,7 @@ public class ReplacementPart
     /// <summary>
     /// Mã phụ tùng thay thế.
     /// </summary>
+    [Key]
     public int PartId { get; set; }
 
     /// <summary>

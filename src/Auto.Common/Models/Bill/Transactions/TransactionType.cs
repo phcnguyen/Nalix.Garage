@@ -1,4 +1,4 @@
-﻿namespace Auto.Common.Models.Transactions;
+﻿namespace Auto.Common.Models.Bill.Transactions;
 
 /// <summary>
 /// Xác định các loại giao dịch tài chính trong hệ thống.
