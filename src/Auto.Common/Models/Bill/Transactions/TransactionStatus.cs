@@ -9,17 +9,17 @@ public enum TransactionStatus
     /// Giao dịch đang chờ xử lý.
     /// - Hệ thống chưa hoàn tất việc xác nhận hoặc chưa nhận được phản hồi từ cổng thanh toán.
     /// </summary>
-    Pending,
+    Pending = 1,
 
     /// <summary>
     /// Giao dịch đã được xử lý thành công.
     /// - Tiền đã được chuyển hoặc nhận đúng như yêu cầu.
     /// </summary>
-    Completed,
+    Completed = 2,
 
     /// <summary>
     /// Giao dịch không thành công.
     /// - Có thể do lỗi hệ thống, không đủ tiền, hoặc bị từ chối bởi cổng thanh toán.
     /// </summary>
-    Failed
+    Failed = 3
 }

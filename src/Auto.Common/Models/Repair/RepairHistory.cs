@@ -35,5 +35,5 @@ public class RepairHistory
     /// <summary>
     /// Tổng chi phí sửa chữa.
     /// </summary>
-    public decimal TotalCost() => RepairTaskList.Sum(task => task.UnitPrice);
+    public decimal TotalCost() => RepairTaskList.Sum(task => task.ServiceItem.UnitPrice);
 }

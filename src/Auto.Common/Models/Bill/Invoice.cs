@@ -2,7 +2,6 @@
 using Auto.Common.Models.Part;
 using Auto.Common.Models.Payments;
 using Auto.Common.Models.Repair;
-using Auto.Common.Models.Service;
 using Auto.Common.Models.Vehicles;
 using System;
 using System.Collections.Generic;
@@ -29,15 +28,10 @@ public class Invoice
     public int OwnerId { get; set; }
 
     /// <summary>
-    /// Mã xe liên quan đến lịch sử sửa chữa.
-    /// </summary>
-    [Required]
-    public int CarId { get; set; }
-
-    /// <summary>
     /// Số hóa đơn (mã duy nhất).
     /// </summary>
     [Required(ErrorMessage = "Invoice number is required.")]
+    [StringLength(50)]
     public string InvoiceNumber { get; set; }
 
     /// <summary>
@@ -110,12 +104,7 @@ public class Invoice
     /// <summary>
     /// Danh sách cho đơn sửa chữa.
     /// </summary>
-    public virtual List<RepairOrder> RepairOrder { get; set; } = [];
-
-    /// <summary>
-    /// Danh sách dịch vụ thực hiện.
-    /// </summary>
-    public virtual List<ServiceItem> ServiceItems { get; set; } = [];
+    public virtual List<RepairOrder> RepairOrders { get; set; } = [];
 
     /// <summary>
     /// Danh sách các giao dịch thanh toán.
@@ -154,12 +143,14 @@ public class Invoice
         .Where(t => t.Type == TransactionType.Revenue)
         .Sum(t => t.Amount) ?? 0);
 
+    /// <summary>
+    /// Cập nhật tổng tiền, thuế và giảm giá.
+    /// </summary>
     public void UpdateTotals()
     {
-        Subtotal = (ServiceItems?.Sum(s => s.UnitPrice * s.Quantity) ?? 0) +
-                   (SpareParts?.Sum(p => p.SellingPrice) ?? 0);
+        Subtotal = (SpareParts?.Sum(p => p.SellingPrice) ?? 0);
 
-        DiscountAmount = DiscountType == DiscountType.Percentage ? Subtotal * Discount : Discount;
+        DiscountAmount = DiscountType == DiscountType.Percentage ? Subtotal * Discount / 100 : Discount;
         TaxAmount = (Subtotal - DiscountAmount) * ((decimal)TaxRate / 100);
         TotalAmount = Subtotal - DiscountAmount + TaxAmount;
     }

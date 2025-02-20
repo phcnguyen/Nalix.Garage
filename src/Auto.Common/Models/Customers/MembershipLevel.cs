@@ -1,32 +1,30 @@
-﻿namespace Auto.Common.Models.Customers;
+﻿using System.ComponentModel;
+
+namespace Auto.Common.Models.Customers;
 
 /// <summary>
-/// Enum đại diện cho cấp độ thành viên.
+/// Enum đại diện cho cấp độ thành viên trong hệ thống.
 /// </summary>
-public enum MembershipLevel
+public enum MembershipLevel : byte
 {
-    /// <summary>
-    /// Không xác định hoặc chưa đăng ký.
-    /// </summary>
+    [Description("Không xác định / Chưa đăng ký")]
     None = 0,
 
-    /// <summary>
-    /// Khách thường.
-    /// </summary>
-    Standard = 1,
+    [Description("Khách dùng thử")]
+    Trial = 1,
 
-    /// <summary>
-    /// Thành viên bạc.
-    /// </summary>
-    Silver = 2,
+    [Description("Khách thường")]
+    Standard = 2,
 
-    /// <summary>
-    /// Thành viên vàng.
-    /// </summary>
-    Gold = 3,
+    [Description("Thành viên bạc")]
+    Silver = 3,
 
-    /// <summary>
-    /// Thành viên cao cấp.
-    /// </summary>
-    Platinum = 4
+    [Description("Thành viên vàng")]
+    Gold = 4,
+
+    [Description("Thành viên bạch kim")]
+    Platinum = 5,
+
+    [Description("Thành viên kim cương (VIP)")]
+    Diamond = 6
 }

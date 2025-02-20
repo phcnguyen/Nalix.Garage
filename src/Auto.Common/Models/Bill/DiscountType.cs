@@ -8,17 +8,17 @@ public enum DiscountType
     /// <summary>
     /// Không áp dụng giảm giá.
     /// </summary>
-    None,
+    None = 0,
 
     /// <summary>
     /// Giảm giá theo phần trăm (%) trên tổng hóa đơn.
     /// Ví dụ: 10% sẽ giảm 10% trên tổng số tiền.
     /// </summary>
-    Percentage,
+    Percentage = 1,
 
     /// <summary>
     /// Giảm giá theo một số tiền cố định.
     /// Ví dụ: Giảm trực tiếp 50,000 VNĐ trên tổng hóa đơn.
     /// </summary>
-    Amount
+    Amount = 2
 }

@@ -1,48 +1,65 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace Auto.Common.Models.Employees;
 
 /// <summary>
-/// Đại diện cho lịch làm việc của nhân viên.
+/// Lớp đại diện cho lịch làm việc của nhân viên.
 /// </summary>
-/// <param name="date">Ngày làm việc hoặc nghỉ phép.</param>
-/// <param name="isWorking">Trạng thái làm việc.</param>
-/// <param name="isOnLeave">Trạng thái nghỉ phép.</param>
-/// <param name="leaveType">Loại nghỉ phép (mặc định là <see cref="LeaveType.None"/>).</param>
-public class WorkSchedule(DateOnly date, bool isWorking, bool isOnLeave, LeaveType leaveType = LeaveType.None)
+public class WorkSchedule
 {
-    public WorkSchedule() : this(default, default, default, LeaveType.None)
+    /// <summary>
+    /// Mã lịch làm việc.
+    /// </summary>
+    [Key]
+    public int WorkScheduleId { get; set; }
+
+    /// <summary>
+    /// Mã nhân viên.
+    /// </summary>
+    [Required]
+    public int EmployeeId { get; set; }
+
+    /// <summary>
+    /// Ngày làm việc.
+    /// </summary>
+    [Required]
+    public DateTime WorkDate { get; set; }
+
+    /// <summary>
+    /// Giờ bắt đầu.
+    /// </summary>
+    [Required]
+    public TimeSpan StartTime { get; set; }
+
+    /// <summary>
+    /// Giờ kết thúc.
+    /// </summary>
+    [Required]
+    public TimeSpan EndTime { get; set; }
+
+    /// <summary>
+    /// Trạng thái làm việc (ví dụ: Đang làm việc, Nghỉ phép).
+    /// </summary>
+    [StringLength(50)]
+    public string Status { get; set; }
+
+    /// <summary>
+    /// Ghi chú.
+    /// </summary>
+    [StringLength(200)]
+    public string Notes { get; set; }
+
+    /// <summary>
+    /// Tính tổng số giờ làm việc.
+    /// </summary>
+    public double TotalHours => (EndTime - StartTime).TotalHours;
+
+    /// <summary>
+    /// Cập nhật trạng thái lịch làm việc.
+    /// </summary>
+    public void UpdateStatus(string newStatus)
     {
+        Status = newStatus;
     }
-
-    /// <summary>
-    /// Ngày làm việc hoặc nghỉ phép.
-    /// </summary>
-    public DateOnly Date { get; set; } = date;
-
-    /// <summary>
-    /// Xác định nhân viên có làm việc trong ngày này không.
-    /// - `true`: Nhân viên đi làm.
-    /// - `false`: Nhân viên không làm việc (có thể do nghỉ phép hoặc ngày nghỉ theo quy định).
-    /// </summary>
-    public bool IsWorking { get; set; } = isWorking;
-
-    /// <summary>
-    /// Xác định nhân viên có nghỉ phép trong ngày này không.
-    /// - `true`: Nhân viên đang nghỉ phép.
-    /// - `false`: Không phải ngày nghỉ phép (có thể là ngày làm việc hoặc ngày nghỉ chung).
-    /// </summary>
-    public bool IsOnLeave { get; set; } = isOnLeave;
-
-    /// <summary>
-    /// Loại nghỉ phép của nhân viên (nếu có).
-    /// Mặc định là <see cref="LeaveType.None"/> nếu không phải ngày nghỉ phép.
-    /// </summary>
-    public LeaveType LeaveType { get; set; } = leaveType;
-
-    /// <summary>
-    /// Hiển thị thông tin lịch làm việc dưới dạng chuỗi.
-    /// </summary>
-    public override string ToString()
-        => $"{Date}: {(IsWorking ? "Working" : "Off")} {(IsOnLeave ? $"- {LeaveType}" : "")}";
 }

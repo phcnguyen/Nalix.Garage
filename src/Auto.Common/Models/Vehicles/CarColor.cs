@@ -1,62 +1,66 @@
-﻿namespace Auto.Common.Models.Vehicles;
+﻿using System.ComponentModel;
+
+namespace Auto.Common.Models.Vehicles;
 
 /// <summary>
 /// Enum định nghĩa các màu xe phổ biến.
 /// </summary>
-public enum CarColor
+public enum CarColor : byte
 {
-    /// <summary>
-    /// Màu xe không xác định.
-    /// </summary>
-    None,
+    [Description("Không xác định")]
+    None = 0,
 
-    /// <summary>
-    /// Màu xe Đen.
-    /// </summary>
-    Black,
+    [Description("Đen")]
+    Black = 1,
 
-    /// <summary>
-    /// Màu xe Trắng.
-    /// </summary>
-    White,
+    [Description("Trắng")]
+    White = 2,
 
-    /// <summary>
-    /// Màu xe Xanh.
-    /// </summary>
-    Blue,
+    [Description("Xanh dương")]
+    Blue = 3,
 
-    /// <summary>
-    /// Màu xe Đỏ.
-    /// </summary>
-    Red,
+    [Description("Đỏ")]
+    Red = 4,
 
-    /// <summary>
-    /// Màu xe Bạc.
-    /// </summary>
-    Silver,
+    [Description("Bạc")]
+    Silver = 5,
 
-    /// <summary>
-    /// Màu xe Vàng.
-    /// </summary>
-    Yellow,
+    [Description("Vàng")]
+    Yellow = 6,
 
-    /// <summary>
-    /// Màu xe Xám.
-    /// </summary>
-    Gray,
+    [Description("Xám")]
+    Gray = 7,
 
-    /// <summary>
-    /// Màu xe Xanh lá.
-    /// </summary>
-    Green,
+    [Description("Xanh lá")]
+    Green = 8,
 
-    /// <summary>
-    /// Màu xe Nâu.
-    /// </summary>
-    Brown,
+    [Description("Nâu")]
+    Brown = 9,
 
-    /// <summary>
-    /// Màu xe Cam.
-    /// </summary>
-    Orange
+    [Description("Cam")]
+    Orange = 10,
+
+    [Description("Tím")]
+    Purple = 11,
+
+    [Description("Hồng")]
+    Pink = 12,
+
+    [Description("Xanh ngọc (Cyan)")]
+    Cyan = 13,
+
+    [Description("Hồng đậm (Magenta)")]
+    Magenta = 14,
+
+    [Description("Be (Kem)")]
+    Beige = 15,
+
+    [Description("Đồng")]
+    Copper = 16,
+
+    [Description("Vàng Champagne")]
+    Champagne = 17,
+
+    [Description("khác")]
+    Other = 255
 }

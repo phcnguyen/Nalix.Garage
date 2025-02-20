@@ -43,6 +43,21 @@ public class Supplier
     public List<string> PhoneNumbers { get; set; } = [];
 
     /// <summary>
+    /// Ghi chú về nhà cung cấp.
+    /// </summary>
+    public string Notes { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Ngày kết thúc hợp tác (nếu có).
+    /// </summary>
+    public DateTime? ContractEndDate { get; set; }
+
+    /// <summary>
+    /// Ngày bắt đầu hợp tác với nhà cung cấp.
+    /// </summary>
+    public DateTime ContractStartDate { get; set; } = DateTime.UtcNow;
+
+    /// <summary>
     /// Tài khoản ngân hàng để thanh toán.
     /// </summary>
     [StringLength(50, ErrorMessage = "Bank account must not exceed 50 characters.")]
@@ -55,29 +70,14 @@ public class Supplier
     public string TaxCode { get; set; } = string.Empty;
 
     /// <summary>
-    /// Điều khoản thanh toán.
-    /// </summary>
-    public PaymentTerms PaymentTerms { get; set; } = PaymentTerms.Unknown;
-
-    /// <summary>
     /// Trạng thái của nhà cung cấp (Hoạt động, Ngừng hợp tác,...).
     /// </summary>
     public SupplierStatus Status { get; set; } = SupplierStatus.Active;
 
     /// <summary>
-    /// Ngày bắt đầu hợp tác với nhà cung cấp.
+    /// Điều khoản thanh toán.
     /// </summary>
-    public DateTime ContractStartDate { get; set; } = DateTime.UtcNow;
-
-    /// <summary>
-    /// Ngày kết thúc hợp tác (nếu có).
-    /// </summary>
-    public DateTime? ContractEndDate { get; set; }
-
-    /// <summary>
-    /// Ghi chú về nhà cung cấp.
-    /// </summary>
-    public string Notes { get; set; } = string.Empty;
+    public PaymentTerms PaymentTerms { get; set; } = PaymentTerms.None;
 
     /// <summary>
     /// Những loại phụ tùng cung cấp.

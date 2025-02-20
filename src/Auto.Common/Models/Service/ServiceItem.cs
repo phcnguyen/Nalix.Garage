@@ -17,28 +17,17 @@ public class ServiceItem
     /// Mô tả của dịch vụ.
     /// </summary>
     [Required(ErrorMessage = "Description is required.")]
-    [StringLength(255, ErrorMessage = "Description must not exceed 255 characters.")]
+    [StringLength(255 * 2, ErrorMessage = "Description must not exceed 255 characters.")]
     public string Description { get; set; } = string.Empty;
 
     /// <summary>
     /// Loại dịch vụ (Sửa chữa, Bảo dưỡng,...).
     /// </summary>
-    public ServiceType Type { get; set; } = ServiceType.Other;
-
-    /// <summary>
-    /// Số lượng dịch vụ.
-    /// </summary>
-    [Range(1, int.MaxValue, ErrorMessage = "Quantity must be at least 1.")]
-    public int Quantity { get; set; } = 1;
+    public ServiceType Type { get; set; } = ServiceType.None;
 
     /// <summary>
     /// Đơn giá của dịch vụ.
     /// </summary>
     [Range(0.01, double.MaxValue, ErrorMessage = "Unit price must be greater than zero.")]
-    public decimal UnitPrice { get; set; } = 50_000;
-
-    /// <summary>
-    /// Tính tổng giá của dịch vụ.
-    /// </summary>
-    public decimal GetTotalPrice() => Quantity * UnitPrice;
+    public decimal UnitPrice { get; set; }
 }

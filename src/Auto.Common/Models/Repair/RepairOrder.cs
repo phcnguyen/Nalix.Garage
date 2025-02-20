@@ -43,17 +43,17 @@ public class RepairOrder
     /// <summary>
     /// Danh sách công việc sửa chữa liên quan.
     /// </summary>
-    public List<RepairTask> RepairTaskList { get; set; } = [];
+    public virtual List<RepairTask> RepairTaskList { get; set; } = [];
 
     /// <summary>
     /// Danh sách phụ tùng thay thế liên quan.
     /// </summary>
-    public List<ReplacementPart> ReplacementPartList { get; set; } = [];
+    public virtual List<ReplacementPart> ReplacementPartList { get; set; } = [];
 
     /// <summary>
     /// Tổng chi phí sửa chữa.
     /// </summary>
     public decimal TotalRepairCost() =>
-        (RepairTaskList?.Sum(task => task.UnitPrice) ?? 0) +
+        (RepairTaskList?.Sum(task => task.ServiceItem.UnitPrice) ?? 0) +
         (ReplacementPartList?.Sum(part => part.UnitPrice) ?? 0);
 }

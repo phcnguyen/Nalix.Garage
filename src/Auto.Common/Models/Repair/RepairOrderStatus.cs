@@ -5,6 +5,8 @@
 /// </summary>
 public enum RepairOrderStatus
 {
+    None = 0,
+
     /// <summary>
     /// Chờ xác nhận.
     /// </summary>

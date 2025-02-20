@@ -1,4 +1,6 @@
-﻿namespace Auto.Common.Models.Payments;
+﻿using System.ComponentModel;
+
+namespace Auto.Common.Models.Payments;
 
 /// <summary>
 /// Xác định trạng thái thanh toán của hóa đơn.
@@ -7,36 +9,43 @@ public enum PaymentStatus
 {
     /// <summary>
     /// Hóa đơn chưa được thanh toán.
-    /// - Khách hàng chưa thực hiện thanh toán.
-    /// - Hóa đơn vẫn còn hiệu lực.
     /// </summary>
-    Unpaid,
+    [Description("Chưa thanh toán")]
+    Unpaid = 0,
 
     /// <summary>
     /// Hóa đơn đã được thanh toán đầy đủ.
-    /// - Không còn số dư cần thanh toán.
-    /// - Không cần thực hiện thêm hành động nào.
     /// </summary>
-    Paid,
+    [Description("Đã thanh toán")]
+    Paid = 1,
 
     /// <summary>
     /// Thanh toán đang được xử lý.
-    /// - Đã có yêu cầu thanh toán, nhưng chưa xác nhận hoàn tất.
-    /// - Có thể đang chờ ngân hàng hoặc hệ thống xử lý.
     /// </summary>
-    Pending,
+    [Description("Đang xử lý")]
+    Pending = 2,
 
     /// <summary>
     /// Hóa đơn đã quá hạn thanh toán.
-    /// - Khách hàng chưa thanh toán sau thời hạn quy định.
-    /// - Có thể áp dụng phí trễ hạn hoặc nhắc nhở thanh toán.
     /// </summary>
-    Overdue,
+    [Description("Quá hạn")]
+    Overdue = 3,
 
     /// <summary>
     /// Hóa đơn bị hủy bỏ.
-    /// - Không cần thanh toán nữa.
-    /// - Có thể do khách hàng từ chối hoặc có lỗi trong hóa đơn.
     /// </summary>
-    Canceled
+    [Description("Đã hủy")]
+    Canceled = 4,
+
+    /// <summary>
+    /// Hóa đơn đã được thanh toán một phần.
+    /// </summary>
+    [Description("Thanh toán một phần")]
+    PartiallyPaid = 5,
+
+    /// <summary>
+    /// Hóa đơn đã được hoàn tiền cho khách hàng.
+    /// </summary>
+    [Description("Đã hoàn tiền")]
+    Refunded = 6
 }

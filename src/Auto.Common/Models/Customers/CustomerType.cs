@@ -1,32 +1,33 @@
-﻿namespace Auto.Common.Models.Customers;
+﻿using System.ComponentModel;
+
+namespace Auto.Common.Models.Customers;
 
 /// <summary>
-/// Enum đại diện cho loại khách hàng.
+/// Enum đại diện cho loại khách hàng trong hệ thống.
 /// </summary>
-public enum CustomerType
+public enum CustomerType : byte
 {
-    /// <summary>
-    /// Không xác định hoặc chưa được phân loại.
-    /// </summary>
-    Unknown = 0,
+    [Description("Không xác định")]
+    None = 0,
 
-    /// <summary>
-    /// Cá nhân.
-    /// </summary>
+    [Description("Khách hàng cá nhân")]
     Individual = 1,
 
-    /// <summary>
-    /// Doanh nghiệp.
-    /// </summary>
+    [Description("Doanh nghiệp")]
     Business = 2,
 
-    /// <summary>
-    /// Chính phủ.
-    /// </summary>
+    [Description("Cơ quan chính phủ")]
     Government = 3,
 
-    /// <summary>
-    /// Loại khách hàng khác.
-    /// </summary>
-    Other = 4
+    [Description("Khách hàng sở hữu nhiều xe")]
+    Fleet = 4,
+
+    [Description("Công ty bảo hiểm")]
+    InsuranceCompany = 5,
+
+    [Description("Khách hàng VIP")]
+    VIP = 6,
+
+    [Description("Loại khách hàng khác")]
+    Other = 255
 }

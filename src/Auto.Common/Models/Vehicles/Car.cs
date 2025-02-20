@@ -37,7 +37,7 @@ public class Car
     /// Model xe.
     /// </summary>
     [StringLength(50, ErrorMessage = "Car model must not exceed 50 characters.")]
-    public string CarModel { get; set; } = "Unknown";
+    public string CarModel { get; set; } = "None";
 
     /// <summary>
     /// Màu sắc.
@@ -48,13 +48,13 @@ public class Car
     /// Số khung.
     /// </summary>
     [StringLength(20, ErrorMessage = "Frame number must not exceed 20 characters.")]
-    public string FrameNumber { get; set; } = "Unknown";
+    public string FrameNumber { get; set; } = "None";
 
     /// <summary>
     /// Số máy.
     /// </summary>
     [StringLength(20, ErrorMessage = "Engine number must not exceed 20 characters.")]
-    public string EngineNumber { get; set; } = "Unknown";
+    public string EngineNumber { get; set; } = "None";
 
     /// <summary>
     /// Lịch sử sửa chữa của xe.

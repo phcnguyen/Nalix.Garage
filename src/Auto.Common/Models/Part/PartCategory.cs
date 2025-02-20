@@ -2,121 +2,131 @@
 
 namespace Auto.Common.Models.Part;
 
-public enum PartCategory
+/// <summary>
+/// Danh mục phụ tùng ô tô.
+/// </summary>
+public enum PartCategory : byte
 {
-    None,
+    [Display(Name = "Không xác định")]
+    None = 0,
 
+    // 🔥 Động cơ & truyền động
     [Display(Name = "Phụ tùng động cơ")]
-    Engine,
-
-    [Display(Name = "Phụ tùng phanh")]
-    Brake,
+    Engine = 1,
 
     [Display(Name = "Phụ tùng truyền động")]
-    Transmission,
-
-    [Display(Name = "Phụ tùng điện")]
-    Electrical,
-
-    [Display(Name = "Phụ tùng thân xe")]
-    Body,
-
-    [Display(Name = "Hệ thống treo")]
-    Suspension,
-
-    [Display(Name = "Hệ thống làm mát")]
-    Cooling,
-
-    [Display(Name = "Hệ thống nhiên liệu")]
-    Fuel,
-
-    [Display(Name = "Hệ thống xả")]
-    Exhaust,
-
-    [Display(Name = "Hệ thống điều hòa")]
-    AirConditioning,
-
-    [Display(Name = "Hệ thống lái")]
-    Steering,
-
-    [Display(Name = "Bánh xe và lốp")]
-    WheelAndTire,
-
-    [Display(Name = "Nội thất")]
-    Interior,
-
-    [Display(Name = "Phụ tùng bảo dưỡng")]
-    Maintenance,
-
-    [Display(Name = "Hệ thống an toàn")]
-    Safety,
-
-    [Display(Name = "Hệ thống khí thải")]
-    Emissions,
-
-    [Display(Name = "Hệ thống đánh lửa")]
-    Ignition,
+    Transmission = 2,
 
     [Display(Name = "Hệ thống phun nhiên liệu")]
-    FuelInjection,
+    FuelInjection = 3,
 
     [Display(Name = "Bộ tăng áp")]
-    Turbocharger,
+    Turbocharger = 4,
 
     [Display(Name = "Hệ thống bôi trơn")]
-    Lubrication,
+    Lubrication = 5,
 
-    [Display(Name = "Gương và kính")]
-    MirrorsAndGlass,
+    [Display(Name = "Hệ thống làm mát")]
+    Cooling = 6,
 
-    [Display(Name = "Hệ thống chiếu sáng")]
-    Lighting,
+    [Display(Name = "Hệ thống nhiên liệu")]
+    Fuel = 7,
 
-    [Display(Name = "Hệ thống chống ồn")]
-    SoundDampening,
+    [Display(Name = "Hệ thống xả")]
+    Exhaust = 8,
+
+    [Display(Name = "Hệ thống đánh lửa")]
+    Ignition = 9,
+
+    // ⚡ Hệ thống điện & điều khiển
+    [Display(Name = "Phụ tùng điện")]
+    Electrical = 10,
 
     [Display(Name = "Cảm biến và mô-đun điều khiển")]
-    SensorsAndModules,
+    SensorsAndModules = 11,
 
     [Display(Name = "Hệ thống chống bó cứng phanh")]
-    ABS,
+    ABS = 12,
 
     [Display(Name = "Hệ thống ổn định điện tử")]
-    ESC,
+    ESC = 13,
 
-    [Display(Name = "Túi khí và các thiết bị an toàn")]
-    Airbags,
+    [Display(Name = "Hệ thống chiếu sáng")]
+    Lighting = 14,
 
-    [Display(Name = "Hệ thống giải trí")]
-    Entertainment,
+    // 🚗 Hệ thống an toàn
+    [Display(Name = "Phụ tùng phanh")]
+    Brake = 15,
 
-    [Display(Name = "Hệ thống định vị")]
-    Navigation,
+    [Display(Name = "Hệ thống an toàn")]
+    Safety = 16,
 
-    [Display(Name = "Hệ thống sưởi ghế")]
-    SeatHeating,
-
-    [Display(Name = "Hệ thống làm mát ghế")]
-    SeatCooling,
-
-    [Display(Name = "Phụ kiện ngoại thất")]
-    ExteriorAccessories,
-
-    [Display(Name = "Phụ kiện nội thất")]
-    InteriorAccessories,
+    [Display(Name = "Túi khí và thiết bị an toàn")]
+    Airbags = 17,
 
     [Display(Name = "Hệ thống khóa và an ninh")]
-    SecurityAndLocking,
+    SecurityAndLocking = 18,
 
+    // 🔧 Khung gầm & treo
+    [Display(Name = "Hệ thống treo")]
+    Suspension = 19,
+
+    [Display(Name = "Hệ thống lái")]
+    Steering = 20,
+
+    [Display(Name = "Bánh xe và lốp")]
+    WheelAndTire = 21,
+
+    // 🏠 Nội thất & tiện nghi
+    [Display(Name = "Hệ thống điều hòa")]
+    AirConditioning = 22,
+
+    [Display(Name = "Nội thất xe")]
+    Interior = 23,
+
+    [Display(Name = "Hệ thống giải trí")]
+    Entertainment = 24,
+
+    [Display(Name = "Hệ thống định vị")]
+    Navigation = 25,
+
+    [Display(Name = "Hệ thống sưởi ghế")]
+    SeatHeating = 26,
+
+    [Display(Name = "Hệ thống làm mát ghế")]
+    SeatCooling = 27,
+
+    // 🎭 Ngoại thất & phụ kiện
+    [Display(Name = "Phụ tùng thân xe")]
+    Body = 28,
+
+    [Display(Name = "Gương và kính")]
+    MirrorsAndGlass = 29,
+
+    [Display(Name = "Phụ kiện ngoại thất")]
+    ExteriorAccessories = 30,
+
+    [Display(Name = "Phụ kiện nội thất")]
+    InteriorAccessories = 31,
+
+    // 🚀 Công nghệ hỗ trợ lái xe
     [Display(Name = "Hệ thống điều khiển hành trình")]
-    CruiseControl,
+    CruiseControl = 32,
 
     [Display(Name = "Camera và cảm biến đỗ xe")]
-    ParkingAssist,
+    ParkingAssist = 33,
 
     [Display(Name = "Hệ thống khởi động từ xa")]
-    RemoteStart,
+    RemoteStart = 34,
 
+    // 🛠 Bảo trì & bảo dưỡng
+    [Display(Name = "Phụ tùng bảo dưỡng")]
+    Maintenance = 35,
+
+    [Display(Name = "Hệ thống chống ồn")]
+    SoundDampening = 36,
+
+    // ❓ Khác
     [Display(Name = "Phụ tùng khác")]
-    Other
+    Other = 255
 }

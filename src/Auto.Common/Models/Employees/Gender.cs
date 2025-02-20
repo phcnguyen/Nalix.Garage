@@ -1,24 +1,33 @@
-﻿namespace Auto.Common.Models.Employees;
+﻿using System.ComponentModel;
+
+namespace Auto.Common.Models.Employees;
 
 /// <summary>
-/// Đại diện cho giới tính của nhân viên trong hệ thống.
-/// Được sử dụng để phân loại và quản lý thông tin nhân sự.
+/// Đại diện cho giới tính của nhân viên.
 /// </summary>
-public enum Gender
+public enum Gender : byte
 {
+    /// <summary>
+    /// Giới tính không xác định hoặc không cung cấp.
+    /// </summary>
+    [Description("Không xác định")]
+    None = 0,
+
     /// <summary>
     /// Giới tính nam.
     /// </summary>
-    Male,
+    [Description("Nam")]
+    Male = 1,
 
     /// <summary>
     /// Giới tính nữ.
     /// </summary>
-    Female,
+    [Description("Nữ")]
+    Female = 2,
 
     /// <summary>
-    /// Giới tính không xác định hoặc không được cung cấp.
-    /// Giá trị mặc định nếu không có thông tin.
+    /// Giới tính khác.
     /// </summary>
-    Unknown
+    [Description("Khác")]
+    Other = 255
 }
