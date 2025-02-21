@@ -1,5 +1,4 @@
-<<<<<<< HEAD
-﻿using Auto.Common.Entities.Bill;
+using Auto.Common.Entities.Bill;
 using Auto.Common.Entities.Bill.Transactions;
 using Auto.Common.Entities.Customers;
 using Auto.Common.Entities.Employees;
@@ -8,16 +7,6 @@ using Auto.Common.Entities.Repair;
 using Auto.Common.Entities.Service;
 using Auto.Common.Entities.Suppliers;
 using Auto.Common.Entities.Vehicles;
-=======
-﻿using Auto.Common.Entites.Bill;
-using Auto.Common.Entites.Customers;
-using Auto.Common.Entites.Employees;
-using Auto.Common.Entites.Part;
-using Auto.Common.Entites.Repair;
-using Auto.Common.Entites.Service;
-using Auto.Common.Entites.Suppliers;
-using Auto.Common.Entites.Vehicles;
->>>>>>> 65bed3ad590b56cc0ec49e49032e27e59206e97e
 using Microsoft.EntityFrameworkCore;
 
 namespace Auto.Database;

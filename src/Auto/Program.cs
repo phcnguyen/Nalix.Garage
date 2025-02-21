@@ -6,39 +6,39 @@ using Auto.Common.Entities.Repair;
 using Auto.Common.Entities.Service;
 using Auto.Common.Entities.Suppliers;
 using Auto.Common.Entities.Vehicles;
+using Auto.Common.Models.Cars;
+using Auto.Common.Models.Payments;
 using Auto.Database;
 using Auto.Database.Repositories;
 using Microsoft.EntityFrameworkCore;
 
-namespace DatabaseTestApp
+namespace Auto
 {
     internal class Program
     {
         private static async Task Main(string[] args)
         {
             var options = new DbContextOptionsBuilder<AppDbContext>()
-                .UseSqlServer("YourConnectionStringHere")
+                .UseInMemoryDatabase(databaseName: "TestDatabase")
                 .Options;
 
-            using (var context = new AppDbContext(options))
+            using var context = new AppDbContext(options);
+            try
             {
-                try
-                {
-                    await TestCustomerRepository(context);
-                    await TestVehicleRepository(context);
-                    await TestEmployeeRepository(context);
-                    await TestInvoiceRepository(context);
-                    await TestSparePartRepository(context);
-                    await TestRepairTaskRepository(context);
-                    await TestServiceItemRepository(context);
-                    await TestSupplierRepository(context);
+                await TestCustomerRepository(context);
+                await TestVehicleRepository(context);
+                await TestEmployeeRepository(context);
+                await TestInvoiceRepository(context);
+                await TestSparePartRepository(context);
+                await TestRepairTaskRepository(context);
+                await TestServiceItemRepository(context);
+                await TestSupplierRepository(context);
 
-                    Console.WriteLine("All tests completed successfully.");
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"An error occurred: {ex.Message}");
-                }
+                Console.WriteLine("All tests completed successfully.");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"An error occurred: {ex.Message}");
             }
         }
 
@@ -52,7 +52,7 @@ namespace DatabaseTestApp
             Console.WriteLine("Added new customer.");
 
             // Test Get Customer
-            var customer = await customerRepository.GetByIdAsync(newCustomer.Id);
+            var customer = await customerRepository.GetByIdAsync(newCustomer.CustomerId);
             Console.WriteLine($"Retrieved customer: {customer.Name}, {customer.Email}, {customer.PhoneNumber}");
 
             // Test Update Customer
@@ -61,7 +61,7 @@ namespace DatabaseTestApp
             Console.WriteLine("Updated customer phone number.");
 
             // Test Delete Customer
-            await customerRepository.DeleteAsync(customer.Id);
+            await customerRepository.DeleteAsync(customer.CustomerId);
             Console.WriteLine("Deleted customer.");
 
             // Save changes
@@ -73,21 +73,21 @@ namespace DatabaseTestApp
             var vehicleRepository = new Repository<Vehicle>(context);
 
             // Test Add Vehicle
-            var newVehicle = new Vehicle { Make = "Toyota", Model = "Camry", Year = 2020 };
+            var newVehicle = new Vehicle { OwnerId = 1, CarYear = 2020, CarType = CarType.Sedan, CarColor = CarColor.None, CarBrand = CarBrand.None, CarLicensePlate = "ABC123", CarModel = "Camry", FrameNumber = "FR12345", EngineNumber = "EN12345" };
             await vehicleRepository.AddAsync(newVehicle);
             Console.WriteLine("Added new vehicle.");
 
             // Test Get Vehicle
-            var vehicle = await vehicleRepository.GetByIdAsync(newVehicle.Id);
-            Console.WriteLine($"Retrieved vehicle: {vehicle.Make}, {vehicle.Model}, {vehicle.Year}");
+            var vehicle = await vehicleRepository.GetByIdAsync(newVehicle.CarId);
+            Console.WriteLine($"Retrieved vehicle: {vehicle.CarModel}, {vehicle.CarYear}");
 
             // Test Update Vehicle
-            vehicle.Year = 2021;
+            vehicle.CarYear = 2021;
             vehicleRepository.Update(vehicle);
             Console.WriteLine("Updated vehicle year.");
 
             // Test Delete Vehicle
-            await vehicleRepository.DeleteAsync(vehicle.Id);
+            await vehicleRepository.DeleteAsync(vehicle.CarId);
             Console.WriteLine("Deleted vehicle.");
 
             // Save changes
@@ -99,21 +99,21 @@ namespace DatabaseTestApp
             var employeeRepository = new Repository<Employee>(context);
 
             // Test Add Employee
-            var newEmployee = new Employee { Name = "Jane Smith", Position = "Mechanic", Salary = 50000 };
+            var newEmployee = new Employee { Name = "Jane Smith", Gender = Gender.Female, DateOfBirth = new DateTime(1990, 1, 1), Address = "123 Street", PhoneNumber = "1234567890", Email = "jane.smith@example.com", Position = Position.Accountant, StartDate = DateTime.UtcNow, Status = EmploymentStatus.Active };
             await employeeRepository.AddAsync(newEmployee);
             Console.WriteLine("Added new employee.");
 
             // Test Get Employee
-            var employee = await employeeRepository.GetByIdAsync(newEmployee.Id);
-            Console.WriteLine($"Retrieved employee: {employee.Name}, {employee.Position}, {employee.Salary}");
+            var employee = await employeeRepository.GetByIdAsync(newEmployee.EmployeeId);
+            Console.WriteLine($"Retrieved employee: {employee.Name}, {employee.Position}");
 
             // Test Update Employee
-            employee.Salary = 55000;
+            employee.PhoneNumber = "0987654321";
             employeeRepository.Update(employee);
-            Console.WriteLine("Updated employee salary.");
+            Console.WriteLine("Updated employee phone number.");
 
             // Test Delete Employee
-            await employeeRepository.DeleteAsync(employee.Id);
+            await employeeRepository.DeleteAsync(employee.EmployeeId);
             Console.WriteLine("Deleted employee.");
 
             // Save changes
@@ -125,21 +125,23 @@ namespace DatabaseTestApp
             var invoiceRepository = new Repository<Invoice>(context);
 
             // Test Add Invoice
-            var newInvoice = new Invoice { Amount = 1000, Date = DateTime.Now };
+            var newInvoice = new Invoice { OwnerId = 1, CreatedBy = 1, InvoiceNumber = "INV12345", InvoiceDate = DateTime.UtcNow, TaxRate = TaxRateType.VAT10, DiscountType = DiscountType.None, PaymentStatus = PaymentStatus.Unpaid, Discount = 0 };
+            newInvoice.UpdateTotals();
             await invoiceRepository.AddAsync(newInvoice);
             Console.WriteLine("Added new invoice.");
 
             // Test Get Invoice
-            var invoice = await invoiceRepository.GetByIdAsync(newInvoice.Id);
-            Console.WriteLine($"Retrieved invoice: {invoice.Amount}, {invoice.Date}");
+            var invoice = await invoiceRepository.GetByIdAsync(newInvoice.InvoiceId);
+            Console.WriteLine($"Retrieved invoice: {invoice.InvoiceNumber}, {invoice.TotalAmount}");
 
             // Test Update Invoice
-            invoice.Amount = 1200;
+            invoice.Discount = 100;
+            invoice.UpdateTotals();
             invoiceRepository.Update(invoice);
-            Console.WriteLine("Updated invoice amount.");
+            Console.WriteLine("Updated invoice discount.");
 
             // Test Delete Invoice
-            await invoiceRepository.DeleteAsync(invoice.Id);
+            await invoiceRepository.DeleteAsync(invoice.InvoiceId);
             Console.WriteLine("Deleted invoice.");
 
             // Save changes
@@ -151,21 +153,21 @@ namespace DatabaseTestApp
             var sparePartRepository = new Repository<SparePart>(context);
 
             // Test Add SparePart
-            var newSparePart = new SparePart { Name = "Brake Pad", Price = 50 };
+            var newSparePart = new SparePart { SupplierId = 1, PartCategory = PartCategory.Brake, PartName = "Brake Pad", PurchasePrice = 20, SellingPrice = 25, IsDiscontinued = false };
             await sparePartRepository.AddAsync(newSparePart);
             Console.WriteLine("Added new spare part.");
 
             // Test Get SparePart
-            var sparePart = await sparePartRepository.GetByIdAsync(newSparePart.Id);
-            Console.WriteLine($"Retrieved spare part: {sparePart.Name}, {sparePart.Price}");
+            var sparePart = await sparePartRepository.GetByIdAsync(newSparePart.PartId);
+            Console.WriteLine($"Retrieved spare part: {sparePart.PartName}, {sparePart.SellingPrice}");
 
             // Test Update SparePart
-            sparePart.Price = 55;
+            sparePart.SellingPrice = 30;
             sparePartRepository.Update(sparePart);
             Console.WriteLine("Updated spare part price.");
 
             // Test Delete SparePart
-            await sparePartRepository.DeleteAsync(sparePart.Id);
+            await sparePartRepository.DeleteAsync(sparePart.PartId);
             Console.WriteLine("Deleted spare part.");
 
             // Save changes
@@ -177,21 +179,22 @@ namespace DatabaseTestApp
             var repairTaskRepository = new Repository<RepairTask>(context);
 
             // Test Add RepairTask
-            var newRepairTask = new RepairTask { Description = "Oil Change", Cost = 30 };
+            var newRepairTask = new RepairTask { EmployeeId = 1, ServiceItemId = 1, Status = RepairOrderStatus.Pending, StartDate = DateTime.UtcNow, EstimatedDuration = 2.5 };
             await repairTaskRepository.AddAsync(newRepairTask);
             Console.WriteLine("Added new repair task.");
 
             // Test Get RepairTask
-            var repairTask = await repairTaskRepository.GetByIdAsync(newRepairTask.Id);
-            Console.WriteLine($"Retrieved repair task: {repairTask.Description}, {repairTask.Cost}");
+            var repairTask = await repairTaskRepository.GetByIdAsync(newRepairTask.RepairTaskId);
+            Console.WriteLine($"Retrieved repair task: {repairTask.ServiceItemId}, {repairTask.Status}");
 
             // Test Update RepairTask
-            repairTask.Cost = 35;
+            repairTask.Status = RepairOrderStatus.Completed;
+            repairTask.CompletionDate = DateTime.UtcNow.AddHours(3);
             repairTaskRepository.Update(repairTask);
-            Console.WriteLine("Updated repair task cost.");
+            Console.WriteLine("Updated repair task status.");
 
             // Test Delete RepairTask
-            await repairTaskRepository.DeleteAsync(repairTask.Id);
+            await repairTaskRepository.DeleteAsync(repairTask.RepairTaskId);
             Console.WriteLine("Deleted repair task.");
 
             // Save changes
@@ -203,21 +206,21 @@ namespace DatabaseTestApp
             var serviceItemRepository = new Repository<ServiceItem>(context);
 
             // Test Add ServiceItem
-            var newServiceItem = new ServiceItem { Name = "Tire Rotation", Price = 25 };
+            var newServiceItem = new ServiceItem { Description = "Tire Rotation", Type = ServiceType.Maintenance, UnitPrice = 25 };
             await serviceItemRepository.AddAsync(newServiceItem);
             Console.WriteLine("Added new service item.");
 
             // Test Get ServiceItem
-            var serviceItem = await serviceItemRepository.GetByIdAsync(newServiceItem.Id);
-            Console.WriteLine($"Retrieved service item: {serviceItem.Name}, {serviceItem.Price}");
+            var serviceItem = await serviceItemRepository.GetByIdAsync(newServiceItem.ServiceId);
+            Console.WriteLine($"Retrieved service item: {serviceItem.Description}, {serviceItem.UnitPrice}");
 
             // Test Update ServiceItem
-            serviceItem.Price = 30;
+            serviceItem.UnitPrice = 30;
             serviceItemRepository.Update(serviceItem);
             Console.WriteLine("Updated service item price.");
 
             // Test Delete ServiceItem
-            await serviceItemRepository.DeleteAsync(serviceItem.Id);
+            await serviceItemRepository.DeleteAsync(serviceItem.ServiceId);
             Console.WriteLine("Deleted service item.");
 
             // Save changes
@@ -229,21 +232,21 @@ namespace DatabaseTestApp
             var supplierRepository = new Repository<Supplier>(context);
 
             // Test Add Supplier
-            var newSupplier = new Supplier { Name = "Auto Parts Co.", ContactInfo = "contact@autoparts.com" };
+            var newSupplier = new Supplier { Name = "Auto Parts Co.", Email = "contact@autoparts.com", Address = "123 Supplier Street", PhoneNumbers = ["1234567890"], Notes = "Reliable supplier", ContractStartDate = DateTime.UtcNow, BankAccount = "123456789", TaxCode = "TAX123", Status = SupplierStatus.Active, PaymentTerms = PaymentTerms.Net30 };
             await supplierRepository.AddAsync(newSupplier);
             Console.WriteLine("Added new supplier.");
 
             // Test Get Supplier
-            var supplier = await supplierRepository.GetByIdAsync(newSupplier.Id);
-            Console.WriteLine($"Retrieved supplier: {supplier.Name}, {supplier.ContactInfo}");
+            var supplier = await supplierRepository.GetByIdAsync(newSupplier.SupplierId);
+            Console.WriteLine($"Retrieved supplier: {supplier.Name}, {supplier.Email}");
 
             // Test Update Supplier
-            supplier.ContactInfo = "support@autoparts.com";
+            supplier.Email = "support@autoparts.com";
             supplierRepository.Update(supplier);
-            Console.WriteLine("Updated supplier contact info.");
+            Console.WriteLine("Updated supplier email.");
 
             // Test Delete Supplier
-            await supplierRepository.DeleteAsync(supplier.Id);
+            await supplierRepository.DeleteAsync(supplier.SupplierId);
             Console.WriteLine("Deleted supplier.");
 
             // Save changes

@@ -1,10 +1,5 @@
-<<<<<<< HEAD:src/Auto.Common/Entities/Vehicles/Vehicle.cs
-﻿using Auto.Common.Entities.Customers;
+using Auto.Common.Entities.Customers;
 using Auto.Common.Entities.Repair;
-=======
-﻿using Auto.Common.Entites.Customers;
-using Auto.Common.Entites.Repair;
->>>>>>> 65bed3ad590b56cc0ec49e49032e27e59206e97e:src/Auto.Common/Entites/Vehicles/Vehicle.cs
 using Auto.Common.Models.Cars;
 using System;
 using System.Collections.Generic;
