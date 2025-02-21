@@ -1,8 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Auto.Common.Entites.Vehicles;
+namespace Auto.Common.Models.Cars;
 
-public enum VehicleType : byte
+public enum CarType : byte
 {
     [Display(Name = "Không xác định")]
     None = 0,

@@ -1,11 +1,11 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Auto.Common.Entites.Vehicles;
+namespace Auto.Common.Models.Cars;
 
 /// <summary>
 /// Enum định nghĩa các màu xe phổ biến.
 /// </summary>
-public enum VehicleColor : byte
+public enum CarColor : byte
 {
     [Display(Name = "Không xác định")]
     None = 0,

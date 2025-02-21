@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Auto.Common.Entites.Payments;
+namespace Auto.Common.Models.Payments;
 
 /// <summary>
 /// Xác định các phương thức thanh toán có thể sử dụng.

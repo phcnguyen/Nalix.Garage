@@ -1,4 +1,4 @@
-﻿using Auto.Common.Entites.Payments;
+﻿using Auto.Common.Models.Payments;
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;

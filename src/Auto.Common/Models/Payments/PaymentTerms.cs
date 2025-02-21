@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Auto.Common.Entites.Payments;
+namespace Auto.Common.Models.Payments;
 
 /// <summary>
 /// Enum đại diện cho các điều khoản thanh toán.

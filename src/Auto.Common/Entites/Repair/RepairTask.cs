@@ -9,7 +9,7 @@ namespace Auto.Common.Entites.Repair;
 /// <summary>
 /// Lớp đại diện cho công việc sửa chữa.
 /// </summary>
-[Table("RepairTasks")]
+[Table(nameof(RepairTask))]
 public class RepairTask
 {
     private DateTime? _completionDate;

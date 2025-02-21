@@ -2,8 +2,8 @@
 using Auto.Common.Entites.Customers;
 using Auto.Common.Entites.Employees;
 using Auto.Common.Entites.Part;
-using Auto.Common.Entites.Payments;
 using Auto.Common.Entites.Repair;
+using Auto.Common.Models.Payments;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;

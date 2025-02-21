@@ -1,11 +1,11 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Auto.Common.Entites.Vehicles;
+namespace Auto.Common.Models.Cars;
 
 /// <summary>
 /// Enum định nghĩa các hãng xe.
 /// </summary>
-public enum VehicleBrand : byte
+public enum CarBrand : byte
 {
     [Display(Name = "Không xác định")]
     None = 0,

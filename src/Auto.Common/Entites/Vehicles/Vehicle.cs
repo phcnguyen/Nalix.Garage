@@ -1,5 +1,6 @@
 ﻿using Auto.Common.Entites.Customers;
 using Auto.Common.Entites.Repair;
+using Auto.Common.Models.Cars;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -45,17 +46,17 @@ public class Vehicle
     /// <summary>
     /// Loại xe (Sedan, SUV, Hatchback, ...).
     /// </summary>
-    public VehicleType CarType { get; set; } = VehicleType.Sedan;
+    public CarType CarType { get; set; } = CarType.Sedan;
 
     /// <summary>
     /// Màu sắc.
     /// </summary>
-    public VehicleColor CarColor { get; set; } = VehicleColor.None;
+    public CarColor CarColor { get; set; } = CarColor.None;
 
     /// <summary>
     /// Hãng xe.
     /// </summary>
-    public VehicleBrand CarBrand { get; set; } = VehicleBrand.None;
+    public CarBrand CarBrand { get; set; } = CarBrand.None;
 
     /// <summary>
     /// Biển số xe khách hàng.
