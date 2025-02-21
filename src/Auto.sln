@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Auto.Common", "Auto.Common\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Auto.Database", "Auto.Database\Auto.Database.csproj", "{11442015-8177-461E-9E7A-6048C2355737}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Auto", "Auto\Auto.csproj", "{777D2BEF-73A6-4469-A1D3-B6FCF48350E2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,8 +23,15 @@ Global
 		{11442015-8177-461E-9E7A-6048C2355737}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{11442015-8177-461E-9E7A-6048C2355737}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{11442015-8177-461E-9E7A-6048C2355737}.Release|Any CPU.Build.0 = Release|Any CPU
+		{777D2BEF-73A6-4469-A1D3-B6FCF48350E2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{777D2BEF-73A6-4469-A1D3-B6FCF48350E2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{777D2BEF-73A6-4469-A1D3-B6FCF48350E2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{777D2BEF-73A6-4469-A1D3-B6FCF48350E2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {11C0F4B9-EDBB-4873-8212-0D203472F242}
 	EndGlobalSection
 EndGlobal

@@ -1,11 +1,13 @@
-﻿using Auto.Common.Entites.Bill;
-using Auto.Common.Entites.Customers;
-using Auto.Common.Entites.Employees;
-using Auto.Common.Entites.Part;
-using Auto.Common.Entites.Repair;
-using Auto.Common.Entites.Suppliers;
+﻿using Auto.Common.Entities.Bill;
+using Auto.Common.Entities.Bill.Transactions;
+using Auto.Common.Entities.Customers;
+using Auto.Common.Entities.Employees;
+using Auto.Common.Entities.Part;
+using Auto.Common.Entities.Repair;
+using Auto.Common.Entities.Service;
+using Auto.Common.Entities.Suppliers;
+using Auto.Common.Entities.Vehicles;
 using Microsoft.EntityFrameworkCore;
-using System.Transactions;
 
 namespace Auto.Database;
 
@@ -18,9 +20,11 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<Supplier> Suppliers { get; set; }
     public DbSet<SparePart> SpareParts { get; set; }
     public DbSet<RepairTask> RepairTasks { get; set; }
+    public DbSet<ServiceItem> ServiceItem { get; set; }
     public DbSet<RepairOrder> RepairOrders { get; set; }
     public DbSet<Transaction> Transactions { get; set; }
-    public DbSet<WorkSchedule> WorkSchedules { get; set; }
+    public DbSet<RepairHistory> RepairHistories { get; set; }
+    public DbSet<ReplacementPart> ReplacementPart { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
