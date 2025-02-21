@@ -2,7 +2,7 @@
 
 ## Giới thiệu
 
-Dự án Auto là một giải pháp phần mềm quản lý garage xe hơi, bao gồm các thực thể như khách hàng, xe, nhân viên, hóa đơn, phụ tùng, công việc sửa chữa, dịch vụ và nhà cung cấp. Hướng dẫn này sẽ giúp bạn sử dụng các thực thể này với Entity Framework Core để thao tác với cơ sở dữ liệu.
+Dự án Auto là một giải pháp phần mềm quản lý gara xe hơi, bao gồm các thực thể như khách hàng, xe, nhân viên, hóa đơn, phụ tùng, công việc sửa chữa, dịch vụ và nhà cung cấp. Hướng dẫn này sẽ giúp bạn sử dụng các thực thể này với Entity Framework Core để thao tác với cơ sở dữ liệu.
 
 ## Yêu cầu
 
@@ -16,8 +16,8 @@ Dự án Auto là một giải pháp phần mềm quản lý garage xe hơi, bao
 - `Auto.Common.Entities.Vehicles`: Chứa thực thể `Vehicle`.
 - `Auto.Common.Entities.Employees`: Chứa thực thể `Employee`.
 - `Auto.Common.Entities.Bill`: Chứa thực thể `Invoice`.
-- `Auto.Common.Entities.Part`: Chứa thực thể `SparePart`.
-- `Auto.Common.Entities.Repair`: Chứa thực thể `RepairTask`.
+- `Auto.Common.Entities.Part`: Chứa thực thể `SparePart`, `ReplacementPart`, `PartCategory`.
+- `Auto.Common.Entities.Repair`: Chứa thực thể `RepairOrder`, `RepairTask`.
 - `Auto.Common.Entities.Service`: Chứa thực thể `ServiceItem`.
 - `Auto.Common.Entities.Suppliers`: Chứa thực thể `Supplier`.
 
@@ -236,6 +236,239 @@ namespace EmployeeExample
                 context.Employees.Remove(employee);
                 await context.SaveChangesAsync();
                 Console.WriteLine("Deleted employee.");
+            }
+        }
+    }
+}
+```
+
+#### Thêm mới một hóa đơn
+
+```csharp name=InvoiceExample.cs
+using System;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using Auto.Database;
+using Auto.Common.Entities.Bill;
+
+namespace InvoiceExample
+{
+    class Program
+    {
+        static async Task Main(string[] args)
+        {
+            var options = new DbContextOptionsBuilder<AppDbContext>()
+                .UseSqlServer("YourConnectionStringHere")
+                .Options;
+
+            using (var context = new AppDbContext(options))
+            {
+                // Thêm mới hóa đơn
+                var newInvoice = new Invoice { OwnerId = 1, CreatedBy = 1, InvoiceNumber = "INV12345", InvoiceDate = DateTime.UtcNow, TaxRate = TaxRateType.VAT10, DiscountType = DiscountType.None, PaymentStatus = PaymentStatus.Unpaid, Discount = 0 };
+                newInvoice.UpdateTotals();
+                await context.Invoices.AddAsync(newInvoice);
+                await context.SaveChangesAsync();
+
+                // Lấy thông tin hóa đơn
+                var invoice = await context.Invoices.FirstOrDefaultAsync(i => i.InvoiceId == newInvoice.InvoiceId);
+                Console.WriteLine($"Retrieved invoice: {invoice.InvoiceNumber}, {invoice.TotalAmount}");
+
+                // Cập nhật thông tin hóa đơn
+                invoice.Discount = 100;
+                invoice.UpdateTotals();
+                context.Invoices.Update(invoice);
+                await context.SaveChangesAsync();
+                Console.WriteLine("Updated invoice discount.");
+
+                // Xóa hóa đơn
+                context.Invoices.Remove(invoice);
+                await context.SaveChangesAsync();
+                Console.WriteLine("Deleted invoice.");
+            }
+        }
+    }
+}
+```
+
+#### Thêm mới một phụ tùng
+
+```csharp name=SparePartExample.cs
+using System;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using Auto.Database;
+using Auto.Common.Entities.Part;
+
+namespace SparePartExample
+{
+    class Program
+    {
+        static async Task Main(string[] args)
+        {
+            var options = new DbContextOptionsBuilder<AppDbContext>()
+                .UseSqlServer("YourConnectionStringHere")
+                .Options;
+
+            using (var context = new AppDbContext(options))
+            {
+                // Thêm mới phụ tùng
+                var newSparePart = new SparePart { SupplierId = 1, PartCategory = PartCategory.Brake, PartName = "Brake Pad", PurchasePrice = 20, SellingPrice = 25, InventoryQuantity = 100, IsDiscontinued = false };
+                await context.SpareParts.AddAsync(newSparePart);
+                await context.SaveChangesAsync();
+
+                // Lấy thông tin phụ tùng
+                var sparePart = await context.SpareParts.FirstOrDefaultAsync(p => p.PartId == newSparePart.PartId);
+                Console.WriteLine($"Retrieved spare part: {sparePart.PartName}, {sparePart.SellingPrice}");
+
+                // Cập nhật thông tin phụ tùng
+                sparePart.SellingPrice = 30;
+                context.SpareParts.Update(sparePart);
+                await context.SaveChangesAsync();
+                Console.WriteLine("Updated spare part price.");
+
+                // Xóa phụ tùng
+                context.SpareParts.Remove(sparePart);
+                await context.SaveChangesAsync();
+                Console.WriteLine("Deleted spare part.");
+            }
+        }
+    }
+}
+```
+
+#### Thêm mới một công việc sửa chữa
+
+```csharp name=RepairTaskExample.cs
+using System;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using Auto.Database;
+using Auto.Common.Entities.Repair;
+
+namespace RepairTaskExample
+{
+    class Program
+    {
+        static async Task Main(string[] args)
+        {
+            var options = new DbContextOptionsBuilder<AppDbContext>()
+                .UseSqlServer("YourConnectionStringHere")
+                .Options;
+
+            using (var context = new AppDbContext(options))
+            {
+                // Thêm mới công việc sửa chữa
+                var newRepairTask = new RepairTask { EmployeeId = 1, ServiceItemId = 1, Status = RepairOrderStatus.Pending, StartDate = DateTime.UtcNow, EstimatedDuration = 2.5 };
+                await context.RepairTasks.AddAsync(newRepairTask);
+                await context.SaveChangesAsync();
+
+                // Lấy thông tin công việc sửa chữa
+                var repairTask = await context.RepairTasks.FirstOrDefaultAsync(r => r.RepairTaskId == newRepairTask.RepairTaskId);
+                Console.WriteLine($"Retrieved repair task: {repairTask.ServiceItemId}, {repairTask.Status}");
+
+                // Cập nhật thông tin công việc sửa chữa
+                repairTask.Status = RepairOrderStatus.Completed;
+                repairTask.CompletionDate = DateTime.UtcNow.AddHours(3);
+                context.RepairTasks.Update(repairTask);
+                await context.SaveChangesAsync();
+                Console.WriteLine("Updated repair task status.");
+
+                // Xóa công việc sửa chữa
+                context.RepairTasks.Remove(repairTask);
+                await context.SaveChangesAsync();
+                Console.WriteLine("Deleted repair task.");
+            }
+        }
+    }
+}
+```
+
+#### Thêm mới một mục dịch vụ
+
+```csharp name=ServiceItemExample.cs
+using System;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using Auto.Database;
+using Auto.Common.Entities.Service;
+
+namespace ServiceItemExample
+{
+    class Program
+    {
+        static async Task Main(string[] args)
+        {
+            var options = new DbContextOptionsBuilder<AppDbContext>()
+                .UseSqlServer("YourConnectionStringHere")
+                .Options;
+
+            using (var context = new AppDbContext(options))
+            {
+                // Thêm mới mục dịch vụ
+                var newServiceItem = new ServiceItem { Description = "Tire Rotation", Type = ServiceType.Maintenance, UnitPrice = 25 };
+                await context.ServiceItems.AddAsync(newServiceItem);
+                await context.SaveChangesAsync();
+
+                // Lấy thông tin mục dịch vụ
+                var serviceItem = await context.ServiceItems.FirstOrDefaultAsync(s => s.ServiceId == newServiceItem.ServiceId);
+                Console.WriteLine($"Retrieved service item: {serviceItem.Description}, {serviceItem.UnitPrice}");
+
+                // Cập nhật thông tin mục dịch vụ
+                serviceItem.UnitPrice = 30;
+                context.ServiceItems.Update(serviceItem);
+                await context.SaveChangesAsync();
+                Console.WriteLine("Updated service item price.");
+
+                // Xóa mục dịch vụ
+                context.ServiceItems.Remove(serviceItem);
+                await context.SaveChangesAsync();
+                Console.WriteLine("Deleted service item.");
+            }
+        }
+    }
+}
+```
+
+#### Thêm mới một nhà cung cấp
+
+```csharp name=SupplierExample.cs
+using System;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using Auto.Database;
+using Auto.Common.Entities.Suppliers;
+
+namespace SupplierExample
+{
+    class Program
+    {
+        static async Task Main(string[] args)
+        {
+            var options = new DbContextOptionsBuilder<AppDbContext>()
+                .UseSqlServer("YourConnectionStringHere")
+                .Options;
+
+            using (var context = new AppDbContext(options))
+            {
+                // Thêm mới nhà cung cấp
+                var newSupplier = new Supplier { Name = "Auto Parts Co.", Email = "contact@autoparts.com", Address = "123 Supplier Street", PhoneNumbers = new List<string> { "1234567890" }, Notes = "Reliable supplier", ContractStartDate = DateTime.UtcNow, BankAccount = "123456789", TaxCode = "TAX123", Status = SupplierStatus.Active, PaymentTerms = PaymentTerms.Net30 };
+                await context.Suppliers.AddAsync(newSupplier);
+                await context.SaveChangesAsync();
+
+                // Lấy thông tin nhà cung cấp
+                var supplier = await context.Suppliers.FirstOrDefaultAsync(s => s.SupplierId == newSupplier.SupplierId);
+                Console.WriteLine($"Retrieved supplier: {supplier.Name}, {supplier.Email}");
+
+                // Cập nhật thông tin nhà cung cấp
+                supplier.Email = "support@autoparts.com";
+                context.Suppliers.Update(supplier);
+                await context.SaveChangesAsync();
+                Console.WriteLine("Updated supplier email.");
+
+                // Xóa nhà cung cấp
+                context.Suppliers.Remove(supplier);
+                await context.SaveChangesAsync();
+                Console.WriteLine("Deleted supplier.");
             }
         }
     }
