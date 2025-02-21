@@ -1,10 +1,9 @@
-﻿using Auto.Common.Models.Bill;
-using Auto.Common.Models.Customers;
-using Auto.Common.Models.Employees;
-using Auto.Common.Models.Part;
-using Auto.Common.Models.Repair;
-using Auto.Common.Models.Suppliers;
-using Auto.Common.Models.Vehicles;
+﻿using Auto.Common.Entites.Bill;
+using Auto.Common.Entites.Customers;
+using Auto.Common.Entites.Employees;
+using Auto.Common.Entites.Part;
+using Auto.Common.Entites.Repair;
+using Auto.Common.Entites.Suppliers;
 using Microsoft.EntityFrameworkCore;
 using System.Transactions;
 
@@ -12,7 +11,7 @@ namespace Auto.Database;
 
 public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(options)
 {
-    public DbSet<Car> Cars { get; set; }
+    public DbSet<Vehicle> Cars { get; set; }
     public DbSet<Invoice> Invoices { get; set; }
     public DbSet<Customer> Customers { get; set; }
     public DbSet<Employee> Employees { get; set; }
@@ -27,5 +26,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     {
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
         base.OnModelCreating(modelBuilder);
+
+        modelBuilder.Entity<Customer>().HasIndex(c => c.Email).IsUnique();
+        modelBuilder.Entity<Customer>().HasIndex(c => c.PhoneNumber).IsUnique();
     }
 }
