@@ -1,4 +1,8 @@
+<<<<<<< HEAD:src/Auto.Common/Entities/Suppliers/Supplier.cs
 ﻿using Auto.Common.Entities.Part;
+=======
+﻿using Auto.Common.Entites.Part;
+>>>>>>> 65bed3ad590b56cc0ec49e49032e27e59206e97e:src/Auto.Common/Entites/Suppliers/Supplier.cs
 using Auto.Common.Models.Payments;
 using System;
 using System.Collections.Generic;

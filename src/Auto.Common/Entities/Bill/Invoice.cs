@@ -1,9 +1,9 @@
-﻿using Auto.Common.Entities.Bill.Transactions;
-using Auto.Common.Entities.Customers;
-using Auto.Common.Entities.Employees;
-using Auto.Common.Entities.Part;
-using Auto.Common.Entities.Repair;
-using Auto.Common.Models.Payments;
+﻿using Auto.Common.Entites.Bill.Transactions;
+using Auto.Common.Entites.Customers;
+using Auto.Common.Entites.Employees;
+using Auto.Common.Entites.Part;
+using Auto.Common.Entites.Payments;
+using Auto.Common.Entites.Repair;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
