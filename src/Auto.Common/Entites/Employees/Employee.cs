@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -27,12 +26,12 @@ public class Employee
     /// <summary>
     /// Giới tính.
     /// </summary>
-    public Gender Gender { get; set; }
+    public Gender Gender { get; set; } = Gender.None;
 
     /// <summary>
     /// Ngày sinh.
     /// </summary>
-    public DateTime DateOfBirth { get; set; }
+    public DateTime? DateOfBirth { get; set; }
 
     /// <summary>
     /// Địa chỉ nhân viên.
@@ -56,17 +55,12 @@ public class Employee
     /// <summary>
     /// Chức vụ.
     /// </summary>
-    public Position Position { get; set; }
-
-    /// <summary>
-    /// Lịch làm việc.
-    /// </summary>
-    public virtual List<WorkSchedule> WorkSchedules { get; set; } = [];
+    public Position Position { get; set; } = Position.None;
 
     /// <summary>
     /// Ngày bắt đầu làm việc.
     /// </summary>
-    public DateTime StartDate { get; set; }
+    public DateTime StartDate { get; set; } = DateTime.UtcNow;
 
     /// <summary>
     /// Ngày kết thúc hợp đồng.
@@ -76,12 +70,7 @@ public class Employee
     /// <summary>
     /// Trạng thái công việc.
     /// </summary>
-    public EmploymentStatus Status { get; set; }
-
-    /// <summary>
-    /// Danh sách đơn nghỉ phép.
-    /// </summary>
-    public virtual List<LeaveType> LeaveTypes { get; set; } = [];
+    public EmploymentStatus Status { get; set; } = EmploymentStatus.None;
 
     /// <summary>
     /// Cập nhật trạng thái công việc.

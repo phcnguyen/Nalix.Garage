@@ -23,7 +23,7 @@ public class SparePart
     /// <summary>
     /// Id nhà cung cấp của phụ tùng.
     /// </summary>
-    [ForeignKey(nameof(Supplier))]
+    [ForeignKey(nameof(Suppliers.Supplier))]
     public int SupplierId { get; set; }
 
     /// <summary>
@@ -81,6 +81,7 @@ public class SparePart
     /// <summary>
     /// Đánh dấu phụ tùng không còn bán.
     /// </summary>
+    [Required]
     public bool IsDiscontinued { get; set; } = false;
 
     /// <summary>

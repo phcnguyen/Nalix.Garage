@@ -25,13 +25,13 @@ public class RepairOrder
     /// <summary>
     /// Id hóa đơn.
     /// </summary>
-    [ForeignKey(nameof(Bill.Invoice))]
+    [ForeignKey(nameof(Invoice))]
     public int InvoiceId { get; set; }
 
     /// <summary>
     /// Thông tin hóa đơn liên quan (Navigation Property).
     /// </summary>
-    public virtual Invoice Invoice { get; set; }
+    public virtual Invoice Invoices { get; set; }
 
     /// <summary>
     /// Id chủ xe.
@@ -63,12 +63,14 @@ public class RepairOrder
     /// <summary>
     /// Danh sách công việc sửa chữa liên quan.
     /// </summary>
-    public virtual List<RepairTask> RepairTaskList { get; set; } = [];
+    [InverseProperty(nameof(RepairTask))]
+    public virtual ICollection<RepairTask> RepairTaskList { get; set; } = [];
 
     /// <summary>
     /// Danh sách phụ tùng thay thế liên quan.
     /// </summary>
-    public virtual List<ReplacementPart> ReplacementPartList { get; set; } = [];
+    [InverseProperty(nameof(ReplacementPart))]
+    public virtual ICollection<ReplacementPart> ReplacementPartList { get; set; } = [];
 
     /// <summary>
     /// Tổng chi phí sửa chữa.

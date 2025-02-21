@@ -1,162 +1,153 @@
-﻿namespace Auto.Common.Entites.Vehicles;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Auto.Common.Entites.Vehicles;
 
 /// <summary>
 /// Enum định nghĩa các hãng xe.
 /// </summary>
 public enum VehicleBrand : byte
 {
+    [Display(Name = "Không xác định")]
     None = 0,
 
+    [Display(Name = "Audi")]
     Audi = 1,
+
+    [Display(Name = "Abarth")]
     Abarth = 2,
+
+    [Display(Name = "Acura")]
     Acura = 3,
+
+    [Display(Name = "Alfa Romeo")]
     AlfaRomeo = 4,
+
+    [Display(Name = "Aston Martin")]
     AstonMartin = 5,
 
+    [Display(Name = "Baic")]
     Baic = 6,
-    Baojun = 7,
-    Bentley = 8,
-    BMW = 9,
-    BYD = 10,
-    Brilliance = 11,
-    Bugatti = 12,
-    Buick = 13,
-    Borgward = 14,
 
-    CarbonMotors = 15,
+    [Display(Name = "Bentley")]
+    Bentley = 8,
+
+    [Display(Name = "BMW")]
+    BMW = 9,
+
+    [Display(Name = "BYD")]
+    BYD = 10,
+
+    [Display(Name = "Bugatti")]
+    Bugatti = 12,
+
+    [Display(Name = "Buick")]
+    Buick = 13,
+
+    [Display(Name = "Cadillac")]
     Cadillac = 16,
-    Changan = 17,
-    Changfeng = 18,
+
+    [Display(Name = "Chevrolet")]
     Chevrolet = 19,
-    Chrysler = 20,
-    Citroen = 21,
+
+    [Display(Name = "Chery")]
     Chery = 22,
 
+    [Display(Name = "Daewoo")]
     Daewoo = 23,
-    Dacia = 24,
-    DetroitElectric = 25,
+
+    [Display(Name = "Dongfeng")]
     Dongfeng = 26,
-    Donkervoort = 27,
 
-    Elfin = 28,
-    Englon = 29,
-    Faw = 30,
-    Fiat = 31,
-    Fisker = 32,
-    Ford = 33,
-    Foton = 34,
-
+    [Display(Name = "Ferrari")]
     Ferrari = 35,
 
-    Gac = 36,
-    Gaz = 37,
-    GMC = 38,
-    Gonow = 39,
-    GreatWall = 40,
-    Gumpert = 41,
+    [Display(Name = "Ford")]
+    Ford = 33,
+
+    [Display(Name = "Geely")]
     Geely = 42,
 
-    Hafei = 43,
-    Hawtai = 44,
-    Holden = 45,
+    [Display(Name = "GMC")]
+    GMC = 38,
+
+    [Display(Name = "Great Wall")]
+    GreatWall = 40,
+
+    [Display(Name = "Honda")]
     Honda = 46,
-    Hummer = 47,
+
+    [Display(Name = "Hyundai")]
     Hyundai = 48,
-    Haval = 49,
 
-    IKCO = 50,
-    Infiniti = 51,
-    Iveco = 52,
-
+    [Display(Name = "Jaguar")]
     Jaguar = 53,
-    Jac = 54,
+
+    [Display(Name = "Jeep")]
     Jeep = 55,
-    Jiangling = 56,
 
-    Koenigsegg = 57,
+    [Display(Name = "KIA")]
     KIA = 58,
-    Karma = 59,
 
-    Genesis = 60,
-
+    [Display(Name = "Lamborghini")]
     Lamborghini = 61,
-    LucidMotors = 62,
-    Lancia = 63,
+
+    [Display(Name = "Land Rover")]
     LandRover = 64,
-    Landwind = 65,
+
+    [Display(Name = "Lexus")]
     Lexus = 66,
-    Lincoln = 67,
-    Luxgen = 68,
-    LIFAN = 69,
-    Lotus = 70,
 
-    Maxus = 71,
+    [Display(Name = "Mazda")]
     Mazda = 72,
-    McLaren = 73,
-    MercedesBenz = 74,
-    MG = 75,
-    Mini = 76,
-    Mitsubishi = 77,
-    Maserati = 78,
-    Maybach = 79,
-    Mahindra = 80,
-    Mastretta = 81,
 
+    [Display(Name = "McLaren")]
+    McLaren = 73,
+
+    [Display(Name = "Mercedes-Benz")]
+    MercedesBenz = 74,
+
+    [Display(Name = "Mitsubishi")]
+    Mitsubishi = 77,
+
+    [Display(Name = "Nissan")]
     Nissan = 82,
 
-    Opel = 83,
-
-    Pagani = 84,
+    [Display(Name = "Peugeot")]
     Peugeot = 85,
-    Perodua = 86,
+
+    [Display(Name = "Porsche")]
     Porsche = 87,
-    Proton = 88,
-    Polestar = 89,
-    Pontiac = 90,
 
-    Qoros = 91,
-
+    [Display(Name = "RAM")]
     RAM = 92,
-    RANZ = 93,
+
+    [Display(Name = "Renault")]
     Renault = 94,
-    RileyMotor = 95,
-    Rover = 96,
+
+    [Display(Name = "Rolls-Royce")]
     RollsRoyce = 97,
-    Rivian = 98,
-    Roewe = 99,
 
-    SAIC = 100,
-    Saab = 101,
-    Seat = 102,
-    Skoda = 103,
-    Smart = 104,
+    [Display(Name = "Subaru")]
     Subaru = 105,
-    Suzuki = 106,
-    SOUEAST = 107,
-    SsangYong = 108,
 
-    Tata = 109,
+    [Display(Name = "Suzuki")]
+    Suzuki = 106,
+
+    [Display(Name = "Tesla")]
     Tesla = 110,
+
+    [Display(Name = "Toyota")]
     Toyota = 111,
 
+    [Display(Name = "VinFast")]
     VinFast = 112,
-    Vauxhall = 113,
-    VENUCIA = 114,
+
+    [Display(Name = "Volvo")]
     Volvo = 115,
+
+    [Display(Name = "Volkswagen")]
     Volkswagen = 116,
-    VAZ = 117,
 
-    Wuling = 118,
-
-    Yulon = 119,
-    Yugo = 120,
-
-    ZHONGXING = 121,
-    ZHONGTAI = 122,
-    Zenvo = 123,
-    Zotye = 124,
-
-    Xinkai = 125,
-
+    [Display(Name = "Khác")]
     Other = 255
 }

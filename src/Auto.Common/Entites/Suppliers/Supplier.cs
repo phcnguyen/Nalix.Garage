@@ -62,13 +62,13 @@ public class Supplier
     /// <summary>
     /// Tài khoản ngân hàng để thanh toán.
     /// </summary>
-    [StringLength(50, ErrorMessage = "Bank account must not exceed 50 characters.")]
+    [StringLength(20, ErrorMessage = "Bank account must not exceed 50 characters.")]
     public string BankAccount { get; set; } = string.Empty;
 
     /// <summary>
     /// Mã số thuế của nhà cung cấp.
     /// </summary>
-    [StringLength(20, ErrorMessage = "Tax code must not exceed 20 characters.")]
+    [StringLength(13, ErrorMessage = "Tax code must not exceed 20 characters.")]
     public string TaxCode { get; set; } = string.Empty;
 
     /// <summary>

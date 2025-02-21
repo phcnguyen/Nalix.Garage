@@ -1,4 +1,4 @@
-﻿using System.ComponentModel;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace Auto.Common.Entites.Vehicles;
 
@@ -7,60 +7,60 @@ namespace Auto.Common.Entites.Vehicles;
 /// </summary>
 public enum VehicleColor : byte
 {
-    [Description("Không xác định")]
+    [Display(Name = "Không xác định")]
     None = 0,
 
-    [Description("Đen")]
+    [Display(Name = "Đen")]
     Black = 1,
 
-    [Description("Trắng")]
+    [Display(Name = "Trắng")]
     White = 2,
 
-    [Description("Xanh dương")]
+    [Display(Name = "Xanh dương")]
     Blue = 3,
 
-    [Description("Đỏ")]
+    [Display(Name = "Đỏ")]
     Red = 4,
 
-    [Description("Bạc")]
+    [Display(Name = "Bạc")]
     Silver = 5,
 
-    [Description("Vàng")]
+    [Display(Name = "Vàng")]
     Yellow = 6,
 
-    [Description("Xám")]
+    [Display(Name = "Xám")]
     Gray = 7,
 
-    [Description("Xanh lá")]
+    [Display(Name = "Xanh lá")]
     Green = 8,
 
-    [Description("Nâu")]
+    [Display(Name = "Nâu")]
     Brown = 9,
 
-    [Description("Cam")]
+    [Display(Name = "Cam")]
     Orange = 10,
 
-    [Description("Tím")]
+    [Display(Name = "Tím")]
     Purple = 11,
 
-    [Description("Hồng")]
+    [Display(Name = "Hồng")]
     Pink = 12,
 
-    [Description("Xanh ngọc (Cyan)")]
+    [Display(Name = "Xanh ngọc (Cyan)")]
     Cyan = 13,
 
-    [Description("Hồng đậm (Magenta)")]
+    [Display(Name = "Hồng đậm (Magenta)")]
     Magenta = 14,
 
-    [Description("Be (Kem)")]
+    [Display(Name = "Be (Kem)")]
     Beige = 15,
 
-    [Description("Đồng")]
+    [Display(Name = "Đồng")]
     Copper = 16,
 
-    [Description("Vàng Champagne")]
+    [Display(Name = "Vàng Champagne")]
     Champagne = 17,
 
-    [Description("khác")]
+    [Display(Name = "Khác")]
     Other = 255
 }

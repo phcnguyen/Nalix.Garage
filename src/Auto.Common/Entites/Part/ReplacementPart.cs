@@ -66,6 +66,7 @@ public class ReplacementPart
     /// <summary>
     /// Phụ tùng có bị lỗi hay không.
     /// </summary>
+    [Required]
     public bool IsDefective { get; private set; } = false;
 
     /// <summary>

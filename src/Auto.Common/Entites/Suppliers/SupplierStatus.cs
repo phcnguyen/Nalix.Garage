@@ -1,4 +1,4 @@
-﻿using System.ComponentModel;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace Auto.Common.Entites.Suppliers;
 
@@ -10,24 +10,24 @@ public enum SupplierStatus : byte
     /// <summary>
     /// Đang hợp tác.
     /// </summary>
-    [Description("Đang hợp tác")]
+    [Display(Name = "Đang hợp tác")]
     Active = 1,
 
     /// <summary>
     /// Ngừng hợp tác.
     /// </summary>
-    [Description("Ngừng hợp tác")]
+    [Display(Name = "Ngừng hợp tác")]
     Inactive = 2,
 
     /// <summary>
     /// Đối tác tiềm năng.
     /// </summary>
-    [Description("Đối tác tiềm năng")]
+    [Display(Name = "Đối tác tiềm năng")]
     Potential = 3,
 
     /// <summary>
     /// Tạm dừng hợp tác (do vi phạm điều khoản, chờ xem xét lại).
     /// </summary>
-    [Description("Tạm dừng hợp tác")]
+    [Display(Name = "Tạm dừng hợp tác")]
     Suspended = 4
 }

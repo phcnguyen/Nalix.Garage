@@ -1,4 +1,4 @@
-﻿using System.ComponentModel;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace Auto.Common.Entites.Employees;
 
@@ -10,24 +10,24 @@ public enum Gender : byte
     /// <summary>
     /// Giới tính không xác định hoặc không cung cấp.
     /// </summary>
-    [Description("Không xác định")]
+    [Display(Name = "Không xác định")]
     None = 0,
 
     /// <summary>
     /// Giới tính nam.
     /// </summary>
-    [Description("Nam")]
+    [Display(Name = "Nam")]
     Male = 1,
 
     /// <summary>
     /// Giới tính nữ.
     /// </summary>
-    [Description("Nữ")]
+    [Display(Name = "Nữ")]
     Female = 2,
 
     /// <summary>
     /// Giới tính khác.
     /// </summary>
-    [Description("Khác")]
+    [Display(Name = "Khác")]
     Other = 255
 }

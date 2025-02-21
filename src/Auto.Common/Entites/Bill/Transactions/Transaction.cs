@@ -8,6 +8,7 @@ namespace Auto.Common.Entites.Bill.Transactions;
 /// <summary>
 /// Đại diện cho một giao dịch tài chính, bao gồm các thông tin về số tiền, phương thức thanh toán và trạng thái.
 /// </summary>
+[Table(nameof(Transaction))]
 public class Transaction
 {
     /// <summary>
@@ -57,7 +58,7 @@ public class Transaction
     /// - Không được vượt quá 255 ký tự.
     /// </summary>
     [StringLength(255, ErrorMessage = "Description must not exceed 255 characters.")]
-    public string Description { get; set; }
+    public string Description { get; set; } = string.Empty;
 
     /// <summary>
     /// Ngày thực hiện giao dịch
@@ -67,17 +68,11 @@ public class Transaction
 
     /// <summary>
     /// Người đã tạo giao dịch trong hệ thống
-    /// - Giới hạn tối đa 50 ký tự
-    /// - Có thể là tên người dùng hoặc mã nhân viên.
     /// </summary>
-    [StringLength(50)]
-    public string CreatedBy { get; set; }
+    public int CreatedBy { get; set; }
 
     /// <summary>
     /// Người gần nhất chỉnh sửa giao dịch
-    /// - Giới hạn tối đa 50 ký tự
-    /// - Null nếu chưa có chỉnh sửa nào.
     /// </summary>
-    [StringLength(50)]
-    public string ModifiedBy { get; set; }
+    public int? ModifiedBy { get; set; }
 }

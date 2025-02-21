@@ -10,6 +10,7 @@ namespace Auto.Common.Entites.Repair;
 /// <summary>
 /// Lớp đại diện cho lịch sử sửa chữa.
 /// </summary>
+[Table(nameof(RepairHistory))]
 public class RepairHistory
 {
     /// <summary>

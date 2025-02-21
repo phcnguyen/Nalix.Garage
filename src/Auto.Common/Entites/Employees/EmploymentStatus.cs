@@ -1,4 +1,4 @@
-﻿using System.ComponentModel;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace Auto.Common.Entites.Employees;
 
@@ -7,33 +7,36 @@ namespace Auto.Common.Entites.Employees;
 /// </summary>
 public enum EmploymentStatus
 {
+    [Display(Name = "Không xác định")]
+    None = 0,
+
     /// <summary>
     /// Nhân viên đang làm việc.
     /// </summary>
-    [Description("Đang làm việc")]
+    [Display(Name = "Đang làm việc")]
     Active = 1,
 
     /// <summary>
     /// Nhân viên đã nghỉ việc.
     /// </summary>
-    [Description("Đã nghỉ việc")]
+    [Display(Name = "Đã nghỉ việc")]
     Inactive = 2,
 
     /// <summary>
     /// Nhân viên đang nghỉ phép.
     /// </summary>
-    [Description("Đang nghỉ phép")]
+    [Display(Name = "Đang nghỉ phép")]
     OnLeave = 3,
 
     /// <summary>
     /// Nhân viên bị chấm dứt hợp đồng.
     /// </summary>
-    [Description("Bị sa thải")]
+    [Display(Name = "Bị sa thải")]
     Terminated = 4,
 
     /// <summary>
     /// Nhân viên đã nghỉ hưu.
     /// </summary>
-    [Description("Đã nghỉ hưu")]
+    [Display(Name = "Đã nghỉ hưu")]
     Retired = 5
 }

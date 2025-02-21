@@ -52,8 +52,8 @@ public class Invoice
     /// <summary>
     /// Số hóa đơn (mã duy nhất).
     /// </summary>
-    [Required(ErrorMessage = "Invoice number is required.")]
-    [StringLength(30, ErrorMessage = "Invoice number must not exceed 30 characters.")]
+    [Required(ErrorMessage = "Invoices number is required.")]
+    [StringLength(30, ErrorMessage = "Invoices number must not exceed 30 characters.")]
     public string InvoiceNumber
     {
         get => _invoiceNumber;
@@ -114,17 +114,20 @@ public class Invoice
     /// <summary>
     /// Danh sách phụ tùng thay thế.
     /// </summary>
-    public virtual List<SparePart> SpareParts { get; set; } = [];
+    [InverseProperty(nameof(SparePart))]
+    public virtual ICollection<SparePart> SpareParts { get; set; } = [];
 
     /// <summary>
     /// Danh sách cho đơn sửa chữa.
     /// </summary>
-    public virtual List<RepairOrder> RepairOrders { get; set; } = [];
+    [InverseProperty(nameof(RepairOrder))]
+    public virtual ICollection<RepairOrder> RepairOrders { get; set; } = [];
 
     /// <summary>
     /// Danh sách các giao dịch thanh toán.
     /// </summary>
-    public virtual List<Transaction> TransactionList { get; set; } = [];
+    [InverseProperty(nameof(Transaction))]
+    public virtual ICollection<Transaction> TransactionList { get; set; } = [];
 
     /// <summary>
     /// Số tiền khách đã thanh toán.

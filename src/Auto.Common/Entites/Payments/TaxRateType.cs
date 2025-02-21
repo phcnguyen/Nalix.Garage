@@ -1,18 +1,18 @@
-﻿using System.ComponentModel;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace Auto.Common.Entites.Payments;
 
 public enum TaxRateType
 {
-    [Description("Không áp dụng thuế VAT (0%)")]
+    [Display(Name = "Không áp dụng thuế VAT (0%)")]
     None = 0,
 
-    [Description("Thuế VAT 5%")]
+    [Display(Name = "Thuế VAT 5%")]
     VAT5 = 5,
 
-    [Description("Thuế VAT 8% (hỗ trợ kinh tế)")]
+    [Display(Name = "Thuế VAT 8% (hỗ trợ kinh tế)")]
     VAT8 = 8,
 
-    [Description("Thuế VAT 10% (mặc định)")]
+    [Display(Name = "Thuế VAT 10% (mặc định)")]
     VAT10 = 10
 }

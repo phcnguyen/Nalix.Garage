@@ -1,4 +1,4 @@
-﻿using System.ComponentModel;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace Auto.Common.Entites.Payments;
 
@@ -7,45 +7,24 @@ namespace Auto.Common.Entites.Payments;
 /// </summary>
 public enum PaymentStatus
 {
-    /// <summary>
-    /// Hóa đơn chưa được thanh toán.
-    /// </summary>
-    [Description("Chưa thanh toán")]
+    [Display(Name = "Chưa thanh toán")]
     Unpaid = 0,
 
-    /// <summary>
-    /// Hóa đơn đã được thanh toán đầy đủ.
-    /// </summary>
-    [Description("Đã thanh toán")]
+    [Display(Name = "Đã thanh toán")]
     Paid = 1,
 
-    /// <summary>
-    /// Thanh toán đang được xử lý.
-    /// </summary>
-    [Description("Đang xử lý")]
+    [Display(Name = "Đang xử lý")]
     Pending = 2,
 
-    /// <summary>
-    /// Hóa đơn đã quá hạn thanh toán.
-    /// </summary>
-    [Description("Quá hạn")]
+    [Display(Name = "Quá hạn")]
     Overdue = 3,
 
-    /// <summary>
-    /// Hóa đơn bị hủy bỏ.
-    /// </summary>
-    [Description("Đã hủy")]
+    [Display(Name = "Đã hủy")]
     Canceled = 4,
 
-    /// <summary>
-    /// Hóa đơn đã được thanh toán một phần.
-    /// </summary>
-    [Description("Thanh toán một phần")]
+    [Display(Name = "Thanh toán một phần")]
     PartiallyPaid = 5,
 
-    /// <summary>
-    /// Hóa đơn đã được hoàn tiền cho khách hàng.
-    /// </summary>
-    [Description("Đã hoàn tiền")]
+    [Display(Name = "Đã hoàn tiền")]
     Refunded = 6
 }

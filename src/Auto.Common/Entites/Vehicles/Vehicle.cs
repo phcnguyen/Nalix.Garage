@@ -101,7 +101,8 @@ public class Vehicle
     /// <summary>
     /// Lịch sử sửa chữa của xe.
     /// </summary>
-    public virtual List<RepairHistory> RepairHistory { get; set; } = [];
+    [InverseProperty(nameof(Repair.RepairHistory))]
+    public virtual ICollection<RepairHistory> RepairHistory { get; set; } = [];
 
     /// <summary>
     /// Ngày đăng ký xe.

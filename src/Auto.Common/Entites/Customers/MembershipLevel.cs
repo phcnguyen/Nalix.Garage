@@ -1,4 +1,4 @@
-﻿using System.ComponentModel;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace Auto.Common.Entites.Customers;
 
@@ -7,24 +7,24 @@ namespace Auto.Common.Entites.Customers;
 /// </summary>
 public enum MembershipLevel : byte
 {
-    [Description("Không xác định / Chưa đăng ký")]
+    [Display(Name = "Không xác định / Chưa đăng ký")]
     None = 0,
 
-    [Description("Khách dùng thử")]
+    [Display(Name = "Khách dùng thử")]
     Trial = 1,
 
-    [Description("Khách thường")]
+    [Display(Name = "Khách thường")]
     Standard = 2,
 
-    [Description("Thành viên bạc")]
+    [Display(Name = "Thành viên bạc")]
     Silver = 3,
 
-    [Description("Thành viên vàng")]
+    [Display(Name = "Thành viên vàng")]
     Gold = 4,
 
-    [Description("Thành viên bạch kim")]
+    [Display(Name = "Thành viên bạch kim")]
     Platinum = 5,
 
-    [Description("Thành viên kim cương (VIP)")]
+    [Display(Name = "Thành viên kim cương (VIP)")]
     Diamond = 6
 }

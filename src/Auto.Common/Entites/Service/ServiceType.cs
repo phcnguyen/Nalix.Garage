@@ -1,4 +1,4 @@
-﻿using System.ComponentModel;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace Auto.Common.Entites.Service;
 
@@ -7,18 +7,18 @@ namespace Auto.Common.Entites.Service;
 /// </summary>
 public enum ServiceType : byte
 {
-    [Description("Không xác định")]
+    [Display(Name = "Không xác định")]
     None = 0,
 
-    [Description("Bảo dưỡng định kỳ")]
+    [Display(Name = "Bảo dưỡng định kỳ")]
     Maintenance = 1,
 
-    [Description("Dịch vụ sửa chữa")]
+    [Display(Name = "Dịch vụ sửa chữa")]
     Repair = 2,
 
-    [Description("Kiểm tra xe")]
+    [Display(Name = "Kiểm tra xe")]
     Inspection = 3,
 
-    [Description("Khác")]
+    [Display(Name = "Khác")]
     Other = 255
 }

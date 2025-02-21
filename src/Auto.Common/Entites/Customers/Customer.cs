@@ -41,7 +41,7 @@ public class Customer
     /// Số điện thoại của khách hàng.
     /// </summary>
     [Required(ErrorMessage = "Phone number is required.")]
-    [StringLength(30, ErrorMessage = "Phone number must not exceed 30 characters.")]
+    [StringLength(12, ErrorMessage = "Phone number must not exceed 30 characters.")]
     [Phone(ErrorMessage = "Invalid phone number format.")]
     public string PhoneNumber
     {
@@ -73,7 +73,7 @@ public class Customer
     /// <summary>
     /// Mã số thuế của khách hàng (nếu có).
     /// </summary>
-    [StringLength(20, ErrorMessage = "Tax code must not exceed 20 characters.")]
+    [StringLength(13, ErrorMessage = "Tax code must not exceed 20 characters.")]
     public string TaxCode
     {
         get => _taxCode;
@@ -104,10 +104,12 @@ public class Customer
     /// <summary>
     /// Danh sách xe của khách hàng.
     /// </summary>
-    public virtual List<Vehicle> CarList { get; set; } = [];
+    [InverseProperty(nameof(Vehicle))]
+    public virtual ICollection<Vehicle> CarList { get; set; } = [];
 
     /// <summary>
     /// Lịch sử sửa chữa của khách hàng.
     /// </summary>
-    public virtual List<RepairHistory> RepairHistory { get; set; } = [];
+    [InverseProperty(nameof(Repair.RepairHistory))]
+    public virtual ICollection<RepairHistory> RepairHistory { get; set; } = [];
 }

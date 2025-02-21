@@ -1,4 +1,6 @@
-﻿namespace Auto.Common.Entites.Repair;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Auto.Common.Entites.Repair;
 
 /// <summary>
 /// Enum đại diện cho các trạng thái của đơn sửa chữa.
@@ -7,33 +9,21 @@ public enum RepairOrderStatus
 {
     None = 0,
 
-    /// <summary>
-    /// Chờ xác nhận.
-    /// </summary>
+    [Display(Name = "Chờ xác nhận")]
     Pending = 1,
 
-    /// <summary>
-    /// Đang chờ phụ tùng.
-    /// </summary>
+    [Display(Name = "Đang chờ phụ tùng")]
     WaitingForParts = 2,
 
-    /// <summary>
-    /// Đang sửa chữa.
-    /// </summary>
+    [Display(Name = "Đang sửa chữa")]
     InProgress = 3,
 
-    /// <summary>
-    /// Hoàn thành nhưng chưa thanh toán.
-    /// </summary>
+    [Display(Name = "Hoàn thành (chưa thanh toán)")]
     Completed = 4,
 
-    /// <summary>
-    /// Đã thanh toán.
-    /// </summary>
+    [Display(Name = "Đã thanh toán")]
     Paid = 5,
 
-    /// <summary>
-    /// Đơn đã bị hủy.
-    /// </summary>
+    [Display(Name = "Đã hủy")]
     Canceled = 6
 }

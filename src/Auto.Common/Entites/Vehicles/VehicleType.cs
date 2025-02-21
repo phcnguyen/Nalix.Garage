@@ -1,30 +1,30 @@
-﻿using System.ComponentModel;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace Auto.Common.Entites.Vehicles;
 
 public enum VehicleType : byte
 {
-    [Description("Không xác định")]
+    [Display(Name = "Không xác định")]
     None = 0,
 
-    [Description("Sedan - Xe du lịch")]
+    [Display(Name = "Sedan - Xe du lịch")]
     Sedan = 1,
 
-    [Description("SUV - Xe thể thao đa dụng")]
+    [Display(Name = "SUV - Xe thể thao đa dụng")]
     SUV = 2,
 
-    [Description("Hatchback - Xe cỡ nhỏ")]
+    [Display(Name = "Hatchback - Xe cỡ nhỏ")]
     Hatchback = 3,
 
-    [Description("Coupe - Xe thể thao")]
+    [Display(Name = "Coupe - Xe thể thao")]
     Coupe = 4,
 
-    [Description("Convertible - Xe mui trần")]
+    [Display(Name = "Convertible - Xe mui trần")]
     Convertible = 5,
 
-    [Description("Pickup - Xe bán tải")]
+    [Display(Name = "Pickup - Xe bán tải")]
     Pickup = 6,
 
-    [Description("Khác")]
+    [Display(Name = "Khác")]
     Other = 255
 }
