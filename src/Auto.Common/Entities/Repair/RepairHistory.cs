@@ -38,7 +38,7 @@ public class RepairHistory
     /// <summary>
     /// Danh sách công việc sửa chữa liên quan.
     /// </summary>
-    public virtual List<RepairTask> RepairTaskList { get; set; } = [];
+    public virtual ICollection<RepairTask> RepairTaskList { get; set; } = [];
 
     /// <summary>
     /// Tổng chi phí sửa chữa.
