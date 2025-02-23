@@ -3,6 +3,7 @@ using Notio.Logging;
 using Notio.Network.Handlers;
 using Notio.Network.Package.Helpers;
 using Notio.Shared.Memory.Buffer;
+using System;
 
 namespace Auto.Server.Threading;
 
