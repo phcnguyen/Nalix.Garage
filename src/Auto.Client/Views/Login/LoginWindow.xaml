@@ -15,6 +15,17 @@
     </Window.Resources>
 
     <Grid Margin="0,0,15,75">
+
+        <!-- ==== Thanh tiêu đề có nút Đóng & Thu nhỏ ==== -->
+        <Grid Background="{DynamicResource HeaderBackgroundBrush}" Height="40"
+              VerticalAlignment="Top">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="40" />
+                <ColumnDefinition Width="40" />
+            </Grid.ColumnDefinitions>
+        </Grid>
+
         <!-- Main Container -->
         <Border Background="{DynamicResource SecondaryBackgroundBrush}"
                 CornerRadius="5"
@@ -26,7 +37,6 @@
                 Effect="{DynamicResource DropShadow}">
 
             <Grid Margin="0,65,0,0">
-                <!-- Main Content -->
                 <StackPanel HorizontalAlignment="Center">
 
                     <!-- Input Fields -->

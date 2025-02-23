@@ -8,4 +8,9 @@ public partial class LoginWindow : Window
     {
         InitializeComponent();
     }
+
+    private void CloseWindow_Click(object sender, RoutedEventArgs e)
+    {
+        this.Close();
+    }
 }
