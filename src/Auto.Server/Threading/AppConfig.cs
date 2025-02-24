@@ -11,19 +11,17 @@ public static class AppConfig
 {
     public static ServerListener InitializeTcpServer()
     {
-        BufferAllocator bufferAllocator = new();
-
         PacketDispatcher dispatcher = new(cfg =>
-            cfg.WithPacketSerialization(
+            cfg.WithLogging(CLogging.Instance)
+               .WithPacketSerialization(
                     packet => new Memory<byte>(PackageSerializeHelper.Serialize((Notio.Network.Package.Packet)packet)),
                     data => PackageSerializeHelper.Deserialize(data.Span))
                .WithErrorHandler((exception, command) => CLogging.Instance.Error($"Error handling command:{command}", exception))
-               .WithHandler<PacketHandler>()
                .WithPacketCrypto(null, null)
                .WithPacketCompression(null, null)
+               .WithHandler<PacketHandler>()
         );
 
-        ServerProtocol serverProtocol = new(dispatcher);
-        return new ServerListener(serverProtocol, bufferAllocator, CLogging.Instance);
+        return new ServerListener(new ServerProtocol(dispatcher), new BufferAllocator(), CLogging.Instance);
     }
 }
