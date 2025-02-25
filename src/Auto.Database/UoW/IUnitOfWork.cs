@@ -3,7 +3,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Auto.Database;
+namespace Auto.Database.UoW;
 
 /// <summary>
 /// Unit of Work pattern interface để quản lý transaction
