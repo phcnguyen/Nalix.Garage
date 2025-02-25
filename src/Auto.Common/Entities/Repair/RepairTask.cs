@@ -12,6 +12,7 @@ namespace Auto.Common.Entities.Repair;
 [Table(nameof(RepairTask))]
 public class RepairTask
 {
+    private DateTime? _startDate;
     private DateTime? _completionDate;
 
     /// <summary>
@@ -50,12 +51,21 @@ public class RepairTask
     /// <summary>
     /// Ngày bắt đầu công việc.
     /// </summary>
-    public DateTime? StartDate { get; set; }
+    public DateTime? StartDate
+    {
+        get => _startDate;
+        set
+        {
+            if (value.HasValue && value > DateTime.UtcNow)
+                throw new ArgumentException("Start date cannot be in the future.");
+            _startDate = value;
+        }
+    }
 
     /// <summary>
     /// Thời gian ước tính để hoàn thành công việc (tính bằng giờ).
     /// </summary>
-    [Range(0, double.MaxValue, ErrorMessage = "Duration must be positive.")]
+    [Range(0, 1000, ErrorMessage = "Estimated duration must be between 0 and 1000 hours.")]
     public double EstimatedDuration { get; set; } = 1.0;
 
     /// <summary>

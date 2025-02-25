@@ -9,11 +9,11 @@ namespace Auto.Database.Repositories;
 
 public class Repository<T> : IRepository<T> where T : class
 {
-    protected readonly AppDbContext _context;
+    protected readonly AutoGarageDbContext _context;
     protected readonly DbSet<T> _dbSet;
 
     /// <inheritdoc />
-    public Repository(AppDbContext context)
+    public Repository(AutoGarageDbContext context)
     {
         _context = context;
         _dbSet = _context.Set<T>();

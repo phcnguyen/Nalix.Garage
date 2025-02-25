@@ -13,6 +13,8 @@ namespace Auto.Common.Entities.Suppliers;
 [Table(nameof(Supplier))]
 public class Supplier
 {
+    private DateTime? _contractEndDate;
+
     /// <summary>
     /// Mã nhà cung cấp (Unique identifier).
     /// </summary>
@@ -40,11 +42,6 @@ public class Supplier
     public string Address { get; set; } = string.Empty;
 
     /// <summary>
-    /// Danh sách số điện thoại của nhà cung cấp.
-    /// </summary>
-    public List<string> PhoneNumbers { get; set; } = [];
-
-    /// <summary>
     /// Ghi chú về nhà cung cấp.
     /// </summary>
     public string Notes { get; set; } = string.Empty;
@@ -52,7 +49,16 @@ public class Supplier
     /// <summary>
     /// Ngày kết thúc hợp tác (nếu có).
     /// </summary>
-    public DateTime? ContractEndDate { get; set; }
+    public DateTime? ContractEndDate
+    {
+        get => _contractEndDate;
+        set
+        {
+            if (value.HasValue && value < ContractStartDate)
+                throw new ArgumentException("Contract end date cannot be earlier than start date.");
+            _contractEndDate = value;
+        }
+    }
 
     /// <summary>
     /// Ngày bắt đầu hợp tác với nhà cung cấp.
@@ -84,5 +90,10 @@ public class Supplier
     /// <summary>
     /// Những loại phụ tùng cung cấp.
     /// </summary>
-    public virtual List<SparePart> SpareParts { get; set; } = [];
+    public virtual ICollection<SparePart> SpareParts { get; set; } = [];
+
+    /// <summary>
+    /// Danh sách số điện thoại của nhà cung cấp (Quan hệ 1-N với `SupplierPhone`).
+    /// </summary>
+    public virtual ICollection<SupplierPhone> PhoneNumbers { get; set; } = [];
 }

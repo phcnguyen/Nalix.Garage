@@ -13,6 +13,12 @@ public class ReplacementPart
     private int _quantity;
     private DateOnly? _expiryDate;
 
+    public ReplacementPart()
+    {
+        if (ExpiryDate.HasValue && ExpiryDate.Value < DateAdded)
+            throw new ArgumentException("Expiry date cannot be earlier than the date added.");
+    }
+
     /// <summary>
     /// Mã phụ tùng thay thế.
     /// </summary>
@@ -43,7 +49,7 @@ public class ReplacementPart
     public int Quantity
     {
         get => _quantity;
-        private set
+        set
         {
             if (value < 0)
                 throw new ArgumentException("Quantity cannot be negative.");

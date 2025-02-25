@@ -53,14 +53,14 @@ public class Transaction
     /// Số tiền liên quan đến giao dịch.
     /// - Giá trị phải lớn hơn 0.
     /// </summary>
-    [Range(0.01, double.MaxValue, ErrorMessage = "Transaction amount must be greater than 0.")]
+    [Range(0.01, 999_999_999.99, ErrorMessage = "Transaction amount must be between 0.01 and 999,999,999.99.")]
     public decimal Amount { get; set; }
 
     /// <summary>
     /// Mô tả chi tiết về giao dịch (tùy chọn)
     /// - Không được vượt quá 255 ký tự.
     /// </summary>
-    [MaxLength(255, ErrorMessage = "Description must not exceed 255 characters.")]
+    [StringLength(255, ErrorMessage = "Description must not exceed 255 characters.")]
     public string Description { get; set; } = string.Empty;
 
     /// <summary>

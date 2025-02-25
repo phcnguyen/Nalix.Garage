@@ -31,11 +31,7 @@ public class Customer
     /// </summary>
     [Required(ErrorMessage = "Full name is required.")]
     [MaxLength(100, ErrorMessage = "Full name must not exceed 100 characters.")]
-    public string Name
-    {
-        get => _fullName;
-        set => _fullName = value.Trim();
-    }
+    public string Name { get => _fullName; set => _fullName = value.Trim() ?? string.Empty; }
 
     /// <summary>
     /// Số điện thoại của khách hàng.
@@ -43,42 +39,27 @@ public class Customer
     [Required(ErrorMessage = "Phone number is required.")]
     [MaxLength(12, ErrorMessage = "Phone number must not exceed 30 characters.")]
     [Phone(ErrorMessage = "Invalid phone number format.")]
-    public string PhoneNumber
-    {
-        get => _phoneNumber;
-        set => _phoneNumber = value.Trim();
-    }
+    [RegularExpression(@"^\d{10,12}$", ErrorMessage = "Phone number must be 10-12 digits.")]
+    public string PhoneNumber { get => _phoneNumber; set => _phoneNumber = value?.Trim() ?? string.Empty; }
 
     /// <summary>
     /// Email của khách hàng.
     /// </summary>
     [EmailAddress(ErrorMessage = "Invalid email format.")]
     [StringLength(100, ErrorMessage = "Email must not exceed 100 characters.")]
-    public string Email
-    {
-        get => _email;
-        set => _email = value.Trim();
-    }
+    public string Email { get => _email; set => _email = value?.Trim() ?? string.Empty; }
 
     /// <summary>
     /// Địa chỉ của khách hàng.
     /// </summary>
     [MaxLength(255, ErrorMessage = "Address must not exceed 255 characters.")]
-    public string Address
-    {
-        get => _address;
-        set => _address = value.Trim();
-    }
+    public string Address { get => _address; set => _address = value.Trim() ?? string.Empty; }
 
     /// <summary>
     /// Mã số thuế của khách hàng (nếu có).
     /// </summary>
     [MaxLength(13, ErrorMessage = "Tax code must not exceed 20 characters.")]
-    public string TaxCode
-    {
-        get => _taxCode;
-        set => _taxCode = value.Trim();
-    }
+    public string TaxCode { get => _taxCode; set => _taxCode = value.Trim() ?? string.Empty; }
 
     /// <summary>
     /// Sinh nhật của khách hàng.
@@ -98,6 +79,7 @@ public class Customer
     /// <summary>
     /// Công nợ của khách hàng.
     /// </summary>
+    [Column(TypeName = "decimal(18,2)")]
     [Range(0, double.MaxValue, ErrorMessage = "Debt cannot be negative.")]
     public decimal Debt { get; set; } = 0;
 

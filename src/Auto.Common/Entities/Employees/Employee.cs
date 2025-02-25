@@ -10,6 +10,9 @@ namespace Auto.Common.Entities.Employees;
 [Table("Employees")]
 public class Employee
 {
+    private DateTime? _endDate;
+    private DateTime _startDate = DateTime.UtcNow;
+
     /// <summary>
     /// Mã nhân viên.
     /// </summary>
@@ -60,12 +63,29 @@ public class Employee
     /// <summary>
     /// Ngày bắt đầu làm việc.
     /// </summary>
-    public DateTime StartDate { get; set; } = DateTime.UtcNow;
+    public DateTime StartDate
+    {
+        get => _startDate;
+        set
+        {
+            if (EndDate.HasValue && value > EndDate.Value)
+                throw new ArgumentException("Start date cannot be later than end date.");
+            _startDate = value;
+        }
+    }
 
     /// <summary>
     /// Ngày kết thúc hợp đồng.
     /// </summary>
-    public DateTime? EndDate { get; set; }
+    public DateTime? EndDate
+    {
+        get => _endDate;
+        set
+        {
+            _endDate = value;
+            UpdateStatus();
+        }
+    }
 
     /// <summary>
     /// Trạng thái công việc.

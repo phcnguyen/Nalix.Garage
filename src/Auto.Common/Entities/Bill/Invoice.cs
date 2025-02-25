@@ -18,6 +18,7 @@ namespace Auto.Common.Entities.Bill;
 [Table(nameof(Invoice))]
 public class Invoice
 {
+    private decimal _discount;
     private string _invoiceNumber = string.Empty;
 
     /// <summary>
@@ -52,13 +53,9 @@ public class Invoice
     /// <summary>
     /// Số hóa đơn (mã duy nhất).
     /// </summary>
-    [Required(ErrorMessage = "Invoices number is required.")]
-    [MaxLength(30, ErrorMessage = "Invoices number must not exceed 30 characters.")]
-    public string InvoiceNumber
-    {
-        get => _invoiceNumber;
-        set => _invoiceNumber = value.Trim();
-    }
+    [Required(ErrorMessage = "Invoice number is required.")]
+    [MaxLength(30, ErrorMessage = "Invoice number must not exceed 30 characters.")]
+    public string InvoiceNumber { get => _invoiceNumber; set => _invoiceNumber = value?.Trim() ?? string.Empty; }
 
     /// <summary>
     /// Ngày lập hóa đơn.
@@ -84,32 +81,16 @@ public class Invoice
     /// Giá trị giảm giá.
     /// </summary>
     [Range(0, double.MaxValue, ErrorMessage = "Discount must be a positive value.")]
-    public decimal Discount { get; set; } = 0;
-
-    /// <summary>
-    /// Tổng tiền trước thuế và giảm giá.
-    /// </summary>
-    public decimal Subtotal { get; private set; }
-
-    /// <summary>
-    /// Số tiền thuế thực tế.
-    /// </summary>
-    public decimal TaxAmount { get; private set; }
-
-    /// <summary>
-    /// Số tiền giảm giá thực tế.
-    /// </summary>
-    public decimal DiscountAmount { get; private set; }
-
-    /// <summary>
-    /// Tổng số tiền cần thanh toán sau thuế và giảm giá.
-    /// </summary>
-    public decimal TotalAmount { get; private set; }
-
-    /// <summary>
-    /// Số tiền còn nợ.
-    /// </summary>
-    public decimal BalanceDue => TotalAmount - (TransactionList?.Sum(t => t.Amount) ?? 0);
+    public decimal Discount
+    {
+        get => _discount;
+        set
+        {
+            if (DiscountType == DiscountType.Percentage && (value < 0 || value > 100))
+                throw new ArgumentException("Discount percentage must be between 0 and 100.");
+            _discount = value;
+        }
+    }
 
     /// <summary>
     /// Danh sách phụ tùng thay thế.
@@ -127,26 +108,49 @@ public class Invoice
     public virtual ICollection<Transaction> TransactionList { get; set; } = [];
 
     /// <summary>
-    /// Số tiền khách đã thanh toán.
+    /// Tính tổng tiền trước thuế và giảm giá.
     /// </summary>
-    public decimal AmountPaid() =>
-        TransactionList?
-            .Where(t => t.Type == TransactionType.Revenue)
-            .Sum(t => t.Amount) ?? 0;
+    [Column(TypeName = "decimal(18,2)")]
+    public decimal Subtotal => CalculateSubtotal();
 
     /// <summary>
-    /// Cập nhật tổng tiền, thuế và giảm giá.
+    /// Số tiền giảm giá thực tế.
     /// </summary>
-    public void UpdateTotals()
-    {
-        Subtotal = (SpareParts?.Sum(p => p.SellingPrice) ?? 0) +
-                   (RepairOrders?.Sum(o => o.TotalRepairCost()) ?? 0);
+    public decimal DiscountAmount => CalculateDiscount();
 
-        DiscountAmount = DiscountType == DiscountType.Percentage
-            ? Subtotal * Discount / 100
-            : Discount;
+    /// <summary>
+    /// Số tiền thuế thực tế.
+    /// </summary>
+    public decimal TaxAmount => CalculateTax();
 
-        TaxAmount = (Subtotal - DiscountAmount) * ((decimal)TaxRate / 100);
-        TotalAmount = Subtotal - DiscountAmount + TaxAmount;
-    }
+    /// <summary>
+    /// Tổng số tiền cần thanh toán sau thuế và giảm giá.
+    /// </summary>
+    public decimal TotalAmount => CalculateTotalAmount();
+
+    /// <summary>
+    /// Số tiền còn nợ.
+    /// </summary>
+    public decimal BalanceDue => TotalAmount - AmountPaid();
+
+    /// <summary>
+    /// Hóa đơn đã thanh toán đủ chưa?
+    /// </summary>
+    public bool IsFullyPaid => BalanceDue <= 0;
+
+    /// <summary>
+    /// Số tiền khách đã thanh toán.
+    /// </summary>
+    public decimal AmountPaid()
+        => TransactionList?.Where(t => t.Type == TransactionType.Revenue).Sum(t => t.Amount) ?? 0;
+
+    private decimal CalculateSubtotal()
+        => (SpareParts?.Sum(p => p.SellingPrice) ?? 0) + (RepairOrders?.Sum(o => o.TotalRepairCost()) ?? 0);
+
+    private decimal CalculateDiscount()
+        => DiscountType == DiscountType.Percentage ? Subtotal * Discount / 100 : Discount;
+
+    private decimal CalculateTax() => (Subtotal - DiscountAmount) * ((decimal)TaxRate / 100);
+
+    private decimal CalculateTotalAmount() => Subtotal - DiscountAmount + TaxAmount;
 }

@@ -18,11 +18,11 @@ namespace Auto
     {
         private static async Task Main(string[] args)
         {
-            var options = new DbContextOptionsBuilder<AppDbContext>()
+            var options = new DbContextOptionsBuilder<AutoGarageDbContext>()
                 .UseInMemoryDatabase(databaseName: "TestDatabase")
                 .Options;
 
-            using var context = new AppDbContext(options);
+            using var context = new AutoGarageDbContext(options);
             try
             {
                 await TestCustomerRepository(context);
@@ -42,7 +42,7 @@ namespace Auto
             }
         }
 
-        private static async Task TestCustomerRepository(AppDbContext context)
+        private static async Task TestCustomerRepository(AutoGarageDbContext context)
         {
             var customerRepository = new Repository<Customer>(context);
 
@@ -68,7 +68,7 @@ namespace Auto
             await customerRepository.SaveChangesAsync();
         }
 
-        private static async Task TestVehicleRepository(AppDbContext context)
+        private static async Task TestVehicleRepository(AutoGarageDbContext context)
         {
             var vehicleRepository = new Repository<Vehicle>(context);
 
@@ -94,7 +94,7 @@ namespace Auto
             await vehicleRepository.SaveChangesAsync();
         }
 
-        private static async Task TestEmployeeRepository(AppDbContext context)
+        private static async Task TestEmployeeRepository(AutoGarageDbContext context)
         {
             var employeeRepository = new Repository<Employee>(context);
 
@@ -120,13 +120,12 @@ namespace Auto
             await employeeRepository.SaveChangesAsync();
         }
 
-        private static async Task TestInvoiceRepository(AppDbContext context)
+        private static async Task TestInvoiceRepository(AutoGarageDbContext context)
         {
             var invoiceRepository = new Repository<Invoice>(context);
 
             // Test Add Invoice
             var newInvoice = new Invoice { OwnerId = 1, CreatedBy = 1, InvoiceNumber = "INV12345", InvoiceDate = DateTime.UtcNow, TaxRate = TaxRateType.VAT10, DiscountType = DiscountType.None, PaymentStatus = PaymentStatus.Unpaid, Discount = 0 };
-            newInvoice.UpdateTotals();
             await invoiceRepository.AddAsync(newInvoice);
             Console.WriteLine("Added new invoice.");
 
@@ -136,7 +135,6 @@ namespace Auto
 
             // Test Update Invoice
             invoice.Discount = 100;
-            invoice.UpdateTotals();
             invoiceRepository.Update(invoice);
             Console.WriteLine("Updated invoice discount.");
 
@@ -148,7 +146,7 @@ namespace Auto
             await invoiceRepository.SaveChangesAsync();
         }
 
-        private static async Task TestSparePartRepository(AppDbContext context)
+        private static async Task TestSparePartRepository(AutoGarageDbContext context)
         {
             var sparePartRepository = new Repository<SparePart>(context);
 
@@ -174,7 +172,7 @@ namespace Auto
             await sparePartRepository.SaveChangesAsync();
         }
 
-        private static async Task TestRepairTaskRepository(AppDbContext context)
+        private static async Task TestRepairTaskRepository(AutoGarageDbContext context)
         {
             var repairTaskRepository = new Repository<RepairTask>(context);
 
@@ -201,7 +199,7 @@ namespace Auto
             await repairTaskRepository.SaveChangesAsync();
         }
 
-        private static async Task TestServiceItemRepository(AppDbContext context)
+        private static async Task TestServiceItemRepository(AutoGarageDbContext context)
         {
             var serviceItemRepository = new Repository<ServiceItem>(context);
 
@@ -211,7 +209,7 @@ namespace Auto
             Console.WriteLine("Added new service item.");
 
             // Test Get ServiceItem
-            var serviceItem = await serviceItemRepository.GetByIdAsync(newServiceItem.ServiceId);
+            var serviceItem = await serviceItemRepository.GetByIdAsync(newServiceItem.ServiceItemId);
             Console.WriteLine($"Retrieved service item: {serviceItem.Description}, {serviceItem.UnitPrice}");
 
             // Test Update ServiceItem
@@ -220,19 +218,19 @@ namespace Auto
             Console.WriteLine("Updated service item price.");
 
             // Test Delete ServiceItem
-            await serviceItemRepository.DeleteAsync(serviceItem.ServiceId);
+            await serviceItemRepository.DeleteAsync(serviceItem.ServiceItemId);
             Console.WriteLine("Deleted service item.");
 
             // Save changes
             await serviceItemRepository.SaveChangesAsync();
         }
 
-        private static async Task TestSupplierRepository(AppDbContext context)
+        private static async Task TestSupplierRepository(AutoGarageDbContext context)
         {
             var supplierRepository = new Repository<Supplier>(context);
 
             // Test Add Supplier
-            var newSupplier = new Supplier { Name = "Auto Parts Co.", Email = "contact@autoparts.com", Address = "123 Supplier Street", PhoneNumbers = ["1234567890"], Notes = "Reliable supplier", ContractStartDate = DateTime.UtcNow, BankAccount = "123456789", TaxCode = "TAX123", Status = SupplierStatus.Active, PaymentTerms = PaymentTerms.Net30 };
+            var newSupplier = new Supplier { Name = "Auto Parts Co.", Email = "contact@autoparts.com", Address = "123 Supplier Street", Notes = "Reliable supplier", ContractStartDate = DateTime.UtcNow, BankAccount = "123456789", TaxCode = "TAX123", Status = SupplierStatus.Active, PaymentTerms = PaymentTerms.Net30 };
             await supplierRepository.AddAsync(newSupplier);
             Console.WriteLine("Added new supplier.");
 

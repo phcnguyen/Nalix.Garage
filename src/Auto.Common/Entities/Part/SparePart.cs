@@ -14,6 +14,12 @@ public class SparePart
     private decimal _sellingPrice;
     private int _inventoryQuantity;
 
+    public SparePart()
+    {
+        if (SellingPrice < PurchasePrice)
+            throw new ArgumentException("Selling price cannot be lower than purchase price.");
+    }
+
     /// <summary>
     /// Mã phụ tùng.
     /// </summary>
@@ -70,7 +76,7 @@ public class SparePart
     public int InventoryQuantity
     {
         get => _inventoryQuantity;
-        private set
+        set
         {
             if (value < 0)
                 throw new ArgumentException("Inventory quantity cannot be negative.");
@@ -83,17 +89,4 @@ public class SparePart
     /// </summary>
     [Required]
     public bool IsDiscontinued { get; set; } = false;
-
-    /// <summary>
-    /// Điều chỉnh số lượng tồn kho (cộng/trừ một giá trị dương).
-    /// </summary>
-    /// <param name="quantity">Số lượng cần thay đổi.</param>
-    /// <exception cref="ArgumentException">Nếu số lượng tồn kho bị âm.</exception>
-    public void AdjustInventory(int quantity)
-    {
-        if (InventoryQuantity + quantity < 0)
-            throw new ArgumentException("Inventory quantity cannot be negative.");
-
-        InventoryQuantity += quantity;
-    }
 }

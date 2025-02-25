@@ -25,13 +25,13 @@ public class RepairOrder
     /// <summary>
     /// Id hóa đơn.
     /// </summary>
-    [ForeignKey(nameof(Invoice))]
+    [ForeignKey(nameof(Bill.Invoice))]
     public int InvoiceId { get; set; }
 
     /// <summary>
     /// Thông tin hóa đơn liên quan (Navigation Property).
     /// </summary>
-    public virtual Invoice Invoices { get; set; }
+    public virtual Invoice Invoice { get; set; }
 
     /// <summary>
     /// Id chủ xe.
@@ -47,13 +47,13 @@ public class RepairOrder
     /// <summary>
     /// Mã xe liên quan đến đơn sửa chữa.
     /// </summary>
-    [ForeignKey(nameof(Vehicle))]
+    [ForeignKey(nameof(Vehicles.Vehicle))]
     public int CarId { get; set; }
 
     /// <summary>
     /// Thông tin xe liên quan (Navigation Property).
     /// </summary>
-    public virtual Vehicle Car { get; set; }
+    public virtual Vehicle Vehicle { get; set; }
 
     /// <summary>
     /// Ngày lập đơn.

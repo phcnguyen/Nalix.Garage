@@ -22,13 +22,13 @@ public class RepairHistory
     /// <summary>
     /// Mã xe liên quan đến lịch sử sửa chữa.
     /// </summary>
-    [ForeignKey(nameof(Vehicle))]
-    public int CarId { get; set; }
+    [ForeignKey(nameof(Vehicles.Vehicle))]
+    public int VehicleId { get; set; }
 
     /// <summary>
     /// Thông tin xe liên quan (Navigation Property).
     /// </summary>
-    public virtual Vehicle Car { get; set; }
+    public virtual Vehicle Vehicle { get; set; }
 
     /// <summary>
     /// Ngày sửa chữa.
@@ -43,5 +43,6 @@ public class RepairHistory
     /// <summary>
     /// Tổng chi phí sửa chữa.
     /// </summary>
-    public decimal TotalCost() => RepairTaskList?.Sum(task => task.ServiceItem?.UnitPrice ?? 0) ?? 0;
+    [Column(TypeName = "decimal(18,2)")]
+    public decimal TotalCost => (RepairTaskList ?? []).Sum(task => task.ServiceItem?.UnitPrice ?? 0);
 }

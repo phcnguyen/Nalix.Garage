@@ -63,11 +63,8 @@ public class Vehicle
     /// </summary>
     [Required(ErrorMessage = "Vehicle license plate is required.")]
     [MaxLength(9)]
-    public string CarLicensePlate
-    {
-        get => _carLicensePlate;
-        set => _carLicensePlate = value.Trim().ToUpper();
-    }
+    [RegularExpression(@"^[0-9]{2}[A-Z]{1,2}-[0-9]{3,5}$", ErrorMessage = "Invalid license plate format.")]
+    public string CarLicensePlate { get => _carLicensePlate; set => _carLicensePlate = value?.Trim().ToUpper() ?? string.Empty; }
 
     /// <summary>
     /// Model xe.
@@ -102,7 +99,7 @@ public class Vehicle
     /// <summary>
     /// Lịch sử sửa chữa của xe.
     /// </summary>
-    public virtual ICollection<RepairHistory> RepairHistory { get; set; } = [];
+    public virtual ICollection<RepairHistory> RepairHistoryes { get; set; } = [];
 
     /// <summary>
     /// Ngày đăng ký xe.
@@ -112,7 +109,7 @@ public class Vehicle
     /// <summary>
     /// Quá trình lái xe (Km đã đi).
     /// </summary>
-    [Range(0, 1_000_000, ErrorMessage = "Mileage must be a positive value.")]
+    [Range(0, 1000000, ErrorMessage = "Mileage must be between 0 and 1,000,000 km.")]
     public double Mileage { get; set; } = 0;
 
     /// <summary>
