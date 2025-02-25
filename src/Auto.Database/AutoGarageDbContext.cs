@@ -38,6 +38,18 @@ public class AutoGarageDbContext(DbContextOptions<AutoGarageDbContext> options) 
 
         #region Vehicle Configuration
 
+        modelBuilder.Entity<Account>()
+            .HasIndex(a => a.Username)
+            .IsUnique(); // Đảm bảo username duy nhất
+
+        modelBuilder.Entity<Account>()
+            .Property(a => a.Role)
+            .HasConversion<byte>(); // Chuyển đổi enum RoleType thành int trong DB
+
+        #endregion Vehicle Configuration
+
+        #region Vehicle Configuration
+
         // Cấu hình cho bảng Vehicle
         modelBuilder.Entity<Vehicle>()
             .HasIndex(v => v.CarLicensePlate)
@@ -243,7 +255,7 @@ public class AutoGarageDbContext(DbContextOptions<AutoGarageDbContext> options) 
 
         modelBuilder.Entity<Transaction>()
             .Property(t => t.Type)
-            .HasConversion<int>();
+            .HasConversion<byte>();
 
         modelBuilder.Entity<Transaction>()
             .HasIndex(t => t.Status);

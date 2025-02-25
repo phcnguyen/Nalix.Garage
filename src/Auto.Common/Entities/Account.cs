@@ -32,12 +32,23 @@ public class Account
     public string PasswordHash { get; private set; } = string.Empty;
 
     /// <summary>
+    /// Vai trò của tài khoản trong hệ thống.
+    /// </summary>
+    [Required]
+    public RoleType Role { get; set; } = RoleType.User;
+
+    /// <summary>
+    /// Trạng thái hoạt động của tài khoản.
+    /// </summary>
+    public bool IsActive { get; set; } = true;
+
+    /// <summary>
+    /// Thời gian đăng nhập gần nhất.
+    /// </summary>
+    public DateTime? LastLogin { get; set; }
+
+    /// <summary>
     /// Ngày tạo tài khoản.
     /// </summary>
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-
-    /// <summary>
-    /// Ngày cập nhật cuối cùng.
-    /// </summary>
-    public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 }

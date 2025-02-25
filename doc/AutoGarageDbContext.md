@@ -420,6 +420,271 @@ foreach (var inv in unpaidInvoices)
 }
 ```
 
+### 5.9. Truy vấn doanh thu theo khoảng thời gian
+
+- Mục đích: Tính tổng doanh thu từ các giao dịch thanh toán trong một khoảng thời gian (ví dụ: tháng 2/2025).
+
+```csharp
+var startDate = new DateTime(2025, 2, 1);
+var endDate = new DateTime(2025, 2, 28);
+
+var revenue = context.Transactions
+    .Where(t => t.Type == TransactionType.Revenue 
+             && t.Status == TransactionStatus.Completed 
+             && t.TransactionDate >= startDate 
+             && t.TransactionDate <= endDate)
+    .Sum(t => t.Amount);
+
+Console.WriteLine($"Doanh thu từ {startDate:dd/MM/yyyy} đến {endDate:dd/MM/yyyy}: {revenue:N0} VND");
+```
+
+### 5.10. Kiểm tra tồn kho phụ tùng sắp hết
+
+- Mục đích: Liệt kê các phụ tùng có số lượng tồn kho dưới ngưỡng tối thiểu (ví dụ: dưới 5 cái).
+
+```csharp
+var lowStockParts = context.SpareParts
+    .Where(sp => sp.InventoryQuantity < 5 && !sp.IsDiscontinued)
+    .Include(sp => sp.Supplier)
+    .ToList();
+
+foreach (var part in lowStockParts)
+{
+    Console.WriteLine($"Phụ tùng: {part.PartName}, Tồn kho: {part.InventoryQuantity}, Nhà cung cấp: {part.Supplier.Name}");
+}
+```
+
+### 5.11. Tạo báo cáo công việc của nhân viên
+
+- Mục đích: Lấy danh sách công việc sửa chữa mà một nhân viên đã thực hiện trong tuần qua.
+
+```csharp
+var employeeId = 1;
+var lastWeek = DateTime.UtcNow.AddDays(-7);
+
+var employeeTasks = context.RepairTasks
+    .Where(rt => rt.EmployeeId == employeeId 
+              && rt.StartDate >= lastWeek)
+    .Include(rt => rt.ServiceItem)
+    .OrderBy(rt => rt.StartDate)
+    .ToList();
+
+Console.WriteLine($"Công việc của nhân viên ID {employeeId} trong tuần qua:");
+foreach (var task in employeeTasks)
+{
+    Console.WriteLine($"- {task.ServiceItem.Description}, Trạng thái: {task.Status}, Bắt đầu: {task.StartDate}");
+}
+```
+
+### 5.12. Thêm nhà cung cấp và phụ tùng cùng lúc
+
+- Mục đích: Thêm một nhà cung cấp mới cùng với danh sách phụ tùng và số điện thoại liên quan.
+
+```csharp
+var supplier = new Supplier
+{
+    Name = "Công ty Phụ tùng XYZ",
+    Email = "xyz@parts.com",
+    TaxCode = "1234567890",
+    PhoneNumbers = new List<SupplierPhone>
+    {
+        new SupplierPhone { PhoneNumber = "0987654321" }
+    },
+    SpareParts = new List<SparePart>
+    {
+        new SparePart
+        {
+            PartName = "Lọc gió XYZ",
+            PurchasePrice = 80000m,
+            SellingPrice = 120000m,
+            InventoryQuantity = 20
+        }
+    }
+};
+context.Suppliers.Add(supplier);
+context.SaveChanges();
+
+Console.WriteLine($"Đã thêm nhà cung cấp {supplier.Name} với mã ID {supplier.SupplierId}");
+```
+
+### 5.13. Tìm xe có lịch sử sửa chữa nhiều nhất
+
+```csharp
+var mostRepairedCar = context.Cars
+    .Select(v => new
+    {
+        Vehicle = v,
+        RepairCount = v.RepairHistoryes.Count
+    })
+    .OrderByDescending(x => x.RepairCount)
+    .FirstOrDefault();
+
+if (mostRepairedCar != null)
+{
+    Console.WriteLine($"Xe sửa nhiều nhất: {mostRepairedCar.Vehicle.CarLicensePlate}, Số lần sửa: {mostRepairedCar.RepairCount}");
+}
+```
+
+### 5.14. Cập nhật giá dịch vụ hàng loạt
+
+```csharp
+var maintenanceServices = context.ServiceItem
+    .Where(si => si.Type == ServiceType.Maintenance)
+    .ToList();
+
+foreach (var service in maintenanceServices)
+{
+    service.UnitPrice *= 1.10m; // Tăng 10%
+}
+context.SaveChanges();
+
+Console.WriteLine($"Đã cập nhật giá cho {maintenanceServices.Count} dịch vụ bảo dưỡng.");
+```
+
+### 5.15. Lấy danh sách hóa đơn quá hạn thanh toán
+
+```csharp
+var overdueInvoices = context.Invoices
+    .Where(i => !i.IsFullyPaid 
+             && i.InvoiceDate < DateTime.UtcNow.AddDays(-7))
+    .Include(i => i.Owner)
+    .ToList();
+
+foreach (var inv in overdueInvoices)
+{
+    Console.WriteLine($"Hóa đơn: {inv.InvoiceNumber}, Khách hàng: {inv.Owner.Name}, Quá hạn: {(DateTime.UtcNow - inv.InvoiceDate).Days} ngày");
+}
+```
+
+### 5.16. Kiểm tra xe sắp hết hạn bảo hiểm
+
+```csharp
+var upcomingExpiries = context.Cars
+    .Where(v => v.InsuranceExpiryDate.HasValue 
+             && v.InsuranceExpiryDate.Value <= DateTime.UtcNow.AddDays(30)
+             && v.InsuranceExpiryDate.Value >= DateTime.UtcNow)
+    .Include(v => v.Owner)
+    .ToList();
+
+foreach (var car in upcomingExpiries)
+{
+    Console.WriteLine($"Xe: {car.CarLicensePlate}, Chủ xe: {car.Owner.Name}, Hết hạn bảo hiểm: {car.InsuranceExpiryDate.Value:dd/MM/yyyy}");
+}
+```
+
+### 5.17. Tính tổng chi phí sửa chữa của khách hàng
+
+```csharp
+var customerId = 1;
+var startOfYear = new DateTime(DateTime.UtcNow.Year, 1, 1);
+
+var totalRepairCost = context.RepairOrders
+    .Where(ro => ro.OwnerId == customerId 
+              && ro.Invoice.InvoiceDate >= startOfYear)
+    .Sum(ro => ro.Invoice.TotalAmount);
+
+Console.WriteLine($"Tổng chi phí sửa chữa của khách hàng ID {customerId} trong năm {DateTime.UtcNow.Year}: {totalRepairCost:N0} VND");
+```
+
+### 5.18. Thêm phụ tùng thay thế vào đơn sửa chữa
+
+```csharp
+var repairOrder = context.RepairOrders
+    .Include(ro => ro.ReplacementPartList)
+    .FirstOrDefault(ro => ro.RepairOrderId == 1);
+
+var sparePart = context.SpareParts
+    .FirstOrDefault(sp => sp.PartId == 1);
+
+if (repairOrder != null && sparePart != null)
+{
+    var replacementPart = new ReplacementPart
+    {
+        PartCode = "REP-001",
+        PartName = sparePart.PartName,
+        UnitPrice = sparePart.SellingPrice,
+        Quantity = 1,
+        Manufacturer = "OEM"
+    };
+    repairOrder.ReplacementPartList.Add(replacementPart);
+    sparePart.AdjustInventory(-1); // Giảm tồn kho
+    context.SaveChanges();
+    Console.WriteLine($"Đã thêm phụ tùng {replacementPart.PartName} vào đơn sửa chữa ID {repairOrder.RepairOrderId}");
+}
+```
+
+### 5.19. Tạo báo cáo phụ tùng bán chạy
+
+```csharp
+var topParts = context.ReplacementPart
+    .GroupBy(rp => new { rp.PartCode, rp.PartName })
+    .Select(g => new
+    {
+        PartCode = g.Key.PartCode,
+        PartName = g.Key.PartName,
+        TotalUsed = g.Sum(rp => rp.Quantity)
+    })
+    .OrderByDescending(x => x.TotalUsed)
+    .Take(5)
+    .ToList();
+
+Console.WriteLine("Top 5 phụ tùng bán chạy:");
+foreach (var part in topParts)
+{
+    Console.WriteLine($"- {part.PartName} (Mã: {part.PartCode}), Số lượng: {part.TotalUsed}");
+}
+```
+
+### 5.20. Kiểm tra nhà cung cấp ngừng hợp tác
+
+```csharp
+var inactiveSuppliersWithStock = context.Suppliers
+    .Where(s => s.Status == SupplierStatus.Inactive)
+    .Include(s => s.SpareParts)
+    .Where(s => s.SpareParts.Any(sp => sp.InventoryQuantity > 0))
+    .ToList();
+
+foreach (var supplier in inactiveSuppliersWithStock)
+{
+    Console.WriteLine($"Nhà cung cấp: {supplier.Name}, Còn tồn kho: {supplier.SpareParts.Sum(sp => sp.InventoryQuantity)} phụ tùng");
+}
+```
+
+### 5.21. Xuất danh sách công việc chưa hoàn thành
+
+```csharp
+var pendingTasks = context.RepairTasks
+    .Where(rt => rt.Status == RepairOrderStatus.Pending || rt.Status == RepairOrderStatus.InProgress)
+    .Include(rt => rt.Employee)
+    .Include(rt => rt.ServiceItem)
+    .ToList();
+
+Console.WriteLine("Danh sách công việc chưa hoàn thành:");
+foreach (var task in pendingTasks)
+{
+    Console.WriteLine($"- Dịch vụ: {task.ServiceItem.Description}, Nhân viên: {task.Employee.Name}, Trạng thái: {task.Status}");
+}
+```
+
+### 5.22. Gửi thông báo hóa đơn quá hạn qua email giả lập
+
+```csharp
+var overdueInvoices = context.Invoices
+    .Where(i => !i.IsFullyPaid && i.InvoiceDate < DateTime.UtcNow.AddDays(-7))
+    .Include(i => i.Owner)
+    .ToList();
+
+foreach (var invoice in overdueInvoices)
+{
+    var daysOverdue = (DateTime.UtcNow - invoice.InvoiceDate).Days;
+    var message = $"Kính gửi {invoice.Owner.Name},\n" +
+                  $"Hóa đơn {invoice.InvoiceNumber} của bạn đã quá hạn {daysOverdue} ngày. " +
+                  $"Số tiền còn lại: {invoice.BalanceDue:N0} VND. Vui lòng thanh toán sớm.\n" +
+                  $"Trân trọng,\nGarage Ô tô XYZ";
+    Console.WriteLine($"Gửi email đến {invoice.Owner.Email}:\n{message}\n---");
+}
+```
+
 ## 6. Kết luận
 
 `AutoGarageDbContext` được thiết kế với mục tiêu tối ưu hiệu suất và đảm bảo tính toàn vẹn dữ liệu. Các chỉ mục và ràng buộc được triển khai cẩn thận để hỗ trợ truy vấn nhanh và tránh lỗi logic. Các ví dụ trên minh họa cách sử dụng thực tế, từ thêm dữ liệu, truy vấn, đến cập nhật trạng thái. Đây là nền tảng vững chắc cho ứng dụng quản lý garage ô tô, có thể mở rộng khi nhu cầu tăng.
