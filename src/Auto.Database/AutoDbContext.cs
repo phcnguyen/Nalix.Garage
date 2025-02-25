@@ -88,12 +88,10 @@ public class AutoDbContext(DbContextOptions<AutoDbContext> options) : DbContext(
             .IsUnique();
 
         // Index cho OwnerId giúp tối ưu truy vấn khi tìm kiếm xe theo chủ sở hữu
-        modelBuilder.Entity<Vehicle>()
-            .HasIndex(v => v.OwnerId);
+        modelBuilder.Entity<Vehicle>().HasIndex(v => v.OwnerId);
 
         // Index cho CarBrand giúp tăng tốc tìm kiếm xe theo hãng
-        modelBuilder.Entity<Vehicle>()
-            .HasIndex(v => v.CarBrand);
+        modelBuilder.Entity<Vehicle>().HasIndex(v => v.CarBrand);
 
         // Index phức hợp giúp tối ưu truy vấn khi lọc theo nhiều tiêu chí
         modelBuilder.Entity<Vehicle>()
@@ -112,21 +110,16 @@ public class AutoDbContext(DbContextOptions<AutoDbContext> options) : DbContext(
             .HasIndex(i => i.InvoiceNumber)
             .IsUnique();
 
-        // Index giúp tối ưu truy vấn theo chủ hóa đơn
-        modelBuilder.Entity<Invoice>()
-            .HasIndex(i => i.OwnerId);
-
-        // Index hỗ trợ truy vấn nhanh theo người tạo hóa đơn
-        modelBuilder.Entity<Invoice>()
-            .HasIndex(i => i.CreatedBy);
-
-        // Index giúp tối ưu tìm kiếm hóa đơn theo ngày lập
-        modelBuilder.Entity<Invoice>()
-            .HasIndex(i => i.InvoiceDate);
+        // Index
+        // 1.Giúp tối ưu truy vấn theo chủ hóa đơn
+        // 2.Hỗ trợ truy vấn nhanh theo người tạo hóa đơn
+        // 3.Giúp tối ưu tìm kiếm hóa đơn theo ngày lập
+        modelBuilder.Entity<Invoice>().HasIndex(i => i.OwnerId);
+        modelBuilder.Entity<Invoice>().HasIndex(i => i.CreatedBy);
+        modelBuilder.Entity<Invoice>().HasIndex(i => i.InvoiceDate);
 
         // Bộ lọc toàn cục (Global Query Filter) để chỉ lấy hóa đơn chưa thanh toán
-        // modelBuilder.Entity<Invoice>()
-        //    .HasQueryFilter(i => !i.IsFullyPaid);
+        // modelBuilder.Entity<Invoice>().HasQueryFilter(i => !i.IsFullyPaid);
     }
 
     private static void ConfigureCustomer(ModelBuilder modelBuilder)
@@ -141,13 +134,9 @@ public class AutoDbContext(DbContextOptions<AutoDbContext> options) : DbContext(
             .HasIndex(c => c.PhoneNumber)
             .IsUnique();
 
-        // Index hỗ trợ truy vấn theo mã số thuế
-        modelBuilder.Entity<Customer>()
-            .HasIndex(c => c.TaxCode);
-
-        // Index giúp tối ưu tìm kiếm khách hàng theo tên
-        modelBuilder.Entity<Customer>()
-            .HasIndex(c => c.Name);
+        // Index hỗ trợ truy vấn theo mã số thuế và theo tên
+        modelBuilder.Entity<Customer>().HasIndex(c => c.TaxCode);
+        modelBuilder.Entity<Customer>().HasIndex(c => c.Name);
     }
 
     private static void ConfigureEmployee(ModelBuilder modelBuilder)
@@ -158,11 +147,8 @@ public class AutoDbContext(DbContextOptions<AutoDbContext> options) : DbContext(
             .IsUnique();
 
         // Index giúp tối ưu truy vấn theo số điện thoại và trạng thái làm việc
-        modelBuilder.Entity<Employee>()
-            .HasIndex(e => e.PhoneNumber);
-
-        modelBuilder.Entity<Employee>()
-            .HasIndex(e => e.Status);
+        modelBuilder.Entity<Employee>().HasIndex(e => e.PhoneNumber);
+        modelBuilder.Entity<Employee>().HasIndex(e => e.Status);
 
         // Chuyển đổi enum thành byte để tối ưu lưu trữ
         modelBuilder.Entity<Employee>()
@@ -201,8 +187,7 @@ public class AutoDbContext(DbContextOptions<AutoDbContext> options) : DbContext(
             .OnDelete(DeleteBehavior.Cascade); // Xóa Supplier sẽ xóa luôn danh sách số điện thoại
 
         // Tạo index cho (SupplierId, PhoneNumber) giúp tối ưu tìm kiếm
-        modelBuilder.Entity<SupplierPhone>()
-            .HasIndex(sp => new { sp.SupplierId, sp.PhoneNumber });
+        modelBuilder.Entity<SupplierPhone>().HasIndex(sp => new { sp.SupplierId, sp.PhoneNumber });
     }
 
     private static void ConfigureSparePart(ModelBuilder modelBuilder)
@@ -229,8 +214,7 @@ public class AutoDbContext(DbContextOptions<AutoDbContext> options) : DbContext(
             .IsUnique();
 
         // Index giúp tăng tốc tìm kiếm phụ tùng theo tên
-        modelBuilder.Entity<SparePart>()
-            .HasIndex(sp => sp.PartName);
+        modelBuilder.Entity<SparePart>().HasIndex(sp => sp.PartName);
     }
 
     private static void ConfigureRepairTask(ModelBuilder modelBuilder)
@@ -250,14 +234,9 @@ public class AutoDbContext(DbContextOptions<AutoDbContext> options) : DbContext(
             .OnDelete(DeleteBehavior.Restrict);
 
         // Index tối ưu tìm kiếm và truy vấn
-        modelBuilder.Entity<RepairTask>()
-            .HasIndex(rt => rt.Status);
-
-        modelBuilder.Entity<RepairTask>()
-            .HasIndex(rt => new { rt.StartDate, rt.CompletionDate });
-
-        modelBuilder.Entity<RepairTask>()
-            .HasIndex(rt => rt.EmployeeId);
+        modelBuilder.Entity<RepairTask>().HasIndex(rt => rt.Status);
+        modelBuilder.Entity<RepairTask>().HasIndex(rt => new { rt.StartDate, rt.CompletionDate });
+        modelBuilder.Entity<RepairTask>().HasIndex(rt => rt.EmployeeId);
 
         // Ràng buộc kiểm tra CompletionDate phải lớn hơn hoặc bằng StartDate hoặc null
         modelBuilder.Entity<RepairTask>()
@@ -267,11 +246,8 @@ public class AutoDbContext(DbContextOptions<AutoDbContext> options) : DbContext(
     private static void ConfigureServiceItem(ModelBuilder modelBuilder)
     {
         // Index giúp tối ưu tìm kiếm theo mô tả dịch vụ và loại dịch vụ
-        modelBuilder.Entity<ServiceItem>()
-            .HasIndex(si => si.Description);
-
-        modelBuilder.Entity<ServiceItem>()
-            .HasIndex(si => si.Type);
+        modelBuilder.Entity<ServiceItem>().HasIndex(si => si.Description);
+        modelBuilder.Entity<ServiceItem>().HasIndex(si => si.Type);
 
         modelBuilder.Entity<ServiceItem>()
             .Property(si => si.UnitPrice)
@@ -310,14 +286,9 @@ public class AutoDbContext(DbContextOptions<AutoDbContext> options) : DbContext(
             .OnDelete(DeleteBehavior.Cascade); // Xóa RepairOrder sẽ xóa luôn ReplacementPart
 
         // Tạo index tối ưu truy vấn
-        modelBuilder.Entity<RepairOrder>()
-            .HasIndex(ro => ro.OwnerId);
-
-        modelBuilder.Entity<RepairOrder>()
-            .HasIndex(ro => ro.CarId);
-
-        modelBuilder.Entity<RepairOrder>()
-            .HasIndex(ro => ro.InvoiceId);
+        modelBuilder.Entity<RepairOrder>().HasIndex(ro => ro.OwnerId);
+        modelBuilder.Entity<RepairOrder>().HasIndex(ro => ro.CarId);
+        modelBuilder.Entity<RepairOrder>().HasIndex(ro => ro.InvoiceId);
     }
 
     private static void ConfigureTransaction(ModelBuilder modelBuilder)
@@ -335,20 +306,11 @@ public class AutoDbContext(DbContextOptions<AutoDbContext> options) : DbContext(
             .OnDelete(DeleteBehavior.Restrict); // Không xóa Transaction nếu Invoice bị xóa
 
         // Tạo index để tối ưu truy vấn
-        modelBuilder.Entity<Transaction>()
-            .HasIndex(t => t.Status);
-
-        modelBuilder.Entity<Transaction>()
-            .HasIndex(t => t.Type);
-
-        modelBuilder.Entity<Transaction>()
-            .HasIndex(t => t.InvoiceId);
-
-        modelBuilder.Entity<Transaction>()
-            .HasIndex(t => t.CreatedBy);
-
-        modelBuilder.Entity<Transaction>()
-            .HasIndex(t => t.TransactionDate);
+        modelBuilder.Entity<Transaction>().HasIndex(t => t.Status);
+        modelBuilder.Entity<Transaction>().HasIndex(t => t.Type);
+        modelBuilder.Entity<Transaction>().HasIndex(t => t.InvoiceId);
+        modelBuilder.Entity<Transaction>().HasIndex(t => t.CreatedBy);
+        modelBuilder.Entity<Transaction>().HasIndex(t => t.TransactionDate);
 
         // Ràng buộc dữ liệu để đảm bảo tính hợp lệ
         modelBuilder.Entity<Transaction>()
@@ -373,11 +335,8 @@ public class AutoDbContext(DbContextOptions<AutoDbContext> options) : DbContext(
             .OnDelete(DeleteBehavior.Restrict); // Không xóa RepairHistory nếu Vehicle bị xóa
 
         // Tạo index để tối ưu truy vấn
-        modelBuilder.Entity<RepairHistory>()
-            .HasIndex(rh => rh.VehicleId);
-
-        modelBuilder.Entity<RepairHistory>()
-            .HasIndex(rh => rh.RepairDate);
+        modelBuilder.Entity<RepairHistory>().HasIndex(rh => rh.VehicleId);
+        modelBuilder.Entity<RepairHistory>().HasIndex(rh => rh.RepairDate);
     }
 
     private static void ConfigureReplacementPart(ModelBuilder modelBuilder)
@@ -388,8 +347,7 @@ public class AutoDbContext(DbContextOptions<AutoDbContext> options) : DbContext(
             .IsUnique();
 
         // Index hỗ trợ tìm kiếm nhanh theo nhà sản xuất
-        modelBuilder.Entity<ReplacementPart>()
-            .HasIndex(rp => rp.Manufacturer);
+        modelBuilder.Entity<ReplacementPart>().HasIndex(rp => rp.Manufacturer);
 
         // Định dạng kiểu dữ liệu chính xác cho giá phụ tùng
         modelBuilder.Entity<ReplacementPart>()
