@@ -1,6 +1,5 @@
 ﻿using Auto.Common.Entities.Bill;
 using Auto.Common.Entities.Customers;
-using Auto.Common.Entities.Part;
 using Auto.Common.Entities.Vehicles;
 using System;
 using System.Collections.Generic;
@@ -25,7 +24,7 @@ public class RepairOrder
     /// <summary>
     /// Id hóa đơn.
     /// </summary>
-    [ForeignKey(nameof(Bill.Invoice))]
+    [ForeignKey(nameof(Invoice))]
     public int InvoiceId { get; set; }
 
     /// <summary>
@@ -47,7 +46,7 @@ public class RepairOrder
     /// <summary>
     /// Mã xe liên quan đến đơn sửa chữa.
     /// </summary>
-    [ForeignKey(nameof(Vehicles.Vehicle))]
+    [ForeignKey(nameof(Vehicle))]
     public int CarId { get; set; }
 
     /// <summary>
@@ -68,12 +67,12 @@ public class RepairOrder
     /// <summary>
     /// Danh sách phụ tùng thay thế liên quan.
     /// </summary>
-    public virtual ICollection<ReplacementPart> ReplacementPartList { get; set; } = [];
+    public virtual ICollection<RepairOrderSparePart> RepairOrderSpareParts { get; set; } = [];
 
     /// <summary>
     /// Tổng chi phí sửa chữa.
     /// </summary>
     public decimal TotalRepairCost() =>
         (RepairTaskList?.Sum(task => task.ServiceItem.UnitPrice) ?? 0) +
-        (ReplacementPartList?.Sum(part => part.UnitPrice) ?? 0);
+        (RepairOrderSpareParts?.Sum(sp => sp.SparePart.SellingPrice * sp.Quantity) ?? 0);
 }

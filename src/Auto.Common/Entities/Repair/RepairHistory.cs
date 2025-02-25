@@ -22,7 +22,7 @@ public class RepairHistory
     /// <summary>
     /// Mã xe liên quan đến lịch sử sửa chữa.
     /// </summary>
-    [ForeignKey(nameof(Vehicles.Vehicle))]
+    [ForeignKey(nameof(Vehicle))]
     public int VehicleId { get; set; }
 
     /// <summary>

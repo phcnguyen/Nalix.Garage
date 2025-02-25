@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Auto.Common.Entities.Bill.Transactions;
+namespace Auto.Common.Entities.Transactions;
 
 /// <summary>
 /// Xác định các loại giao dịch tài chính trong hệ thống.

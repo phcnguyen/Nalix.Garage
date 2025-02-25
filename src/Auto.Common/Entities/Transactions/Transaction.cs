@@ -1,9 +1,10 @@
-﻿using Auto.Common.Enums.Payments;
+﻿using Auto.Common.Entities.Bill;
+using Auto.Common.Enums.Payments;
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Auto.Common.Entities.Bill.Transactions;
+namespace Auto.Common.Entities.Transactions;
 
 /// <summary>
 /// Đại diện cho một giao dịch tài chính, bao gồm các thông tin về số tiền, phương thức thanh toán và trạng thái.
@@ -30,14 +31,12 @@ public class Transaction
     /// - <see cref="TransactionType.DebtPayment"/>: Giao dịch trả nợ
     /// - <see cref="TransactionType.RepairCost"/>: Chi phí sửa chữa.
     /// </summary>
-    [Column(TypeName = "int")]
     public TransactionType Type { get; set; }
 
     /// <summary>
     /// Phương thức thanh toán của giao dịch
     /// - Ví dụ: Tiền mặt, chuyển khoản, thẻ tín dụng, ví điện tử.
     /// </summary>
-    [Column(TypeName = "int")]
     public PaymentMethod PaymentMethod { get; set; }
 
     /// <summary>
@@ -46,14 +45,13 @@ public class Transaction
     /// - <see cref="TransactionStatus.Completed"/>: Đã hoàn thành
     /// - <see cref="TransactionStatus.Failed"/>: Thất bại.
     /// </summary>
-    [Column(TypeName = "int")]
     public TransactionStatus Status { get; set; } = TransactionStatus.Pending;
 
     /// <summary>
     /// Số tiền liên quan đến giao dịch.
     /// - Giá trị phải lớn hơn 0.
     /// </summary>
-    [Range(0.01, 999_999_999.99, ErrorMessage = "Transaction amount must be between 0.01 and 999,999,999.99.")]
+    [Range(0.01, 999999999.99, ErrorMessage = "Transaction amount must be between 0.01 and 999,999,999.99.")]
     public decimal Amount { get; set; }
 
     /// <summary>

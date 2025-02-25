@@ -1,8 +1,8 @@
-﻿using Auto.Common.Entities.Bill.Transactions;
-using Auto.Common.Entities.Customers;
+﻿using Auto.Common.Entities.Customers;
 using Auto.Common.Entities.Employees;
 using Auto.Common.Entities.Part;
 using Auto.Common.Entities.Repair;
+using Auto.Common.Entities.Transactions;
 using Auto.Common.Enums.Payments;
 using System;
 using System.Collections.Generic;
@@ -30,13 +30,13 @@ public class Invoice
     /// <summary>
     /// Id chủ xe.
     /// </summary>
-    [ForeignKey(nameof(Customer))]
+    [ForeignKey(nameof(Customers.Customer))]
     public int OwnerId { get; set; }
 
     /// <summary>
     /// Thông tin chủ xe (Navigation Property).
     /// </summary>
-    public virtual Customer Owner { get; set; }
+    public virtual Customer Customer { get; set; }
 
     /// <summary>
     /// Người tạo hóa đơn.

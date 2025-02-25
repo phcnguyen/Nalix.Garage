@@ -24,7 +24,7 @@ public class RepairTask
     /// <summary>
     /// Nhân viên thực hiện công việc sửa chữa.
     /// </summary>
-    [ForeignKey(nameof(Employees.Employee))]
+    [ForeignKey(nameof(Employee))]
     public int EmployeeId { get; set; }
 
     /// <summary>
@@ -35,7 +35,7 @@ public class RepairTask
     /// <summary>
     /// Các dịch vụ sử dụng.
     /// </summary>
-    [ForeignKey(nameof(Service.ServiceItem))]
+    [ForeignKey(nameof(ServiceItem))]
     public int ServiceItemId { get; set; }
 
     /// <summary>

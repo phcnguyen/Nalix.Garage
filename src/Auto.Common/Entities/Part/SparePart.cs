@@ -29,7 +29,7 @@ public class SparePart
     /// <summary>
     /// Id nhà cung cấp của phụ tùng.
     /// </summary>
-    [ForeignKey(nameof(Suppliers.Supplier))]
+    [ForeignKey(nameof(Supplier))]
     public int SupplierId { get; set; }
 
     /// <summary>

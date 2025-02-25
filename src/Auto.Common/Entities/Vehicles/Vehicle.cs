@@ -23,19 +23,19 @@ public class Vehicle
     /// Mã xe.
     /// </summary>
     [Key]
-    public int CarId { get; set; }
+    public int VehicleId { get; set; }
 
     /// <summary>
     /// Id chủ xe.
     /// </summary>
     [Required]
     [ForeignKey(nameof(Customer))]
-    public int OwnerId { get; set; }
+    public int CustomerId { get; set; }
 
     /// <summary>
     /// Thông tin chủ xe (Navigation Property).
     /// </summary>
-    public virtual Customer Owner { get; set; }
+    public virtual Customer Customer { get; set; }
 
     /// <summary>
     /// Năm sản xuất.

@@ -1,12 +1,12 @@
 ﻿using Auto.Common.Entities.Authentication;
 using Auto.Common.Entities.Bill;
-using Auto.Common.Entities.Bill.Transactions;
 using Auto.Common.Entities.Customers;
 using Auto.Common.Entities.Employees;
 using Auto.Common.Entities.Part;
 using Auto.Common.Entities.Repair;
 using Auto.Common.Entities.Service;
 using Auto.Common.Entities.Suppliers;
+using Auto.Common.Entities.Transactions;
 using Auto.Common.Entities.Vehicles;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -87,8 +87,8 @@ public class AutoDbContext(DbContextOptions<AutoDbContext> options) : DbContext(
             .HasIndex(v => v.CarLicensePlate)
             .IsUnique();
 
-        // Index cho OwnerId giúp tối ưu truy vấn khi tìm kiếm xe theo chủ sở hữu
-        modelBuilder.Entity<Vehicle>().HasIndex(v => v.OwnerId);
+        // Index cho CustomerId giúp tối ưu truy vấn khi tìm kiếm xe theo chủ sở hữu
+        modelBuilder.Entity<Vehicle>().HasIndex(v => v.CustomerId);
 
         // Index cho CarBrand giúp tăng tốc tìm kiếm xe theo hãng
         modelBuilder.Entity<Vehicle>().HasIndex(v => v.CarBrand);
@@ -273,7 +273,7 @@ public class AutoDbContext(DbContextOptions<AutoDbContext> options) : DbContext(
             .HasOne(ro => ro.Vehicle)
             .WithMany()
             .HasForeignKey(ro => ro.CarId)
-            .OnDelete(DeleteBehavior.SetNull); // Set CarId về null nếu Vehicle bị xóa
+            .OnDelete(DeleteBehavior.SetNull); // Set VehicleId về null nếu Vehicle bị xóa
 
         modelBuilder.Entity<RepairOrder>()
             .HasMany(ro => ro.RepairTaskList)
