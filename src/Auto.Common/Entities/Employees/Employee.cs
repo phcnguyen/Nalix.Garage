@@ -20,7 +20,7 @@ public class Employee
     /// Tên nhân viên.
     /// </summary>
     [Required(ErrorMessage = "Employee name is required.")]
-    [StringLength(50)]
+    [MaxLength(50)]
     public string Name { get; set; }
 
     /// <summary>
@@ -36,19 +36,19 @@ public class Employee
     /// <summary>
     /// Địa chỉ nhân viên.
     /// </summary>
-    [StringLength(200)]
+    [MaxLength(200)]
     public string Address { get; set; }
 
     /// <summary>
     /// Số điện thoại nhân viên.
     /// </summary>
-    [StringLength(14)]
+    [MaxLength(14)]
     public string PhoneNumber { get; set; }
 
     /// <summary>
     /// Email nhân viên.
     /// </summary>
-    [StringLength(50)]
+    [MaxLength(50)]
     [EmailAddress]
     public string Email { get; set; }
 

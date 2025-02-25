@@ -1,4 +1,4 @@
-﻿using Auto.Server.TcpHandlers;
+﻿using Auto.Server.Network;
 using Notio.Logging;
 using Notio.Network.Handlers;
 using Notio.Network.Package.Helpers;
@@ -9,19 +9,15 @@ namespace Auto.Server.Threading;
 
 public static class AppConfig
 {
-    public static ServerListener InitializeTcpServer()
-    {
-        PacketDispatcher dispatcher = new(cfg =>
-            cfg.WithLogging(CLogging.Instance)
+    public static ServerListener InitializeServer()
+        => new(new ServerProtocol(
+            new PacketDispatcher(cfg => cfg.WithLogging(CLogging.Instance)
                .WithPacketSerialization(
                     packet => new Memory<byte>(PackageSerializeHelper.Serialize((Notio.Network.Package.Packet)packet)),
                     data => PackageSerializeHelper.Deserialize(data.Span))
                .WithErrorHandler((exception, command) => CLogging.Instance.Error($"Error handling command:{command}", exception))
                .WithPacketCrypto(null, null)
                .WithPacketCompression(null, null)
-               .WithHandler<PacketHandler>()
-        );
-
-        return new ServerListener(new ServerProtocol(dispatcher), new BufferAllocator(), CLogging.Instance);
-    }
+               .WithHandler<HandshakeHandler>()
+        )), new BufferAllocator(), CLogging.Instance);
 }

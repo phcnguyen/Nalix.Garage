@@ -3,7 +3,7 @@ using Notio.Common.Memory;
 using Notio.Network.Listeners;
 using Notio.Network.Protocols;
 
-namespace Auto.Server.TcpHandlers;
+namespace Auto.Server.Network;
 
 public class ServerListener(IProtocol protocol, IBufferPool bufferPool, ILogger logger)
     : Listener(protocol, bufferPool, logger)

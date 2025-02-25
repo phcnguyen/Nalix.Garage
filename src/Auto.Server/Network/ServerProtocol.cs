@@ -2,7 +2,7 @@
 using Notio.Network.Handlers;
 using Notio.Network.Protocols;
 
-namespace Auto.Server.TcpHandlers;
+namespace Auto.Server.Network;
 
 public class ServerProtocol(IPacketDispatcher packetDispatcher) : Protocol
 {

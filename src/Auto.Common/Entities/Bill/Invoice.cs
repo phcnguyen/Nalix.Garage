@@ -53,7 +53,7 @@ public class Invoice
     /// Số hóa đơn (mã duy nhất).
     /// </summary>
     [Required(ErrorMessage = "Invoices number is required.")]
-    [StringLength(30, ErrorMessage = "Invoices number must not exceed 30 characters.")]
+    [MaxLength(30, ErrorMessage = "Invoices number must not exceed 30 characters.")]
     public string InvoiceNumber
     {
         get => _invoiceNumber;

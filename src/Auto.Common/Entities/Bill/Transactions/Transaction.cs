@@ -60,7 +60,7 @@ public class Transaction
     /// Mô tả chi tiết về giao dịch (tùy chọn)
     /// - Không được vượt quá 255 ký tự.
     /// </summary>
-    [StringLength(255, ErrorMessage = "Description must not exceed 255 characters.")]
+    [MaxLength(255, ErrorMessage = "Description must not exceed 255 characters.")]
     public string Description { get; set; } = string.Empty;
 
     /// <summary>

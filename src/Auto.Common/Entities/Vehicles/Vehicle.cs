@@ -62,7 +62,7 @@ public class Vehicle
     /// Biển số xe khách hàng.
     /// </summary>
     [Required(ErrorMessage = "Vehicle license plate is required.")]
-    [StringLength(9)]
+    [MaxLength(9)]
     public string CarLicensePlate
     {
         get => _carLicensePlate;
@@ -72,7 +72,7 @@ public class Vehicle
     /// <summary>
     /// Model xe.
     /// </summary>
-    [StringLength(50, ErrorMessage = "Vehicle model must not exceed 50 characters.")]
+    [MaxLength(50, ErrorMessage = "Vehicle model must not exceed 50 characters.")]
     public string CarModel
     {
         get => _carModel;
@@ -82,7 +82,7 @@ public class Vehicle
     /// <summary>
     /// Số khung.
     /// </summary>
-    [StringLength(17, ErrorMessage = "Frame number must not exceed 17 characters.")]
+    [MaxLength(17, ErrorMessage = "Frame number must not exceed 17 characters.")]
     public string FrameNumber
     {
         get => _frameNumber;
@@ -92,7 +92,7 @@ public class Vehicle
     /// <summary>
     /// Số máy.
     /// </summary>
-    [StringLength(17, ErrorMessage = "Engine number must not exceed 17 characters.")]
+    [MaxLength(17, ErrorMessage = "Engine number must not exceed 17 characters.")]
     public string EngineNumber
     {
         get => _engineNumber;

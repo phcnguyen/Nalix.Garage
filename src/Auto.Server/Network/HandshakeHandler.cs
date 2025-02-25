@@ -7,10 +7,10 @@ using Notio.Network.Package;
 using Notio.Network.Package.Enums;
 using Notio.Network.Package.Extensions;
 
-namespace Auto.Server.TcpHandlers;
+namespace Auto.Server.Network;
 
 [PacketController]
-internal class PacketHandler
+internal class HandshakeHandler
 {
     [PacketCommand(1, Authoritys.Guests)]
     public static void InitiateSecureConnection(IConnection connection, Packet packet)

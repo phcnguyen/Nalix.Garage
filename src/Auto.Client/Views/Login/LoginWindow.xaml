@@ -3,119 +3,100 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:local="clr-namespace:Auto.Client.Behaviors"
         Title="Login"
-        Height="365"
-        Width="375"
-        Background="Transparent"
+        Height="300"
+        Width="380"
+        ResizeMode="NoResize"
         WindowStartupLocation="CenterScreen"
-        WindowStyle="None"
-        AllowsTransparency="True">
+        WindowStyle="SingleBorderWindow"
+        AllowsTransparency="False"
+        Background="White">
 
     <Window.Resources>
         <ResourceDictionary Source="/Auto.Client;component/Resources/Themes/Theme.xaml" />
     </Window.Resources>
 
-    <Grid Margin="0,0,15,75">
+    <Grid>
+        <!-- Đảm bảo layout đúng bằng cách đặt RowDefinitions -->
+        <Grid.RowDefinitions>
+            <RowDefinition Height="50" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
 
-        <!-- ==== Thanh tiêu đề có nút Đóng & Thu nhỏ ==== -->
-        <Grid Background="{DynamicResource HeaderBackgroundBrush}" Height="40"
-              VerticalAlignment="Top">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="40" />
-                <ColumnDefinition Width="40" />
-            </Grid.ColumnDefinitions>
-        </Grid>
-
-        <!-- Main Container -->
-        <Border Background="{DynamicResource SecondaryBackgroundBrush}"
-                CornerRadius="5"
-                Width="360"
-                Height="290"
-                Padding="20"
-                VerticalAlignment="Center"
+        <!-- Input Fields -->
+        <Border Grid.Row="1"
+                Background="{DynamicResource InputBackgroundBrush}"
+                BorderBrush="{DynamicResource InputBorderBrush}"
+                BorderThickness="1"
+                CornerRadius="6"
+                Padding="5"
+                Width="240"
+                Height="85"
                 HorizontalAlignment="Center"
-                Effect="{DynamicResource DropShadow}">
+                VerticalAlignment="Center">
+            <Grid>
+                <TextBox x:Name="txtUsername"
+                         Background="Transparent"
+                         local:WatermarkBehavior.Watermark="Username"
+                         BorderThickness="0"
+                         Foreground="{DynamicResource PrimaryTextBrush}"
+                         VerticalContentAlignment="Center"
+                         HorizontalContentAlignment="Left"
+                         FontSize="14"
+                         Padding="10,0,10,0"
+                         Height="40"
+                         Width="Auto" Margin="-1,-2,-1,35" />
 
-            <Grid Margin="0,65,0,0">
-                <StackPanel HorizontalAlignment="Center">
+                <!-- Line Separator -->
+                <Rectangle Fill="{DynamicResource InputBorderBrush}"
+                           Height="1"
+                           VerticalAlignment="Center"
+                           Margin="-4,0,-4,0" />
 
-                    <!-- Input Fields -->
-                    <Border Background="{DynamicResource InputBackgroundBrush}"
-                            BorderBrush="{DynamicResource InputBorderBrush}"
-                            BorderThickness="1"
-                            CornerRadius="6"
-                            Padding="5"
-                            Width="240"
-                            Height="85">
-
-                        <Grid>
-                            <!-- Username TextBox -->
-                            <TextBox x:Name="txtUsername"
-                                     Background="Transparent"
-                                     local:WatermarkBehavior.Watermark="Username"
-                                     BorderThickness="0"
-                                     Foreground="{DynamicResource PrimaryTextBrush}"
-                                     VerticalAlignment="Top"
-                                     VerticalContentAlignment="Center"
-                                     HorizontalContentAlignment="Left"
-                                     FontSize="14"
-                                     Padding="10,0,10,00"
-                                     Height="40"
-                                     TextWrapping="NoWrap" Margin="-4,-6,-48,0" />
-
-                            <!-- Line Separator -->
-                            <Rectangle Fill="{DynamicResource InputBorderBrush}"
-                                       Height="1"
-                                       VerticalAlignment="Center"
-                                       Margin="-4,0,-4,0" />
-
-                            <!-- PasswordBox -->
-                            <Grid Margin="0,43,0,0">
-                                <PasswordBox x:Name="txtPassword"
-                                             local:WatermarkBehavior.Watermark="Password"
-                                             Background="Transparent"
-                                             Foreground="{DynamicResource PrimaryTextBrush}"
-                                             VerticalContentAlignment="Center"
-                                             HorizontalContentAlignment="Left"
-                                             BorderThickness="0"
-                                             FontSize="14"
-                                             Padding="10,5,10,5"
-                                             Height="40"
-                                             PasswordChar="●" Margin="-4,-4,-48,-6" />
-                            </Grid>
-                        </Grid>
-                    </Border>
-
-                    <!-- Checkboxes for Remember Password and Automatic Login -->
-                    <StackPanel Orientation="Horizontal"
-                                HorizontalAlignment="Center"
-                                Margin="0,5,0,10">
-                        <CheckBox Content="Remember Password" Foreground="{DynamicResource PrimaryTextBrush}"
-                                  IsChecked="True" Margin="0,0,10,0" />
-                        <CheckBox Content="Automatic Login" Foreground="{DynamicResource PrimaryTextBrush}"
-                                  IsChecked="True" />
-                    </StackPanel>
-
-                    <!-- Login Button -->
-                    <Button Content="Login"
-                            Width="240" Height="40"
-                            Background="{DynamicResource ButtonBackgroundBrush}"
-                            Foreground="White"
-                            FontSize="16"
-                            Cursor="Hand"
-                            BorderThickness="0"
-                            FontWeight="Bold" />
-
-                    <!-- Register and Recover Password Links -->
-                    <StackPanel Orientation="Horizontal"
-                                HorizontalAlignment="Center"
-                                Margin="0,10,0,0">
-                        <TextBlock Text="Forgot Password ?"
-                                   Foreground="{DynamicResource AccentBrush}"
-                                   Cursor="Hand" />
-                    </StackPanel>
-                </StackPanel>
+                <!-- PasswordBox -->
+                <PasswordBox x:Name="txtPassword"
+                             Background="Transparent"
+                             Foreground="{DynamicResource PrimaryTextBrush}"
+                             VerticalContentAlignment="Center"
+                             HorizontalContentAlignment="Left"
+                             BorderThickness="0"
+                             FontSize="14"
+                             Padding="10,5,10,5"
+                             Height="NaN"
+                             Width="Auto"
+                             PasswordChar="●"
+                             Margin="-1,38,-1,0" />
             </Grid>
         </Border>
+
+        <!-- Checkboxes for Remember Password and Automatic Login -->
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,5,0,10">
+            <CheckBox Content="Remember Password" Foreground="{DynamicResource PrimaryTextBrush}"
+                      IsChecked="False" Margin="0,0,10,0" />
+            <CheckBox Content="Automatic Login" Foreground="{DynamicResource PrimaryTextBrush}"
+                      IsChecked="False" />
+        </StackPanel>
+
+        <!-- Login Button -->
+        <Button Grid.Row="3"
+                Content="Login"
+                Width="240" Height="40"
+                Background="{DynamicResource ButtonBackgroundBrush}"
+                Foreground="White"
+                FontSize="16"
+                Cursor="Hand"
+                BorderThickness="0"
+                FontWeight="Bold"
+                HorizontalAlignment="Center" />
+
+        <!-- Register and Recover Password Links -->
+        <TextBlock Grid.Row="4"
+                   Text="Forgot Password ?"
+                   Foreground="{DynamicResource AccentBrush}"
+                   Cursor="Hand"
+                   HorizontalAlignment="Center"
+                   Margin="0,10,0,0" />
     </Grid>
 </Window>

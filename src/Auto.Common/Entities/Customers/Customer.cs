@@ -30,7 +30,7 @@ public class Customer
     /// Họ và tên khách hàng.
     /// </summary>
     [Required(ErrorMessage = "Full name is required.")]
-    [StringLength(100, ErrorMessage = "Full name must not exceed 100 characters.")]
+    [MaxLength(100, ErrorMessage = "Full name must not exceed 100 characters.")]
     public string Name
     {
         get => _fullName;
@@ -41,7 +41,7 @@ public class Customer
     /// Số điện thoại của khách hàng.
     /// </summary>
     [Required(ErrorMessage = "Phone number is required.")]
-    [StringLength(12, ErrorMessage = "Phone number must not exceed 30 characters.")]
+    [MaxLength(12, ErrorMessage = "Phone number must not exceed 30 characters.")]
     [Phone(ErrorMessage = "Invalid phone number format.")]
     public string PhoneNumber
     {
@@ -63,7 +63,7 @@ public class Customer
     /// <summary>
     /// Địa chỉ của khách hàng.
     /// </summary>
-    [StringLength(255, ErrorMessage = "Address must not exceed 255 characters.")]
+    [MaxLength(255, ErrorMessage = "Address must not exceed 255 characters.")]
     public string Address
     {
         get => _address;
@@ -73,7 +73,7 @@ public class Customer
     /// <summary>
     /// Mã số thuế của khách hàng (nếu có).
     /// </summary>
-    [StringLength(13, ErrorMessage = "Tax code must not exceed 20 characters.")]
+    [MaxLength(13, ErrorMessage = "Tax code must not exceed 20 characters.")]
     public string TaxCode
     {
         get => _taxCode;

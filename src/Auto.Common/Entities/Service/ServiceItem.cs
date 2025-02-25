@@ -19,7 +19,7 @@ public class ServiceItem
     /// Mô tả của dịch vụ.
     /// </summary>
     [Required(ErrorMessage = "Description is required.")]
-    [StringLength(255 * 2, ErrorMessage = "Description must not exceed 255 characters.")]
+    [MaxLength(255 * 2, ErrorMessage = "Description must not exceed 255 characters.")]
     public string Description { get; set; } = string.Empty;
 
     /// <summary>
