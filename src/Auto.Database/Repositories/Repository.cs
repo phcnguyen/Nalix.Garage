@@ -3,57 +3,124 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Auto.Database.Repositories;
 
-public class Repository<T> : IRepository<T> where T : class
+/// <summary>
+/// Generic repository implementation using Entity Framework Core.
+/// </summary>
+/// <typeparam name="T">Entity type.</typeparam>
+public class Repository<T>(AutoDbContext context) : IRepository<T>, IRepositoryAsync<T> where T : class
 {
-    protected readonly AutoGarageDbContext _context;
-    protected readonly DbSet<T> _dbSet;
+    private readonly AutoDbContext _context = context ?? throw new ArgumentNullException(nameof(context));
+    private readonly DbSet<T> _dbSet = context.Set<T>();
 
-    /// <inheritdoc />
-    public Repository(AutoGarageDbContext context)
+    // ================================
+    // Synchronous Methods
+    // ================================
+
+    public IEnumerable<T> GetAll(int pageNumber = 1, int pageSize = 10)
+        => [.. _dbSet.AsNoTracking()
+                 .Skip((pageNumber - 1) * pageSize)
+                 .Take(pageSize)];
+
+    public int Count() => _dbSet.Count();
+
+    public bool Any(Expression<Func<T, bool>> predicate) => _dbSet.Any(predicate);
+
+    public T GetById(int id) => _dbSet.Find(id);
+
+    public IEnumerable<T> Find(Expression<Func<T, bool>> predicate, int pageNumber = 1, int pageSize = 10)
+        => [.. _dbSet.AsNoTracking()
+                 .Where(predicate)
+                 .Skip((pageNumber - 1) * pageSize)
+                 .Take(pageSize)];
+
+    public IEnumerable<T> Get(Expression<Func<T, bool>> filter = null,
+                              Func<IQueryable<T>, IOrderedQueryable<T>> orderBy = null,
+                              string includeProperties = "",
+                              int pageNumber = 1, int pageSize = 10)
     {
-        _context = context;
-        _dbSet = _context.Set<T>();
+        var query = _dbSet.AsQueryable();
+        if (filter is not null) query = query.Where(filter);
+
+        foreach (var prop in includeProperties.Split(',', StringSplitOptions.RemoveEmptyEntries))
+            query = query.Include(prop.Trim());
+
+        query = query.Skip((pageNumber - 1) * pageSize).Take(pageSize);
+        return orderBy is not null ? [.. orderBy(query)] : query.ToList();
     }
 
-    /// <inheritdoc />
-    public async Task<IEnumerable<T>> GetAllAsync() => await _dbSet.ToListAsync();
+    public void Add(T entity) => _dbSet.Add(entity);
 
-    /// <inheritdoc />
-    public async Task<T> GetByIdAsync(int id) => await _dbSet.FindAsync(id);
+    public void AddRange(IEnumerable<T> entities) => _dbSet.AddRange(entities);
 
-    /// <inheritdoc />
-    public async Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> predicate)
-        => await _dbSet.Where(predicate).ToListAsync();
+    public void Update(T entity) => _dbSet.Update(entity);
 
-    /// <inheritdoc />
-    public async Task AddAsync(T entity)
+    public void UpdateRange(IEnumerable<T> entities) => _dbSet.UpdateRange(entities);
+
+    public void Delete(int id) => _dbSet.Remove(_dbSet.Find(id)!);
+
+    public void Delete(T entity) => _dbSet.Remove(entity);
+
+    public void DeleteRange(IEnumerable<T> entities) => _dbSet.RemoveRange(entities);
+
+    public int SaveChanges() => _context.SaveChanges();
+
+    // ================================
+    // Asynchronous Methods
+    // ================================
+
+    public async Task<IEnumerable<T>> GetAllAsync(int pageNumber = 1, int pageSize = 10, CancellationToken cancellationToken = default)
+        => await _dbSet.AsNoTracking()
+                       .Skip((pageNumber - 1) * pageSize)
+                       .Take(pageSize)
+                       .ToListAsync(cancellationToken);
+
+    public async Task<int> CountAsync(CancellationToken cancellationToken = default)
+        => await _dbSet.CountAsync(cancellationToken);
+
+    public async Task<bool> AnyAsync(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default)
+        => await _dbSet.AnyAsync(predicate, cancellationToken);
+
+    public async Task<T> GetByIdAsync(int id, CancellationToken cancellationToken = default)
+        => await _dbSet.FindAsync([id], cancellationToken);
+
+    public async Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> predicate, int pageNumber = 1, int pageSize = 10, CancellationToken cancellationToken = default)
+        => await _dbSet.AsNoTracking()
+                       .Where(predicate)
+                       .Skip((pageNumber - 1) * pageSize)
+                       .Take(pageSize)
+                       .ToListAsync(cancellationToken);
+
+    public async Task<IEnumerable<T>> GetAsync(Expression<Func<T, bool>> filter = null,
+                                               Func<IQueryable<T>, IOrderedQueryable<T>> orderBy = null,
+                                               string includeProperties = "",
+                                               int pageNumber = 1, int pageSize = 10,
+                                               CancellationToken cancellationToken = default)
     {
-        await _dbSet.AddAsync(entity);
-        await _context.SaveChangesAsync();
+        var query = _dbSet.AsQueryable();
+        if (filter is not null) query = query.Where(filter);
+
+        foreach (var prop in includeProperties.Split(',', StringSplitOptions.RemoveEmptyEntries))
+            query = query.Include(prop.Trim());
+
+        query = query.Skip((pageNumber - 1) * pageSize).Take(pageSize);
+        return orderBy is not null ? await orderBy(query).ToListAsync(cancellationToken)
+                                   : await query.ToListAsync(cancellationToken);
     }
 
-    /// <inheritdoc />
-    public void Update(T entity)
-    {
-        _dbSet.Update(entity);
-        _context.SaveChanges();
-    }
+    public async Task AddAsync(T entity, CancellationToken cancellationToken = default)
+        => await _dbSet.AddAsync(entity, cancellationToken);
 
-    /// <inheritdoc />
-    public async Task DeleteAsync(int id)
-    {
-        var entity = await _dbSet.FindAsync(id);
-        if (entity != null)
-        {
-            _dbSet.Remove(entity);
-            await _context.SaveChangesAsync();
-        }
-    }
+    public async Task AddRangeAsync(IEnumerable<T> entities, CancellationToken cancellationToken = default)
+        => await _dbSet.AddRangeAsync(entities, cancellationToken);
 
-    /// <inheritdoc />
-    public async Task<int> SaveChangesAsync() => await _context.SaveChangesAsync();
+    public async Task DeleteAsync(int id, CancellationToken cancellationToken = default)
+        => _dbSet.Remove(await _dbSet.FindAsync([id], cancellationToken)!);
+
+    public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+        => await _context.SaveChangesAsync(cancellationToken);
 }

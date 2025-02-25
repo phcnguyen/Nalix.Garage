@@ -13,7 +13,7 @@ using System;
 
 namespace Auto.Database;
 
-public class AutoGarageDbContext(DbContextOptions<AutoGarageDbContext> options) : DbContext(options)
+public class AutoDbContext(DbContextOptions<AutoDbContext> options) : DbContext(options)
 {
     public DbSet<Vehicle> Cars { get; set; }
     public DbSet<Account> Account { get; set; }
@@ -21,7 +21,6 @@ public class AutoGarageDbContext(DbContextOptions<AutoGarageDbContext> options) 
     public DbSet<Customer> Customers { get; set; }
     public DbSet<Employee> Employees { get; set; }
     public DbSet<Supplier> Suppliers { get; set; }
-
     public DbSet<SupplierPhone> SupplierPhone { get; set; }
     public DbSet<SparePart> SpareParts { get; set; }
     public DbSet<RepairTask> RepairTasks { get; set; }
@@ -33,8 +32,20 @@ public class AutoGarageDbContext(DbContextOptions<AutoGarageDbContext> options) 
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.ApplyConfigurationsFromAssembly(typeof(AutoGarageDbContext).Assembly);
+        modelBuilder.ApplyConfigurationsFromAssembly(typeof(AutoDbContext).Assembly);
         base.OnModelCreating(modelBuilder);
+
+        #region Account Configuration
+
+        modelBuilder.Entity<Account>()
+            .HasIndex(a => a.Username)
+            .IsUnique(); // Đảm bảo username duy nhất
+
+        modelBuilder.Entity<Account>()
+            .Property(a => a.Role)
+            .HasConversion<byte>(); // Chuyển đổi enum RoleType thành int trong DB
+
+        #endregion Account Configuration
 
         #region Vehicle Configuration
 
@@ -43,11 +54,16 @@ public class AutoGarageDbContext(DbContextOptions<AutoGarageDbContext> options) 
             .HasIndex(v => v.CarLicensePlate)
             .IsUnique(); // Tối ưu tìm kiếm theo biển số xe và đảm bảo duy nhất
 
+        // Đặt index cho các cột thường được tìm kiếm
         modelBuilder.Entity<Vehicle>()
             .HasIndex(v => v.OwnerId);
 
         modelBuilder.Entity<Vehicle>()
             .HasIndex(v => v.CarBrand);
+
+        // Index phức hợp cho tìm kiếm phức tạp
+        modelBuilder.Entity<Vehicle>()
+            .HasIndex(v => new { v.CarBrand, v.CarType, v.CarYear });
 
         #endregion Vehicle Configuration
 
@@ -57,19 +73,25 @@ public class AutoGarageDbContext(DbContextOptions<AutoGarageDbContext> options) 
             .Property(i => i.Discount)
             .HasPrecision(18, 2);
 
+        // Giới hạn duy nhất cho mã hóa đơn
+        modelBuilder.Entity<Invoice>()
+            .HasIndex(i => i.InvoiceNumber)
+            .IsUnique(); // Đảm bảo mã hóa đơn không trùng lặp
+
+        // Index cho truy vấn thường xuyên
         modelBuilder.Entity<Invoice>()
             .HasIndex(i => i.OwnerId);
 
         modelBuilder.Entity<Invoice>()
             .HasIndex(i => i.CreatedBy);
 
-        // Cấu hình cho bảng Invoice
+        // Index cho tìm kiếm theo ngày
         modelBuilder.Entity<Invoice>()
-            .HasIndex(i => i.InvoiceNumber)
-            .IsUnique(); // Đảm bảo mã hóa đơn không trùng lặp
+            .HasIndex(i => i.InvoiceDate);
 
+        // Global query filter cho hóa đơn chưa thanh toán
         modelBuilder.Entity<Invoice>()
-            .HasQueryFilter(i => !i.IsFullyPaid); // Lọc mặc định các hóa đơn chưa thanh toán xong
+            .HasQueryFilter(i => !i.IsFullyPaid);
 
         #endregion Invoice Configuration
 
@@ -86,6 +108,10 @@ public class AutoGarageDbContext(DbContextOptions<AutoGarageDbContext> options) 
 
         modelBuilder.Entity<Customer>()
             .HasIndex(c => c.TaxCode);
+
+        // Thêm index cho tìm kiếm theo tên khách hàng
+        modelBuilder.Entity<Customer>()
+            .HasIndex(c => c.Name);
 
         #endregion Customer Configuration
 
@@ -243,7 +269,7 @@ public class AutoGarageDbContext(DbContextOptions<AutoGarageDbContext> options) 
 
         modelBuilder.Entity<Transaction>()
             .Property(t => t.Type)
-            .HasConversion<int>();
+            .HasConversion<byte>();
 
         modelBuilder.Entity<Transaction>()
             .HasIndex(t => t.Status);
