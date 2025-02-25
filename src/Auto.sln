@@ -7,8 +7,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Auto.Common", "Auto.Common\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Auto.Database", "Auto.Database\Auto.Database.csproj", "{11442015-8177-461E-9E7A-6048C2355737}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Auto", "Auto\Auto.csproj", "{777D2BEF-73A6-4469-A1D3-B6FCF48350E2}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Auto.Client", "Auto.Client\Auto.Client.csproj", "{B736BF57-F5F5-4508-992A-F8C805452D45}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Auto.Server", "Auto.Server\Auto.Server.csproj", "{4F7CC541-32A6-4276-BECC-696AFBDE04DA}"
@@ -27,10 +25,6 @@ Global
 		{11442015-8177-461E-9E7A-6048C2355737}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{11442015-8177-461E-9E7A-6048C2355737}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{11442015-8177-461E-9E7A-6048C2355737}.Release|Any CPU.Build.0 = Release|Any CPU
-		{777D2BEF-73A6-4469-A1D3-B6FCF48350E2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{777D2BEF-73A6-4469-A1D3-B6FCF48350E2}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{777D2BEF-73A6-4469-A1D3-B6FCF48350E2}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{777D2BEF-73A6-4469-A1D3-B6FCF48350E2}.Release|Any CPU.Build.0 = Release|Any CPU
 		{B736BF57-F5F5-4508-992A-F8C805452D45}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{B736BF57-F5F5-4508-992A-F8C805452D45}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B736BF57-F5F5-4508-992A-F8C805452D45}.Release|Any CPU.ActiveCfg = Release|Any CPU

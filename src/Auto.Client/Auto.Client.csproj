@@ -1,21 +1,21 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <OutputType>WinExe</OutputType>
-    <TargetFramework>net9.0-windows</TargetFramework>
-    <Nullable>enable</Nullable>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <UseWPF>true</UseWPF>
-  </PropertyGroup>
+	<PropertyGroup>
+		<OutputType>WinExe</OutputType>
+		<TargetFramework>net9.0-windows</TargetFramework>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<UseWPF>true</UseWPF>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <Folder Include="Resources\Fonts\" />
-    <Folder Include="Resources\Images\" />
-  </ItemGroup>
+	<ItemGroup>
+		<Folder Include="Resources\Fonts\" />
+		<Folder Include="Resources\Images\" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Notio.Cryptography" Version="0.2.94" />
-    <PackageReference Include="Notio.Network.Package" Version="0.2.94" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Notio.Cryptography" Version="0.2.94" />
+		<PackageReference Include="Notio.Network.Package" Version="0.2.94" />
+	</ItemGroup>
 
 </Project>

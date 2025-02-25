@@ -7,7 +7,7 @@ namespace Auto.Common.Entities.Employees;
 /// <summary>
 /// Lớp đại diện cho nhân viên.
 /// </summary>
-[Table("Employees")]
+[Table(nameof(Employee))]
 public class Employee
 {
     private DateTime? _endDate;
