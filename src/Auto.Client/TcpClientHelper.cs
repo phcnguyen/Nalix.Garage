@@ -1,10 +1,7 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Net.Sockets;
-using System.Threading;
-using System.Threading.Tasks;
 
-namespace Auto.Common.Helpers;
+namespace Auto.Client;
 
 /// <summary>
 /// Helper để thực hiện kết nối TCP với timeout và xử lý lỗi tốt hơn

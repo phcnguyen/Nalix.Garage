@@ -1,8 +1,9 @@
-﻿using System;
+﻿using Auto.Common.Entities.Authentication.Enums;
+using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Auto.Common.Entities;
+namespace Auto.Common.Entities.Authentication;
 
 /// <summary>
 /// Entity đại diện cho tài khoản người dùng trong hệ thống.

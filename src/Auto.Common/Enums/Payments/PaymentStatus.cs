@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Auto.Common.Models.Payments;
+namespace Auto.Common.Enums.Payments;
 
 /// <summary>
 /// Xác định trạng thái thanh toán của hóa đơn.

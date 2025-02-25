@@ -1,5 +1,5 @@
 using Auto.Common.Entities.Part;
-using Auto.Common.Models.Payments;
+using Auto.Common.Enums.Payments;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;

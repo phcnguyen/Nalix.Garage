@@ -3,7 +3,7 @@ using Auto.Common.Entities.Customers;
 using Auto.Common.Entities.Employees;
 using Auto.Common.Entities.Part;
 using Auto.Common.Entities.Repair;
-using Auto.Common.Models.Payments;
+using Auto.Common.Enums.Payments;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;

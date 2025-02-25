@@ -1,4 +1,4 @@
-﻿using Auto.Common.Entities;
+﻿using Auto.Common.Entities.Authentication;
 using Auto.Common.Entities.Bill;
 using Auto.Common.Entities.Bill.Transactions;
 using Auto.Common.Entities.Customers;

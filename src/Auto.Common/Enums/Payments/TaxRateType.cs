@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Auto.Common.Models.Payments;
+namespace Auto.Common.Enums.Payments;
 
 public enum TaxRateType
 {

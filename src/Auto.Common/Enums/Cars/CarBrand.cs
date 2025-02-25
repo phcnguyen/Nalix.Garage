@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Auto.Common.Models.Cars;
+namespace Auto.Common.Enums.Cars;
 
 /// <summary>
 /// Enum định nghĩa các hãng xe.

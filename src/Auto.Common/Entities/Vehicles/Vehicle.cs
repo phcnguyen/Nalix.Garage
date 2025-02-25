@@ -1,6 +1,6 @@
 using Auto.Common.Entities.Customers;
 using Auto.Common.Entities.Repair;
-using Auto.Common.Models.Cars;
+using Auto.Common.Enums.Cars;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;

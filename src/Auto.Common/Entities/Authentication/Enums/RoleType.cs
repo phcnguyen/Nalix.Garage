@@ -1,4 +1,4 @@
-﻿namespace Auto.Common.Entities;
+﻿namespace Auto.Common.Entities.Authentication.Enums;
 
 /// <summary>
 /// Enum đại diện cho các vai trò trong hệ thống.

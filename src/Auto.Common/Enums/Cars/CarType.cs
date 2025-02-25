@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Auto.Common.Models.Cars;
+namespace Auto.Common.Enums.Cars;
 
 public enum CarType : byte
 {
