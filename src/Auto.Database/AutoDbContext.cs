@@ -281,7 +281,7 @@ public class AutoDbContext(DbContextOptions<AutoDbContext> options) : DbContext(
             .OnDelete(DeleteBehavior.Cascade); // Xóa RepairOrder sẽ xóa luôn RepairTask
 
         modelBuilder.Entity<RepairOrder>()
-            .HasMany(ro => ro.ReplacementPartList)
+            .HasMany(ro => ro.RepairOrderSpareParts)
             .WithOne()
             .OnDelete(DeleteBehavior.Cascade); // Xóa RepairOrder sẽ xóa luôn ReplacementPart
 
