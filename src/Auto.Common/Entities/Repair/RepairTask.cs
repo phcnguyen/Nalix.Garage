@@ -81,4 +81,9 @@ public class RepairTask
             _completionDate = value;
         }
     }
+
+    /// <summary>
+    /// Công việc đã hoàn thành chưa.
+    /// </summary>
+    public bool IsCompleted => Status == RepairOrderStatus.Completed;
 }

@@ -72,7 +72,8 @@ public class RepairOrder
     /// <summary>
     /// Tổng chi phí sửa chữa.
     /// </summary>
-    public decimal TotalRepairCost() =>
+    [Column(TypeName = "decimal(18,2)")]
+    public decimal TotalRepairCost =>
         (RepairTaskList?.Sum(task => task.ServiceItem.UnitPrice) ?? 0) +
         (RepairOrderSpareParts?.Sum(sp => sp.SparePart.SellingPrice * sp.Quantity) ?? 0);
 }
