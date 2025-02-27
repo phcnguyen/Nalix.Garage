@@ -1,4 +1,4 @@
-﻿using Auto.Common.Entities.Authentication.Enums;
+﻿using Notio.Common.Models;
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -36,7 +36,7 @@ public class Account
     /// Vai trò của tài khoản trong hệ thống.
     /// </summary>
     [Required]
-    public RoleType Role { get; set; } = RoleType.User;
+    public Authoritys Role { get; set; } = Authoritys.Guests;
 
     /// <summary>
     /// Trạng thái hoạt động của tài khoản.

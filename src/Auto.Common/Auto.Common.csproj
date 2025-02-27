@@ -14,4 +14,8 @@
 		<Deterministic>true</Deterministic>
 		<UseCompression>true</UseCompression>
 	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Notio.Common" Version="0.2.94" />
+	</ItemGroup>
 </Project>

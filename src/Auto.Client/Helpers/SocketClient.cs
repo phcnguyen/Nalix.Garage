@@ -1,32 +1,34 @@
 ﻿using System.IO;
 using System.Net.Sockets;
 
-namespace Auto.Client;
+namespace Auto.Client.Helpers;
 
 /// <summary>
 /// Helper để thực hiện kết nối TCP với timeout và xử lý lỗi tốt hơn
 /// </summary>
-public class TcpClientHelper : IDisposable
+public class SocketClient : IDisposable
 {
+    private readonly int _connectionTimeout;
     private readonly string _server;
     private readonly int _port;
-    private readonly int _connectionTimeout;
+
+    private NetworkStream? _stream;
     private TcpClient _client;
-    private NetworkStream _stream;
     private bool _disposed;
 
     /// <summary>
-    /// Khởi tạo TcpClientHelper với timeout mặc định là 30 giây
+    /// Khởi tạo SocketClient với timeout mặc định là 30 giây
     /// </summary>
-    public TcpClientHelper(string server, int port, int connectionTimeoutMs = 30000)
+    public SocketClient(string server, int port, int connectionTimeoutMs = 30000)
     {
         _server = server ?? throw new ArgumentNullException(nameof(server));
+
         if (port <= 0 || port > 65535)
             throw new ArgumentOutOfRangeException(nameof(port), "Port must be between 1 and 65535");
 
         _port = port;
-        _connectionTimeout = connectionTimeoutMs;
         _client = new TcpClient();
+        _connectionTimeout = connectionTimeoutMs;
     }
 
     /// <summary>
@@ -34,7 +36,7 @@ public class TcpClientHelper : IDisposable
     /// </summary>
     public async Task ConnectAsync(CancellationToken cancellationToken = default)
     {
-        ObjectDisposedException.ThrowIf(_disposed, nameof(TcpClientHelper));
+        ObjectDisposedException.ThrowIf(_disposed, nameof(SocketClient));
 
         // Đóng kết nối cũ nếu đã mở
         if (_client.Connected)
@@ -63,7 +65,7 @@ public class TcpClientHelper : IDisposable
     /// </summary>
     public async Task SendAsync(byte[] data, CancellationToken cancellationToken = default)
     {
-        ObjectDisposedException.ThrowIf(_disposed, nameof(TcpClientHelper));
+        ObjectDisposedException.ThrowIf(_disposed, nameof(SocketClient));
 
         if (_stream == null)
             throw new InvalidOperationException("Not connected to the server.");
@@ -87,7 +89,7 @@ public class TcpClientHelper : IDisposable
     /// </summary>
     public async Task<byte[]> ReceiveAsync(int bufferSize = 4096, CancellationToken cancellationToken = default)
     {
-        ObjectDisposedException.ThrowIf(_disposed, nameof(TcpClientHelper));
+        ObjectDisposedException.ThrowIf(_disposed, nameof(SocketClient));
 
         if (_stream == null)
             throw new InvalidOperationException("Not connected to the server.");

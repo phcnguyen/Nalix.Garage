@@ -365,6 +365,7 @@ public class AutoDbContext(DbContextOptions<AutoDbContext> options) : DbContext(
                 ExpiryDate = new DateOnly(2026, 2, 25),
                 UnitPrice = 150.50m,
                 Manufacturer = "OEM"
-            });
+            }
+        );
     }
 }
