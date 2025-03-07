@@ -7,10 +7,9 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Notio.Logging" Version="0.2.99" />
-		<PackageReference Include="Notio.Network" Version="0.2.99" />
-		<PackageReference Include="Notio.Cryptography" Version="0.2.99" />
-		<PackageReference Include="Notio.Network.Package" Version="0.2.99" />
+		<ProjectReference Include="..\Auto.Common\Auto.Common.csproj" />
+		<PackageReference Include="Notio.Logging" Version="0.3.35" />
+		<PackageReference Include="Notio.Network" Version="0.3.35" />
 	</ItemGroup>
 
 </Project>

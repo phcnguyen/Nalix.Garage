@@ -14,8 +14,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Notio.Cryptography" Version="0.2.94" />
-		<PackageReference Include="Notio.Network.Package" Version="0.2.94" />
+		<ProjectReference Include="..\Auto.Common\Auto.Common.csproj" />
 	</ItemGroup>
 
 </Project>
