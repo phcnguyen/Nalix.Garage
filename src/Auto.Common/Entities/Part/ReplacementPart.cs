@@ -60,6 +60,7 @@ public class ReplacementPart
     /// <summary>
     /// Đơn giá của phụ tùng.
     /// </summary>
+    [Column(TypeName = "decimal(18,2)")]
     [Range(0.01, double.MaxValue, ErrorMessage = "Unit price must be greater than zero.")]
     public decimal UnitPrice { get; set; }
 
@@ -92,6 +93,7 @@ public class ReplacementPart
     /// <summary>
     /// Tổng giá trị phụ tùng (Quantity * UnitPrice).
     /// </summary>
+    [Column(TypeName = "decimal(18,2)")]
     public decimal TotalValue => Quantity * UnitPrice;
 
     /// <summary>

@@ -25,6 +25,18 @@ public enum CarType : byte
     [Display(Name = "Pickup - Xe bán tải")]
     Pickup = 6,
 
-    [Display(Name = "Khác")]
+    [Display(Name = "Minivan - Xe gia đình")]
+    Minivan = 7,
+
+    [Display(Name = "Truck - Xe tải")]
+    Truck = 8,
+
+    [Display(Name = "Bus - Xe buýt")]
+    Bus = 9,
+
+    [Display(Name = "Motorcycle - Xe máy")]
+    Motorcycle = 10,
+
+    [Display(Name = "Other - Loại khác")]
     Other = 255
 }

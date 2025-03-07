@@ -28,6 +28,18 @@ public enum CustomerType : byte
     [Display(Name = "Khách hàng VIP")]
     VIP = 6,
 
+    [Display(Name = "Khách hàng tiềm năng")]
+    Potential = 7,
+
+    [Display(Name = "Nhà cung cấp")]
+    Supplier = 8,
+
+    [Display(Name = "Tổ chức phi lợi nhuận")]
+    NonProfit = 9,
+
+    [Display(Name = "Đại lý")]
+    Dealer = 10,
+
     [Display(Name = "Loại khách hàng khác")]
     Other = 255
 }

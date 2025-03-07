@@ -116,21 +116,25 @@ public class Invoice
     /// <summary>
     /// Số tiền giảm giá thực tế.
     /// </summary>
+    [Column(TypeName = "decimal(18,2)")]
     public decimal DiscountAmount => CalculateDiscount();
 
     /// <summary>
     /// Số tiền thuế thực tế.
     /// </summary>
+    [Column(TypeName = "decimal(18,2)")]
     public decimal TaxAmount => CalculateTax();
 
     /// <summary>
     /// Tổng số tiền cần thanh toán sau thuế và giảm giá.
     /// </summary>
+    [Column(TypeName = "decimal(18,2)")]
     public decimal TotalAmount => CalculateTotalAmount();
 
     /// <summary>
     /// Số tiền còn nợ.
     /// </summary>
+    [Column(TypeName = "decimal(18,2)")]
     public decimal BalanceDue => TotalAmount - AmountPaid();
 
     /// <summary>
@@ -145,7 +149,7 @@ public class Invoice
         => TransactionList?.Where(t => t.Type == TransactionType.Revenue).Sum(t => t.Amount) ?? 0;
 
     private decimal CalculateSubtotal()
-        => (SpareParts?.Sum(p => p.SellingPrice) ?? 0) + (RepairOrders?.Sum(o => o.TotalRepairCost()) ?? 0);
+        => (SpareParts?.Sum(p => p.SellingPrice) ?? 0) + (RepairOrders?.Sum(o => o.TotalRepairCost) ?? 0);
 
     private decimal CalculateDiscount()
         => DiscountType == DiscountType.Percentage ? Subtotal * Discount / 100 : Discount;

@@ -26,5 +26,25 @@ public enum TransactionStatus
     /// - Có thể do lỗi hệ thống, không đủ tiền, hoặc bị từ chối bởi cổng thanh toán.
     /// </summary>
     [Display(Name = "Thất bại")]
-    Failed = 3
+    Failed = 3,
+
+    /// <summary>
+    /// Giao dịch đã bị hủy bởi khách hàng hoặc hệ thống trước khi xử lý xong.
+    /// </summary>
+    [Display(Name = "Đã hủy")]
+    Canceled = 4,
+
+    /// <summary>
+    /// Giao dịch đã được hoàn tiền cho khách hàng.
+    /// - Áp dụng khi có lỗi hoặc khách hàng yêu cầu hoàn tiền.
+    /// </summary>
+    [Display(Name = "Đã hoàn tiền")]
+    Refunded = 5,
+
+    /// <summary>
+    /// Giao dịch bị tạm giữ để kiểm tra thêm.
+    /// - Có thể do nghi ngờ gian lận hoặc cần xác minh thêm thông tin.
+    /// </summary>
+    [Display(Name = "Đang xem xét")]
+    UnderReview = 6
 }

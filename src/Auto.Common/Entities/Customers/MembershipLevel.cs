@@ -25,6 +25,6 @@ public enum MembershipLevel : byte
     [Display(Name = "Thành viên bạch kim")]
     Platinum = 5,
 
-    [Display(Name = "Thành viên kim cương (VIP)")]
+    [Display(Name = "Thành viên kim cương")]
     Diamond = 6
 }

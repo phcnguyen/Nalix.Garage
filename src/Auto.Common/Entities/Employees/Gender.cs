@@ -23,11 +23,5 @@ public enum Gender : byte
     /// Giới tính nữ.
     /// </summary>
     [Display(Name = "Nữ")]
-    Female = 2,
-
-    /// <summary>
-    /// Giới tính khác.
-    /// </summary>
-    [Display(Name = "Khác")]
-    Other = 255
+    Female = 2
 }

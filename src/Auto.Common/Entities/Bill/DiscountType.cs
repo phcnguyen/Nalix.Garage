@@ -25,5 +25,19 @@ public enum DiscountType
     /// Ví dụ: Giảm trực tiếp 50,000 VNĐ trên tổng hóa đơn.
     /// </summary>
     [Display(Name = "Giảm theo số tiền cố định")]
-    Amount = 2
+    Amount = 2,
+
+    /// <summary>
+    /// Giảm giá theo chương trình khuyến mãi đặc biệt.
+    /// - Ví dụ: Giảm giá ngày lễ, sự kiện, flash sale.
+    /// </summary>
+    [Display(Name = "Giảm giá theo chương trình khuyến mãi")]
+    Promotional = 3,
+
+    /// <summary>
+    /// Giảm giá theo mã giảm giá hoặc voucher.
+    /// - Ví dụ: Nhập mã "DISCOUNT50" để được giảm 50,000 VNĐ.
+    /// </summary>
+    [Display(Name = "Giảm giá theo mã giảm giá")]
+    Coupon = 4
 }

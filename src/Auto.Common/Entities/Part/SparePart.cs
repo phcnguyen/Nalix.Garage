@@ -51,12 +51,14 @@ public class SparePart
     /// <summary>
     /// Giá nhập phụ tùng.
     /// </summary>
+    [Column(TypeName = "decimal(18,2)")]
     [Range(0.01, double.MaxValue, ErrorMessage = "Purchase price must be greater than 0.")]
     public decimal PurchasePrice { get; set; }
 
     /// <summary>
     /// Giá bán của phụ tùng (luôn lớn hơn hoặc bằng giá nhập).
     /// </summary>
+    [Column(TypeName = "decimal(18,2)")]
     [Range(0.01, double.MaxValue, ErrorMessage = "Selling price must be greater than 0.")]
     public decimal SellingPrice
     {

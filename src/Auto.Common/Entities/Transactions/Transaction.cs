@@ -37,7 +37,7 @@ public class Transaction
     /// Phương thức thanh toán của giao dịch
     /// - Ví dụ: Tiền mặt, chuyển khoản, thẻ tín dụng, ví điện tử.
     /// </summary>
-    public PaymentMethod PaymentMethod { get; set; }
+    public PaymentMethod PaymentMethod { get; set; } = PaymentMethod.None;
 
     /// <summary>
     /// Trạng thái của giao dịch.
@@ -51,6 +51,7 @@ public class Transaction
     /// Số tiền liên quan đến giao dịch.
     /// - Giá trị phải lớn hơn 0.
     /// </summary>
+    [Column(TypeName = "decimal(18,2)")]
     [Range(0.01, 999999999.99, ErrorMessage = "Transaction amount must be between 0.01 and 999,999,999.99.")]
     public decimal Amount { get; set; }
 
@@ -76,4 +77,14 @@ public class Transaction
     /// Người gần nhất chỉnh sửa giao dịch
     /// </summary>
     public int? ModifiedBy { get; set; }
+
+    /// <summary>
+    /// Ngày chỉnh sửa gần nhất.
+    /// </summary>
+    public DateTime? UpdatedAt { get; set; }
+
+    /// <summary>
+    /// Đánh dấu nếu giao dịch đã bị hoàn tiền hoặc đảo ngược.
+    /// </summary>
+    public bool IsReversed { get; set; } = false;
 }

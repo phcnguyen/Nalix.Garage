@@ -46,7 +46,7 @@ public class Vehicle
     /// <summary>
     /// Loại xe (Sedan, SUV, Hatchback, ...).
     /// </summary>
-    public CarType CarType { get; set; } = CarType.Sedan;
+    public CarType CarType { get; set; } = CarType.None;
 
     /// <summary>
     /// Màu sắc.

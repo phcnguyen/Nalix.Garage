@@ -126,6 +126,38 @@ public enum PartCategory : byte
     [Display(Name = "Hệ thống chống ồn")]
     SoundDampening = 36,
 
+    // 🌱 Hệ thống nhiên liệu tiên tiến (EV & Hybrid)
+    [Display(Name = "Pin và mô-đun điện")]
+    BatteryAndModules = 37,
+
+    [Display(Name = "Bộ sạc và hệ thống quản lý pin")]
+    ChargingSystem = 38,
+
+    // 🛰 Hệ thống điều hướng & viễn thông
+    [Display(Name = "Hệ thống viễn thông & Internet")]
+    Telematics = 39,
+
+    [Display(Name = "Màn hình hiển thị HUD")]
+    HUD = 40,
+
+    // 🏎 Hệ thống khí động học
+    [Display(Name = "Cánh gió và bộ khuếch tán")]
+    Aerodynamics = 41,
+
+    // 🔇 Hệ thống cách âm & cách nhiệt
+    [Display(Name = "Cách âm & chống rung")]
+    SoundProofing = 42,
+
+    [Display(Name = "Kính chống UV và cách nhiệt")]
+    UVGlass = 43,
+
+    // 🏕 Phụ kiện chuyên dụng
+    [Display(Name = "Giá nóc và hộp chứa đồ")]
+    RoofRack = 44,
+
+    [Display(Name = "Bộ móc kéo xe")]
+    TowHitch = 45,
+
     // ❓ Khác
     [Display(Name = "Phụ tùng khác")]
     Other = 255
