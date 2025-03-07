@@ -84,6 +84,16 @@ public class Customer
     public decimal Debt { get; set; } = 0;
 
     /// <summary>
+    /// Người đã tạo khách hàng trong hệ thống
+    /// </summary>
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
+    /// <summary>
+    /// Người gần nhất chỉnh sửa thông tin khách hàng.
+    /// </summary>
+    public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+
+    /// <summary>
     /// Danh sách xe của khách hàng.
     /// </summary>
     public virtual ICollection<Vehicle> CarList { get; set; } = [];
