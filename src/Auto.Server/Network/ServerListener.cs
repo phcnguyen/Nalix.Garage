@@ -5,7 +5,7 @@ using Notio.Network.Protocols;
 
 namespace Auto.Server.Network;
 
-public class ServerListener(IProtocol protocol, IBufferPool bufferPool, ILogger logger)
+public sealed class ServerListener(IProtocol protocol, IBufferPool bufferPool, ILogger logger)
     : Listener(protocol, bufferPool, logger)
 {
 }

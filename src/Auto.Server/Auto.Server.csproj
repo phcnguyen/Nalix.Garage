@@ -8,8 +8,9 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\Auto.Common\Auto.Common.csproj" />
-		<PackageReference Include="Notio.Logging" Version="0.3.35" />
-		<PackageReference Include="Notio.Network" Version="0.3.35" />
+		<ProjectReference Include="..\Auto.Database\Auto.Database.csproj" />
+		<PackageReference Include="Notio.Logging" Version="0.3.36" />
+		<PackageReference Include="Notio.Network" Version="0.3.36" />
 	</ItemGroup>
 
 </Project>

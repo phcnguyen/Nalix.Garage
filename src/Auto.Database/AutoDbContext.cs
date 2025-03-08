@@ -18,7 +18,7 @@ namespace Auto.Database;
 /// </summary>
 public class AutoDbContext(DbContextOptions<AutoDbContext> options) : DbContext(options)
 {
-    public DbSet<Vehicle> Cars { get; set; }
+    public DbSet<Vehicle> Vehicles { get; set; }
     public DbSet<Account> Accounts { get; set; }
     public DbSet<Invoice> Invoices { get; set; }
     public DbSet<Customer> Customers { get; set; }

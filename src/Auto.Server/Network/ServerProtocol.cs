@@ -4,7 +4,7 @@ using Notio.Network.Protocols;
 
 namespace Auto.Server.Network;
 
-public class ServerProtocol(IPacketDispatcher packetDispatcher) : Protocol
+public sealed class ServerProtocol(IPacketDispatcher packetDispatcher) : Protocol
 {
     private readonly IPacketDispatcher _packetDispatcher = packetDispatcher;
 
