@@ -30,7 +30,7 @@ public class Account
     /// </summary>
     [Required]
     [MaxLength(256)]
-    public string PasswordHash { get; private set; } = string.Empty;
+    public string PasswordHash { get; set; } = string.Empty;
 
     /// <summary>
     /// Vai trò của tài khoản trong hệ thống.
