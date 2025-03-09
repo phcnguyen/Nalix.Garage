@@ -87,7 +87,7 @@ public class AutoDbContext(DbContextOptions<AutoDbContext> options) : DbContext(
             .HasIndex(v => v.CarLicensePlate)
             .IsUnique();
 
-        // Index cho CustomerId giúp tối ưu truy vấn khi tìm kiếm xe theo chủ sở hữu
+        // Index cho Id giúp tối ưu truy vấn khi tìm kiếm xe theo chủ sở hữu
         modelBuilder.Entity<Vehicle>().HasIndex(v => v.CustomerId);
 
         // Index cho CarBrand giúp tăng tốc tìm kiếm xe theo hãng
@@ -186,7 +186,7 @@ public class AutoDbContext(DbContextOptions<AutoDbContext> options) : DbContext(
             .HasForeignKey(sp => sp.SupplierId)
             .OnDelete(DeleteBehavior.Cascade); // Xóa Supplier sẽ xóa luôn danh sách số điện thoại
 
-        // Tạo index cho (SupplierId, PhoneNumber) giúp tối ưu tìm kiếm
+        // Tạo index cho (Id, PhoneNumber) giúp tối ưu tìm kiếm
         modelBuilder.Entity<SupplierPhone>().HasIndex(sp => new { sp.SupplierId, sp.PhoneNumber });
     }
 
@@ -273,7 +273,7 @@ public class AutoDbContext(DbContextOptions<AutoDbContext> options) : DbContext(
             .HasOne(ro => ro.Vehicle)
             .WithMany()
             .HasForeignKey(ro => ro.CarId)
-            .OnDelete(DeleteBehavior.SetNull); // Set VehicleId về null nếu Vehicle bị xóa
+            .OnDelete(DeleteBehavior.SetNull); // Set Id về null nếu Vehicle bị xóa
 
         modelBuilder.Entity<RepairOrder>()
             .HasMany(ro => ro.RepairTaskList)
@@ -358,7 +358,7 @@ public class AutoDbContext(DbContextOptions<AutoDbContext> options) : DbContext(
         modelBuilder.Entity<ReplacementPart>().HasData(
             new ReplacementPart
             {
-                PartId = 1,
+                Id = 1,
                 PartCode = "ABC123",
                 PartName = "Brake Pad",
                 DateAdded = new DateOnly(2025, 2, 25),

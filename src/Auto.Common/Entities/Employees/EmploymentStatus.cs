@@ -38,5 +38,11 @@ public enum EmploymentStatus
     /// Nhân viên đã nghỉ hưu.
     /// </summary>
     [Display(Name = "Đã nghỉ hưu")]
-    Retired = 5
+    Retired = 5,
+
+    /// <summary>
+    /// Nhân viên đã được tuyển dụng nhưng chưa bắt đầu làm việc.
+    /// </summary>
+    [Display(Name = "Chờ bắt đầu")]
+    Pending = 6,
 }

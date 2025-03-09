@@ -9,10 +9,19 @@ namespace Auto.Common.Entities.Suppliers;
 [Table(nameof(SupplierPhone))]
 public class SupplierPhone
 {
+    #region Fields
+
+    // Hiện tại không có private fields, để lại region này cho tính nhất quán.
+
+    #endregion
+
+    #region Identification Properties
+
     /// <summary>
     /// Mã định danh duy nhất của số điện thoại nhà cung cấp.
     /// </summary>
     [Key]
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int Id { get; set; }
 
     /// <summary>
@@ -27,6 +36,10 @@ public class SupplierPhone
     /// </summary>
     public Supplier Supplier { get; set; }
 
+    #endregion
+
+    #region Contact Properties
+
     /// <summary>
     /// Số điện thoại của nhà cung cấp (10-12 chữ số).
     /// </summary>
@@ -34,4 +47,6 @@ public class SupplierPhone
     [MaxLength(12)]
     [RegularExpression(@"^\d{10,12}$", ErrorMessage = "The phone number must be between 10-12 digits.")]
     public string PhoneNumber { get; set; } = string.Empty;
+
+    #endregion
 }

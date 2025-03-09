@@ -12,14 +12,21 @@ namespace Auto.Common.Entities.Repair;
 [Table(nameof(RepairTask))]
 public class RepairTask
 {
+    #region Fields
+
     private DateTime? _startDate;
     private DateTime? _completionDate;
+
+    #endregion
+
+    #region Identification Properties
 
     /// <summary>
     /// Mã công việc sửa chữa.
     /// </summary>
     [Key]
-    public int RepairTaskId { get; set; }
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+    public int Id { get; set; }
 
     /// <summary>
     /// Nhân viên thực hiện công việc sửa chữa.
@@ -42,6 +49,10 @@ public class RepairTask
     /// Thông tin dịch vụ liên quan (Navigation Property).
     /// </summary>
     public virtual ServiceItem ServiceItem { get; set; }
+
+    #endregion
+
+    #region Task Details Properties
 
     /// <summary>
     /// Trạng thái công việc sửa chữa.
@@ -86,4 +97,6 @@ public class RepairTask
     /// Công việc đã hoàn thành chưa.
     /// </summary>
     public bool IsCompleted => Status == RepairOrderStatus.Completed;
+
+    #endregion
 }

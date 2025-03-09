@@ -11,20 +11,21 @@ namespace Auto.Common.Entities.Part;
 [Table(nameof(SparePart))]
 public class SparePart
 {
+    #region Fields
+
     private decimal _sellingPrice;
     private int _inventoryQuantity;
 
-    public SparePart()
-    {
-        if (SellingPrice < PurchasePrice)
-            throw new ArgumentException("Selling price cannot be lower than purchase price.");
-    }
+    #endregion
+
+    #region Identification Properties
 
     /// <summary>
     /// Mã phụ tùng.
     /// </summary>
     [Key]
-    public int PartId { get; set; }
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+    public int Id { get; set; }
 
     /// <summary>
     /// Id nhà cung cấp của phụ tùng.
@@ -37,6 +38,10 @@ public class SparePart
     /// </summary>
     public virtual Supplier Supplier { get; set; }
 
+    #endregion
+
+    #region Basic Properties
+
     /// <summary>
     /// Loại phụ tùng.
     /// </summary>
@@ -47,6 +52,10 @@ public class SparePart
     /// </summary>
     [Required, StringLength(100, ErrorMessage = "Part name must not exceed 100 characters.")]
     public string PartName { get; set; } = string.Empty;
+
+    #endregion
+
+    #region Price and Quantity Properties
 
     /// <summary>
     /// Giá nhập phụ tùng.
@@ -66,7 +75,7 @@ public class SparePart
         set
         {
             if (value < PurchasePrice)
-                throw new ArgumentException("Selling price cannot be lower than purchase price.");
+                throw new InvalidOperationException("Selling price cannot be lower than purchase price.");
             _sellingPrice = value;
         }
     }
@@ -86,9 +95,15 @@ public class SparePart
         }
     }
 
+    #endregion
+
+    #region Status Properties
+
     /// <summary>
     /// Đánh dấu phụ tùng không còn bán.
     /// </summary>
     [Required]
     public bool IsDiscontinued { get; set; } = false;
+
+    #endregion
 }

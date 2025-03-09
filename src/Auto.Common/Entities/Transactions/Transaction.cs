@@ -12,17 +12,30 @@ namespace Auto.Common.Entities.Transactions;
 [Table(nameof(Transaction))]
 public class Transaction
 {
+    #region Fields
+
+    // Hiện tại không có private fields, để lại region này cho tính nhất quán.
+
+    #endregion
+
+    #region Identification Properties
+
     /// <summary>
     /// Mã giao dịch duy nhất trong hệ thống.
     /// </summary>
     [Key]
-    public int TransactionId { get; set; }
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+    public int Id { get; set; }
 
     /// <summary>
     /// Mã hóa đơn liên quan đến giao dịch.
     /// </summary>
     [ForeignKey(nameof(Invoice))]
     public int InvoiceId { get; set; }
+
+    #endregion
+
+    #region Transaction Details Properties
 
     /// <summary>
     /// Loại giao dịch
@@ -68,6 +81,10 @@ public class Transaction
     /// </summary>
     public DateTime TransactionDate { get; set; } = DateTime.UtcNow;
 
+    #endregion
+
+    #region Audit Properties
+
     /// <summary>
     /// Người đã tạo giao dịch trong hệ thống
     /// </summary>
@@ -83,8 +100,14 @@ public class Transaction
     /// </summary>
     public DateTime? UpdatedAt { get; set; }
 
+    #endregion
+
+    #region Status Properties
+
     /// <summary>
     /// Đánh dấu nếu giao dịch đã bị hoàn tiền hoặc đảo ngược.
     /// </summary>
     public bool IsReversed { get; set; } = false;
+
+    #endregion
 }

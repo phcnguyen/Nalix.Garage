@@ -15,11 +15,20 @@ namespace Auto.Common.Entities.Repair;
 [Table(nameof(RepairOrder))]
 public class RepairOrder
 {
+    #region Fields
+
+    // Hiện tại không có private fields, để lại region này cho tính nhất quán.
+
+    #endregion
+
+    #region Identification Properties
+
     /// <summary>
     /// Mã đơn sửa chữa.
     /// </summary>
     [Key]
-    public int RepairOrderId { get; set; }
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+    public int Id { get; set; }
 
     /// <summary>
     /// Id hóa đơn.
@@ -39,11 +48,6 @@ public class RepairOrder
     public int OwnerId { get; set; }
 
     /// <summary>
-    /// Thông tin chủ xe (Navigation Property).
-    /// </summary>
-    public virtual Customer Owner { get; set; }
-
-    /// <summary>
     /// Mã xe liên quan đến đơn sửa chữa.
     /// </summary>
     [ForeignKey(nameof(Vehicle))]
@@ -53,6 +57,15 @@ public class RepairOrder
     /// Thông tin xe liên quan (Navigation Property).
     /// </summary>
     public virtual Vehicle Vehicle { get; set; }
+
+    /// <summary>
+    /// Thông tin chủ xe (Navigation Property).
+    /// </summary>
+    public virtual Customer Owner { get; set; }
+
+    #endregion
+
+    #region Order Details Properties
 
     /// <summary>
     /// Ngày lập đơn.
@@ -76,4 +89,6 @@ public class RepairOrder
     public decimal TotalRepairCost =>
         (RepairTaskList?.Sum(task => task.ServiceItem.UnitPrice) ?? 0) +
         (RepairOrderSpareParts?.Sum(sp => sp.SparePart.SellingPrice * sp.Quantity) ?? 0);
+
+    #endregion
 }

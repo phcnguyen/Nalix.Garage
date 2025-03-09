@@ -1,12 +1,14 @@
-﻿using Auto.Common.Entities.Customers;
-using Auto.Common.Entities.Vehicles;
+﻿using Auto.Common.Entities.Vehicles;
 using Auto.Common.Enums;
 using Auto.Common.Enums.Cars;
 using Auto.Database;
+using Microsoft.EntityFrameworkCore;
 using Notio.Common.Connection;
 using Notio.Common.Models;
 using Notio.Common.Package;
 using Notio.Network.Handlers;
+using System;
+using System.Linq;
 
 namespace Auto.Server.Services;
 
@@ -20,8 +22,6 @@ public sealed class VehicleService(AutoDbContext context) : BaseService
     /// <summary>
     /// Thêm một phương tiện mới vào hệ thống.
     /// </summary>
-    /// <param name="packet">Gói tin chứa thông tin phương tiện.</param>
-    /// <param name="connection">Kết nối của client gửi yêu cầu.</param>
     [PacketCommand((int)Command.AddVehicle, Authoritys.User)]
     public void AddVehicle(IPacket packet, IConnection connection)
     {
@@ -31,37 +31,51 @@ public sealed class VehicleService(AutoDbContext context) : BaseService
             return;
         }
 
-        Customer? customer = context.Customers.Find(customerId);
-        if (customer == null)
+        if (!context.Customers.Any(c => c.Id == customerId))
         {
             connection.Send(CreateErrorPacket("Customer not found."));
             return;
         }
 
+        string licensePlate = parts[5].Trim();
+        string frameNumber = parts[7].Trim();
+        string engineNumber = parts[8].Trim();
+
+        if (context.Vehicles.Any(v => v.CarLicensePlate == licensePlate || v.FrameNumber == frameNumber || v.EngineNumber == engineNumber))
+        {
+            connection.Send(CreateErrorPacket("Vehicle already exists with the same license plate, frame number, or engine number."));
+            return;
+        }
+
         Vehicle vehicle = new()
         {
-            CustomerId = customer.CustomerId,
+            CustomerId = customerId,
             CarYear = ParseInt(parts[1], 1900),
             CarType = ParseEnum(parts[2], CarType.None),
             CarColor = ParseEnum(parts[3], CarColor.None),
             CarBrand = ParseEnum(parts[4], CarBrand.None),
-            CarLicensePlate = parts[5],
-            CarModel = parts[6],
-            FrameNumber = parts[7],
-            EngineNumber = parts[8],
+            CarLicensePlate = licensePlate,
+            CarModel = parts[6].Trim(),
+            FrameNumber = frameNumber,
+            EngineNumber = engineNumber,
             Mileage = ParseInt(parts[9], 0)
         };
 
         context.Vehicles.Add(vehicle);
-        context.SaveChanges();
-        connection.Send(CreateSuccessPacket("Vehicle added successfully."));
+        try
+        {
+            context.SaveChanges();
+            connection.Send(CreateSuccessPacket("Vehicle added successfully."));
+        }
+        catch (Exception)
+        {
+            connection.Send(CreateErrorPacket("Failed to add vehicle."));
+        }
     }
 
     /// <summary>
     /// Cập nhật thông tin phương tiện trong hệ thống.
     /// </summary>
-    /// <param name="packet">Gói tin chứa thông tin cập nhật.</param>
-    /// <param name="connection">Kết nối của client gửi yêu cầu.</param>
     [PacketCommand((int)Command.UpdateVehicle, Authoritys.User)]
     public void UpdateVehicle(IPacket packet, IConnection connection)
     {
@@ -78,25 +92,46 @@ public sealed class VehicleService(AutoDbContext context) : BaseService
             return;
         }
 
+        string licensePlate = parts[5].Trim();
+        string frameNumber = parts[7].Trim();
+        string engineNumber = parts[8].Trim();
+
+        if (context.Vehicles.Any(v =>
+            v.Id != vehicleId &&
+            (v.CarLicensePlate == licensePlate ||
+            v.FrameNumber == frameNumber ||
+            v.EngineNumber == engineNumber)))
+        {
+            connection.Send(
+                CreateErrorPacket("Another vehicle already exists with the same license plate, frame number, or engine number."));
+            return;
+        }
+
+        context.Attach(vehicle); // Tối ưu cập nhật chỉ những trường thay đổi
         vehicle.CarYear = ParseInt(parts[1], vehicle.CarYear);
         vehicle.CarType = ParseEnum(parts[2], vehicle.CarType);
         vehicle.CarColor = ParseEnum(parts[3], vehicle.CarColor);
         vehicle.CarBrand = ParseEnum(parts[4], vehicle.CarBrand);
-        vehicle.CarLicensePlate = parts[5];
-        vehicle.CarModel = parts[6];
-        vehicle.FrameNumber = parts[7];
-        vehicle.EngineNumber = parts[8];
+        vehicle.CarLicensePlate = licensePlate;
+        vehicle.CarModel = parts[6].Trim();
+        vehicle.FrameNumber = frameNumber;
+        vehicle.EngineNumber = engineNumber;
         vehicle.Mileage = ParseDouble(parts[9], vehicle.Mileage);
 
-        context.SaveChanges();
-        connection.Send(CreateSuccessPacket("Vehicle updated successfully."));
+        try
+        {
+            context.SaveChanges();
+            connection.Send(CreateSuccessPacket("Vehicle updated successfully."));
+        }
+        catch (Exception)
+        {
+            connection.Send(CreateErrorPacket("Failed to update vehicle."));
+        }
     }
 
     /// <summary>
     /// Xóa một phương tiện khỏi hệ thống.
     /// </summary>
-    /// <param name="packet">Gói tin chứa ID phương tiện cần xóa.</param>
-    /// <param name="connection">Kết nối của client gửi yêu cầu.</param>
     [PacketCommand((int)Command.RemoveVehicle, Authoritys.User)]
     public void RemoveVehicle(IPacket packet, IConnection connection)
     {
@@ -106,24 +141,18 @@ public sealed class VehicleService(AutoDbContext context) : BaseService
             return;
         }
 
-        Vehicle? vehicle = context.Vehicles.Find(vehicleId);
-        if (vehicle == null)
-        {
-            connection.Send(CreateErrorPacket("Vehicle not found."));
-            return;
-        }
+        // Tối ưu bằng cách xóa trực tiếp, tránh truy vấn thừa
+        int deleted = context.Vehicles.Where(v => v.Id == vehicleId).ExecuteDelete();
 
-        context.Vehicles.Remove(vehicle);
-        context.SaveChanges();
-        connection.Send(CreateSuccessPacket("Vehicle removed successfully."));
+        if (deleted > 0)
+            connection.Send(CreateSuccessPacket("Vehicle removed successfully."));
+        else
+            connection.Send(CreateErrorPacket("Vehicle not found."));
     }
 
     /// <summary>
     /// Kiểm tra và lấy ID phương tiện từ gói tin.
     /// </summary>
-    /// <param name="packet">Gói tin chứa thông tin ID.</param>
-    /// <param name="vehicleId">ID phương tiện nếu hợp lệ.</param>
-    /// <returns>Trả về true nếu ID hợp lệ, ngược lại trả về false.</returns>
     private static bool TryGetVehicleId(IPacket packet, out int vehicleId)
     {
         vehicleId = -1;

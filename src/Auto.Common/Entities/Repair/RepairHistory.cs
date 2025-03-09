@@ -13,11 +13,20 @@ namespace Auto.Common.Entities.Repair;
 [Table(nameof(RepairHistory))]
 public class RepairHistory
 {
+    #region Fields
+
+    // Hiện tại không có private fields, nhưng để lại region này cho tính nhất quán.
+
+    #endregion
+
+    #region Identification Properties
+
     /// <summary>
     /// Mã lịch sử sửa chữa.
     /// </summary>
     [Key]
-    public int HistoryId { get; set; }
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+    public int Id { get; set; }
 
     /// <summary>
     /// Mã xe liên quan đến lịch sử sửa chữa.
@@ -29,6 +38,10 @@ public class RepairHistory
     /// Thông tin xe liên quan (Navigation Property).
     /// </summary>
     public virtual Vehicle Vehicle { get; set; }
+
+    #endregion
+
+    #region Repair Details Properties
 
     /// <summary>
     /// Ngày sửa chữa.
@@ -45,4 +58,6 @@ public class RepairHistory
     /// </summary>
     [Column(TypeName = "decimal(18,2)")]
     public decimal TotalCost => (RepairTaskList ?? []).Sum(task => task.ServiceItem?.UnitPrice ?? 0);
+
+    #endregion
 }

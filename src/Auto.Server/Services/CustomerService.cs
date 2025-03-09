@@ -1,6 +1,7 @@
 ﻿using Auto.Common.Entities.Customers;
 using Auto.Common.Enums;
 using Auto.Database;
+using Microsoft.EntityFrameworkCore;
 using Notio.Common.Connection;
 using Notio.Common.Models;
 using Notio.Common.Package;
@@ -12,6 +13,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 
 namespace Auto.Server.Services;
 
@@ -22,6 +24,18 @@ namespace Auto.Server.Services;
 public sealed class CustomerService(AutoDbContext context) : BaseService
 {
     private readonly AutoDbContext context = context;
+
+    /// <summary>
+    /// Kiểm tra tính hợp lệ của email.
+    /// </summary>
+    private static bool IsValidEmail(string email) =>
+        Regex.IsMatch(email, @"^[^@\s]+@[^@\s]+\.[^@\s]+$");
+
+    /// <summary>
+    /// Kiểm tra tính hợp lệ của số điện thoại.
+    /// </summary>
+    private static bool IsValidPhoneNumber(string phone) =>
+        Regex.IsMatch(phone, @"^\+?[0-9]{7,15}$");
 
     /// <summary>
     /// Thêm khách hàng mới vào cơ sở dữ liệu.
@@ -35,20 +49,43 @@ public sealed class CustomerService(AutoDbContext context) : BaseService
             return;
         }
 
-        if (context.Customers.Any(c => c.PhoneNumber == parts[1] || c.Email == parts[2]))
+        // Chuẩn hóa dữ liệu
+        string name = parts[0].Trim();
+        string phone = parts[1].Trim();
+        string email = parts[2].Trim();
+        string address = parts[3].Trim();
+        string taxCode = parts[4].Trim();
+        CustomerType type = ParseEnum(parts[5], CustomerType.Individual);
+
+        // Kiểm tra email & số điện thoại hợp lệ
+        if (!IsValidEmail(email))
+        {
+            connection.Send(CreateErrorPacket("Invalid email format."));
+            return;
+        }
+
+        if (!IsValidPhoneNumber(phone))
+        {
+            connection.Send(CreateErrorPacket("Invalid phone number format."));
+            return;
+        }
+
+        // Kiểm tra khách hàng đã tồn tại chưa
+        if (context.Customers.Any(c => c.PhoneNumber == phone || c.Email == email))
         {
             connection.Send(CreateErrorPacket("Customer with this phone or email already exists."));
             return;
         }
 
+        // Tạo khách hàng mới
         Customer customer = new()
         {
-            Name = parts[0],
-            PhoneNumber = parts[1],
-            Email = parts[2],
-            Address = parts[3],
-            TaxCode = parts[4],
-            Type = ParseEnum(parts[4], CustomerType.Individual)
+            Name = name,
+            PhoneNumber = phone,
+            Email = email,
+            Address = address,
+            TaxCode = taxCode,
+            Type = type
         };
 
         context.Customers.Add(customer);
@@ -69,27 +106,48 @@ public sealed class CustomerService(AutoDbContext context) : BaseService
             return;
         }
 
-        Customer? customer = context.Customers.Find(customerId);
+        Customer? customer = context.Customers.SingleOrDefault(c => c.Id == customerId);
         if (customer == null)
         {
             connection.Send(CreateErrorPacket("Customer not found."));
             return;
         }
 
-        customer.Name = parts[1];
-        customer.PhoneNumber = parts[2];
-        customer.Email = parts[3];
-        customer.Address = parts[4];
-        customer.TaxCode = parts[5];
+        // Chuẩn hóa dữ liệu
+        string name = parts[1].Trim();
+        string phone = parts[2].Trim();
+        string email = parts[3].Trim();
+        string address = parts[4].Trim();
+        string taxCode = parts[5].Trim();
+
+        // Kiểm tra email & số điện thoại hợp lệ
+        if (!IsValidEmail(email))
+        {
+            connection.Send(CreateErrorPacket("Invalid email format."));
+            return;
+        }
+
+        if (!IsValidPhoneNumber(phone))
+        {
+            connection.Send(CreateErrorPacket("Invalid phone number format."));
+            return;
+        }
+
+        // Cập nhật thông tin khách hàng
+        customer.Name = name;
+        customer.PhoneNumber = phone;
+        customer.Email = email;
+        customer.Address = address;
+        customer.TaxCode = taxCode;
 
         context.SaveChanges();
         connection.Send(CreateSuccessPacket("Customer updated successfully."));
     }
 
     /// <summary>
-    /// Xóa khách hàng khỏi cơ sở dữ liệu.
+    /// Xóa khách hàng khỏi cơ sở dữ liệu (chỉ khi không có đơn hàng liên quan).
     /// </summary>
-    [PacketCommand((int)Command.RemoveCustomer, Authoritys.User)]
+    [PacketCommand((int)Command.RemoveCustomer, Authoritys.Administrator)]
     public void RemoveCustomer(IPacket packet, IConnection connection)
     {
         if (!TryGetCustomerId(packet, out int customerId))
@@ -98,10 +156,17 @@ public sealed class CustomerService(AutoDbContext context) : BaseService
             return;
         }
 
-        Customer? customer = context.Customers.Find(customerId);
+        Customer? customer = context.Customers.SingleOrDefault(c => c.Id == customerId);
         if (customer == null)
         {
             connection.Send(CreateErrorPacket("Customer not found."));
+            return;
+        }
+
+        // Kiểm tra khách hàng có đơn hàng liên quan không
+        if (context.Customers.Any(o => o.Id == customerId))
+        {
+            connection.Send(CreateErrorPacket("Cannot remove customer with existing orders."));
             return;
         }
 
@@ -126,14 +191,14 @@ public sealed class CustomerService(AutoDbContext context) : BaseService
 
         string keyword = parts[0].Trim();
 
-        var query = context.Customers
+        var query = context.Customers.AsNoTracking()
             .Where(c => c.Name.Contains(keyword) ||
                         c.PhoneNumber.Contains(keyword) ||
                         c.Email.Contains(keyword));
 
         int totalCount = query.Count();
         List<Customer> customers = [.. query
-            .OrderBy(c => c.CustomerId)
+            .OrderBy(c => c.Id)
             .Skip(pageIndex * pageSize)
             .Take(pageSize)];
 
@@ -145,7 +210,7 @@ public sealed class CustomerService(AutoDbContext context) : BaseService
 
         connection.Send(new Packet(
             PacketType.List, PacketFlags.None, PacketPriority.Low,
-            (int)Command.SearchCustomer, ToBytes<Customer>(customers)).Serialize());
+            (int)Command.SearchCustomer, ToBytes(customers)).Serialize());
     }
 
     /// <summary>
@@ -160,7 +225,7 @@ public sealed class CustomerService(AutoDbContext context) : BaseService
             return;
         }
 
-        Customer? cus = context.Customers.Find(customerId);
+        Customer? cus = context.Customers.AsNoTracking().SingleOrDefault(c => c.Id == customerId);
         if (cus == null)
         {
             connection.Send(CreateErrorPacket("Customer not found."));
@@ -171,12 +236,6 @@ public sealed class CustomerService(AutoDbContext context) : BaseService
             (int)Command.GetCustomerById, JsonSerializer.Serialize(cus)).Serialize());
     }
 
-    /// <summary>
-    /// Kiểm tra và lấy ID khách hàng từ gói tin.
-    /// </summary>
-    /// <param name="packet">Gói tin chứa thông tin ID.</param>
-    /// <param name="customerId">Giá trị ID khách hàng sau khi phân tích.</param>
-    /// <returns>Trả về <c>true</c> nếu lấy ID thành công, <c>false</c> nếu thất bại.</returns>
     private static bool TryGetCustomerId(IPacket packet, out int customerId)
     {
         customerId = -1;

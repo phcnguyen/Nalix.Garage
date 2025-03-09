@@ -13,13 +13,20 @@ namespace Auto.Common.Entities.Suppliers;
 [Table(nameof(Supplier))]
 public class Supplier
 {
+    #region Fields
+
     private DateTime? _contractEndDate;
+
+    #endregion
+
+    #region Identification Properties
 
     /// <summary>
     /// Mã nhà cung cấp (Unique identifier).
     /// </summary>
     [Key]
-    public int SupplierId { get; set; }
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+    public int Id { get; set; }
 
     /// <summary>
     /// Tên nhà cung cấp.
@@ -27,6 +34,10 @@ public class Supplier
     [Required(ErrorMessage = "Supplier name is required.")]
     [MaxLength(100, ErrorMessage = "Supplier name must not exceed 100 characters.")]
     public string Name { get; set; } = string.Empty;
+
+    #endregion
+
+    #region Contact Information Properties
 
     /// <summary>
     /// Email của nhà cung cấp.
@@ -42,9 +53,18 @@ public class Supplier
     public string Address { get; set; } = string.Empty;
 
     /// <summary>
-    /// Ghi chú về nhà cung cấp.
+    /// Danh sách số điện thoại của nhà cung cấp (Quan hệ 1-N với `SupplierPhone`).
     /// </summary>
-    public string Notes { get; set; } = string.Empty;
+    public virtual ICollection<SupplierPhone> PhoneNumbers { get; set; } = [];
+
+    #endregion
+
+    #region Contract Details Properties
+
+    /// <summary>
+    /// Ngày bắt đầu hợp tác với nhà cung cấp.
+    /// </summary>
+    public DateTime ContractStartDate { get; set; } = DateTime.UtcNow;
 
     /// <summary>
     /// Ngày kết thúc hợp tác (nếu có).
@@ -61,9 +81,13 @@ public class Supplier
     }
 
     /// <summary>
-    /// Ngày bắt đầu hợp tác với nhà cung cấp.
+    /// Ghi chú về nhà cung cấp.
     /// </summary>
-    public DateTime ContractStartDate { get; set; } = DateTime.UtcNow;
+    public string Notes { get; set; } = string.Empty;
+
+    #endregion
+
+    #region Financial Information Properties
 
     /// <summary>
     /// Tài khoản ngân hàng để thanh toán.
@@ -78,22 +102,23 @@ public class Supplier
     public string TaxCode { get; set; } = string.Empty;
 
     /// <summary>
-    /// Trạng thái của nhà cung cấp (Hoạt động, Ngừng hợp tác,...).
-    /// </summary>
-    public SupplierStatus Status { get; set; } = SupplierStatus.Active;
-
-    /// <summary>
     /// Điều khoản thanh toán.
     /// </summary>
     public PaymentTerms PaymentTerms { get; set; } = PaymentTerms.None;
+
+    #endregion
+
+    #region Status and Relationships Properties
+
+    /// <summary>
+    /// Trạng thái của nhà cung cấp (Hoạt động, Ngừng hợp tác,...).
+    /// </summary>
+    public SupplierStatus Status { get; set; } = SupplierStatus.Active;
 
     /// <summary>
     /// Những loại phụ tùng cung cấp.
     /// </summary>
     public virtual ICollection<SparePart> SpareParts { get; set; } = [];
 
-    /// <summary>
-    /// Danh sách số điện thoại của nhà cung cấp (Quan hệ 1-N với `SupplierPhone`).
-    /// </summary>
-    public virtual ICollection<SupplierPhone> PhoneNumbers { get; set; } = [];
+    #endregion
 }

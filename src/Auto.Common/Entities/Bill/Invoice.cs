@@ -18,14 +18,21 @@ namespace Auto.Common.Entities.Bill;
 [Table(nameof(Invoice))]
 public class Invoice
 {
+    #region Fields
+
     private decimal _discount;
     private string _invoiceNumber = string.Empty;
+
+    #endregion
+
+    #region Identification Properties
 
     /// <summary>
     /// Mã hóa đơn.
     /// </summary>
     [Key]
-    public int InvoiceId { get; set; }
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+    public int Id { get; set; }
 
     /// <summary>
     /// Id chủ xe.
@@ -37,6 +44,21 @@ public class Invoice
     /// Thông tin chủ xe (Navigation Property).
     /// </summary>
     public virtual Customer Customer { get; set; }
+
+    /// <summary>
+    /// Số hóa đơn (mã duy nhất).
+    /// </summary>
+    [Required(ErrorMessage = "Invoice number is required.")]
+    [MaxLength(30, ErrorMessage = "Invoice number must not exceed 30 characters.")]
+    public string InvoiceNumber
+    {
+        get => _invoiceNumber;
+        set => _invoiceNumber = value?.Trim() ?? string.Empty;
+    }
+
+    #endregion
+
+    #region Audit Properties
 
     /// <summary>
     /// Người tạo hóa đơn.
@@ -51,16 +73,18 @@ public class Invoice
     public int? ModifiedBy { get; set; }
 
     /// <summary>
-    /// Số hóa đơn (mã duy nhất).
-    /// </summary>
-    [Required(ErrorMessage = "Invoice number is required.")]
-    [MaxLength(30, ErrorMessage = "Invoice number must not exceed 30 characters.")]
-    public string InvoiceNumber { get => _invoiceNumber; set => _invoiceNumber = value?.Trim() ?? string.Empty; }
-
-    /// <summary>
     /// Ngày lập hóa đơn.
     /// </summary>
     public DateTime InvoiceDate { get; set; } = DateTime.UtcNow;
+
+    #endregion
+
+    #region Payment Details Properties
+
+    /// <summary>
+    /// Trạng thái thanh toán của hóa đơn.
+    /// </summary>
+    public PaymentStatus PaymentStatus { get; set; } = PaymentStatus.Unpaid;
 
     /// <summary>
     /// Tỷ lệ thuế (5% hoặc 10%).
@@ -71,11 +95,6 @@ public class Invoice
     /// Loại giảm giá (phần trăm hoặc số tiền).
     /// </summary>
     public DiscountType DiscountType { get; set; } = DiscountType.None;
-
-    /// <summary>
-    /// Trạng thái thanh toán của hóa đơn.
-    /// </summary>
-    public PaymentStatus PaymentStatus { get; set; } = PaymentStatus.Unpaid;
 
     /// <summary>
     /// Giá trị giảm giá.
@@ -92,6 +111,10 @@ public class Invoice
         }
     }
 
+    #endregion
+
+    #region Related Entities Properties
+
     /// <summary>
     /// Danh sách phụ tùng thay thế.
     /// </summary>
@@ -107,54 +130,68 @@ public class Invoice
     /// </summary>
     public virtual ICollection<Transaction> TransactionList { get; set; } = [];
 
+    #endregion
+
+    #region Calculated Properties
+
     /// <summary>
     /// Tính tổng tiền trước thuế và giảm giá.
     /// </summary>
     [Column(TypeName = "decimal(18,2)")]
-    public decimal Subtotal => CalculateSubtotal();
+    public decimal Subtotal { get; private set; }
 
     /// <summary>
     /// Số tiền giảm giá thực tế.
     /// </summary>
     [Column(TypeName = "decimal(18,2)")]
-    public decimal DiscountAmount => CalculateDiscount();
+    public decimal DiscountAmount { get; private set; }
 
     /// <summary>
     /// Số tiền thuế thực tế.
     /// </summary>
     [Column(TypeName = "decimal(18,2)")]
-    public decimal TaxAmount => CalculateTax();
+    public decimal TaxAmount { get; private set; }
 
     /// <summary>
     /// Tổng số tiền cần thanh toán sau thuế và giảm giá.
     /// </summary>
     [Column(TypeName = "decimal(18,2)")]
-    public decimal TotalAmount => CalculateTotalAmount();
+    public decimal TotalAmount { get; private set; }
 
     /// <summary>
     /// Số tiền còn nợ.
     /// </summary>
     [Column(TypeName = "decimal(18,2)")]
-    public decimal BalanceDue => TotalAmount - AmountPaid();
+    public decimal BalanceDue { get; private set; }
 
     /// <summary>
     /// Hóa đơn đã thanh toán đủ chưa?
     /// </summary>
     public bool IsFullyPaid => BalanceDue <= 0;
 
+    #endregion
+
+    #region Methods
+
     /// <summary>
     /// Số tiền khách đã thanh toán.
     /// </summary>
     public decimal AmountPaid()
-        => TransactionList?.Where(t => t.Type == TransactionType.Revenue).Sum(t => t.Amount) ?? 0;
+    {
+        return TransactionList?.Where(t => t.Type == TransactionType.Revenue).Sum(t => t.Amount) ?? 0;
+    }
 
-    private decimal CalculateSubtotal()
-        => (SpareParts?.Sum(p => p.SellingPrice) ?? 0) + (RepairOrders?.Sum(o => o.TotalRepairCost) ?? 0);
+    /// <summary>
+    /// Tính toán lại các giá trị tài chính của hóa đơn.
+    /// </summary>
+    public void Recalculate()
+    {
+        Subtotal = (SpareParts?.Sum(p => p.SellingPrice) ?? 0) + (RepairOrders?.Sum(o => o.TotalRepairCost) ?? 0);
+        DiscountAmount = DiscountType == DiscountType.Percentage ? Subtotal * Discount / 100 : Discount;
+        TaxAmount = (Subtotal - DiscountAmount) * ((decimal)TaxRate / 100);
+        TotalAmount = Subtotal - DiscountAmount + TaxAmount;
+        BalanceDue = TotalAmount - AmountPaid();
+    }
 
-    private decimal CalculateDiscount()
-        => DiscountType == DiscountType.Percentage ? Subtotal * Discount / 100 : Discount;
-
-    private decimal CalculateTax() => (Subtotal - DiscountAmount) * ((decimal)TaxRate / 100);
-
-    private decimal CalculateTotalAmount() => Subtotal - DiscountAmount + TaxAmount;
+    #endregion
 }
