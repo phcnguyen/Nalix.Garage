@@ -107,19 +107,19 @@ public sealed class VehicleService(AutoDbContext context) : BaseService
             return;
         }
 
-        context.Attach(vehicle); // Tối ưu cập nhật chỉ những trường thay đổi
-        vehicle.CarYear = ParseInt(parts[1], vehicle.CarYear);
-        vehicle.CarType = ParseEnum(parts[2], vehicle.CarType);
-        vehicle.CarColor = ParseEnum(parts[3], vehicle.CarColor);
-        vehicle.CarBrand = ParseEnum(parts[4], vehicle.CarBrand);
-        vehicle.CarLicensePlate = licensePlate;
-        vehicle.CarModel = parts[6].Trim();
-        vehicle.FrameNumber = frameNumber;
-        vehicle.EngineNumber = engineNumber;
-        vehicle.Mileage = ParseDouble(parts[9], vehicle.Mileage);
-
         try
         {
+            context.Attach(vehicle); // Tối ưu cập nhật chỉ những trường thay đổi
+            vehicle.CarYear = ParseInt(parts[1], vehicle.CarYear);
+            vehicle.CarType = ParseEnum(parts[2], vehicle.CarType);
+            vehicle.CarColor = ParseEnum(parts[3], vehicle.CarColor);
+            vehicle.CarBrand = ParseEnum(parts[4], vehicle.CarBrand);
+            vehicle.CarLicensePlate = licensePlate;
+            vehicle.CarModel = parts[6].Trim();
+            vehicle.FrameNumber = frameNumber;
+            vehicle.EngineNumber = engineNumber;
+            vehicle.Mileage = ParseDouble(parts[9], vehicle.Mileage);
+
             context.SaveChanges();
             connection.Send(CreateSuccessPacket("Vehicle updated successfully."));
         }
@@ -132,7 +132,7 @@ public sealed class VehicleService(AutoDbContext context) : BaseService
     /// <summary>
     /// Xóa một phương tiện khỏi hệ thống.
     /// </summary>
-    [PacketCommand((int)Command.RemoveVehicle, Authoritys.User)]
+    [PacketCommand((int)Command.RemoveVehicle, Authoritys.Administrator)]
     public void RemoveVehicle(IPacket packet, IConnection connection)
     {
         if (!TryGetVehicleId(packet, out int vehicleId))

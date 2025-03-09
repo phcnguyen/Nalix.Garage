@@ -1,4 +1,8 @@
-﻿using System.IO;
+﻿using Notio.Common.Package;
+using Notio.Network.Package;
+using Notio.Network.Package.Extensions;
+using System.Buffers;
+using System.IO;
 using System.Net.Sockets;
 
 namespace Auto.Client.Helpers;
@@ -6,77 +10,70 @@ namespace Auto.Client.Helpers;
 /// <summary>
 /// Helper để thực hiện kết nối TCP với timeout và xử lý lỗi tốt hơn
 /// </summary>
-public class SocketClient : IDisposable
+public sealed class SocketClient : IDisposable
 {
-    private readonly int _connectionTimeout;
-    private readonly string _server;
     private readonly int _port;
+    private readonly string _server;
+    private readonly int _connectionTimeout;
 
     private NetworkStream? _stream;
-    private TcpClient _client;
+    private TcpClient? _client; // Nullable để quản lý tốt hơn
     private bool _disposed;
 
-    /// <summary>
-    /// Khởi tạo SocketClient với timeout mặc định là 30 giây
-    /// </summary>
     public SocketClient(string server, int port, int connectionTimeoutMs = 30000)
     {
         _server = server ?? throw new ArgumentNullException(nameof(server));
-
-        if (port <= 0 || port > 65535)
+        if (port is <= 0 or > 65535)
             throw new ArgumentOutOfRangeException(nameof(port), "Port must be between 1 and 65535");
 
         _port = port;
-        _client = new TcpClient();
         _connectionTimeout = connectionTimeoutMs;
+        _client = new TcpClient
+        {
+            NoDelay = true // Tắt Nagle algorithm để cải thiện latency
+        };
     }
 
-    /// <summary>
-    /// Kết nối đến server với timeout
-    /// </summary>
     public async Task ConnectAsync(CancellationToken cancellationToken = default)
     {
-        ObjectDisposedException.ThrowIf(_disposed, nameof(SocketClient));
+        ThrowIfDisposed();
 
-        // Đóng kết nối cũ nếu đã mở
-        if (_client.Connected)
+        if (_client?.Connected == true)
         {
-            _stream?.Close();
-            _client.Close();
-            _client = new TcpClient();
+            await CleanupAsync();
+            _client = new TcpClient { NoDelay = true };
         }
 
-        using var timeoutCts = new CancellationTokenSource(_connectionTimeout);
-        using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(timeoutCts.Token, cancellationToken);
+        using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+        cts.CancelAfter(_connectionTimeout);
 
         try
         {
-            await _client.ConnectAsync(_server, _port, linkedCts.Token);
+            await (_client ??= new TcpClient { NoDelay = true })
+                .ConnectAsync(_server, _port, cts.Token)
+                .ConfigureAwait(false);
             _stream = _client.GetStream();
         }
-        catch (OperationCanceledException) when (timeoutCts.IsCancellationRequested)
+        catch (OperationCanceledException)
         {
-            throw new TimeoutException($"Connection to {_server}:{_port} timed out after {_connectionTimeout}ms");
+            throw new TimeoutException(
+                $"Connection to {_server}:{_port} timed out after {_connectionTimeout}ms");
         }
     }
 
-    /// <summary>
-    /// Gửi dữ liệu với kiểm soát timeout
-    /// </summary>
-    public async Task SendAsync(byte[] data, CancellationToken cancellationToken = default)
+    public async Task SendAsync(IPacket packet, CancellationToken cancellationToken = default)
     {
-        ObjectDisposedException.ThrowIf(_disposed, nameof(SocketClient));
-
-        if (_stream == null)
-            throw new InvalidOperationException("Not connected to the server.");
-
-        if (data == null || data.Length == 0)
-            throw new ArgumentException("Data to send cannot be null or empty", nameof(data));
+        ThrowIfDisposed();
+        EnsureConnected();
 
         try
         {
-            await _stream.WriteAsync(data, cancellationToken);
-            await _stream.FlushAsync(cancellationToken);
+            if (packet is not Packet concretePacket)
+                throw new ArgumentException("Invalid packet type.", nameof(packet));
+
+            ReadOnlyMemory<byte> data = concretePacket.Serialize();
+            await _stream!.WriteAsync(data, cancellationToken).ConfigureAwait(false);
+            await _stream.FlushAsync(cancellationToken).ConfigureAwait(false);
         }
         catch (Exception ex) when (ex is IOException || ex is SocketException)
         {
@@ -84,28 +81,39 @@ public class SocketClient : IDisposable
         }
     }
 
-    /// <summary>
-    /// Nhận dữ liệu với buffer size tối ưu
-    /// </summary>
-    public async Task<byte[]> ReceiveAsync(int bufferSize = 4096, CancellationToken cancellationToken = default)
+    public async Task<IPacket> ReceiveAsync(CancellationToken cancellationToken = default)
     {
-        ObjectDisposedException.ThrowIf(_disposed, nameof(SocketClient));
-
-        if (_stream == null)
-            throw new InvalidOperationException("Not connected to the server.");
+        ThrowIfDisposed();
+        EnsureConnected();
 
         try
         {
-            byte[] buffer = new byte[bufferSize];
-            int bytesRead = await _stream.ReadAsync(buffer, cancellationToken);
+            byte[] buffer = ArrayPool<byte>.Shared.Rent(2);
+            try
+            {
+                await _stream!.ReadExactlyAsync(buffer.AsMemory(0, 2), cancellationToken)
+                    .ConfigureAwait(false);
+                ushort packetLength = BitConverter.ToUInt16(buffer, 0);
 
-            if (bytesRead == 0)
-                throw new IOException("The remote server closed the connection");
+                byte[] packetBuffer = ArrayPool<byte>.Shared.Rent(2 + packetLength);
+                try
+                {
+                    buffer.AsSpan(0, 2).CopyTo(packetBuffer);
+                    await _stream.ReadExactlyAsync(
+                        packetBuffer.AsMemory(2, packetLength),
+                        cancellationToken).ConfigureAwait(false);
 
-            byte[] data = new byte[bytesRead];
-            Array.Copy(buffer, data, bytesRead);
-
-            return data;
+                    return packetBuffer.Deserialize();
+                }
+                finally
+                {
+                    ArrayPool<byte>.Shared.Return(packetBuffer);
+                }
+            }
+            finally
+            {
+                ArrayPool<byte>.Shared.Return(buffer);
+            }
         }
         catch (Exception ex) when (ex is IOException || ex is SocketException)
         {
@@ -113,13 +121,21 @@ public class SocketClient : IDisposable
         }
     }
 
-    /// <summary>
-    /// Đóng kết nối
-    /// </summary>
-    public void Close()
+    public async ValueTask CloseAsync()
     {
-        _stream?.Close();
-        _client?.Close();
+        if (_disposed || _client == null) return;
+
+        try
+        {
+            if (_stream != null)
+                await _stream.DisposeAsync().ConfigureAwait(false);
+            _client.Close();
+        }
+        finally
+        {
+            _stream = null;
+            _client = null;
+        }
     }
 
     public void Dispose()
@@ -129,7 +145,34 @@ public class SocketClient : IDisposable
         _stream?.Dispose();
         _client?.Dispose();
         _disposed = true;
-
         GC.SuppressFinalize(this);
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (_disposed) return;
+
+        if (_stream != null)
+            await _stream.DisposeAsync().ConfigureAwait(false);
+        _client?.Dispose();
+        _disposed = true;
+    }
+
+    private void ThrowIfDisposed()
+    {
+        ObjectDisposedException.ThrowIf(_disposed, nameof(SocketClient));
+    }
+
+    private void EnsureConnected()
+    {
+        if (_stream == null || !_client!.Connected)
+            throw new InvalidOperationException("Not connected to the server.");
+    }
+
+    private async ValueTask CleanupAsync()
+    {
+        if (_stream != null)
+            await _stream.DisposeAsync().ConfigureAwait(false);
+        _client?.Close();
     }
 }

@@ -76,7 +76,7 @@ public sealed class AccountService(AutoDbContext context) : BaseService
         // Truy vấn tài khoản từ database
         Account? account = context.Accounts.SingleOrDefault(a => a.Username == username);
 
-        if (account == null || account.FailedLoginAttempts >= 5 && account.LastFailedLogin.AddMinutes(15) > DateTime.UtcNow)
+        if (account == null || account.FailedLoginAttempts >= 5 && account.LastFailedLogin?.AddMinutes(15) > DateTime.UtcNow)
         {
             connection.Send(CreateErrorPacket("Too many failed login attempts. Try again later."));
             return;
