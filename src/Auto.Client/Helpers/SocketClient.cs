@@ -1,5 +1,5 @@
-﻿using Notio.Common.Cryptography;
-using Notio.Common.Package;
+﻿using Notio.Common.Enums;
+using Notio.Common.Interfaces;
 using Notio.Network.Package;
 using Notio.Network.Package.Extensions;
 using System.Buffers;

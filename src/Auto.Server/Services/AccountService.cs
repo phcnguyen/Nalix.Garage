@@ -1,11 +1,12 @@
 ﻿using Auto.Common.Entities.Authentication;
 using Auto.Common.Enums;
 using Auto.Database;
+using Auto.Server.Services.Base;
+using Notio.Common.Attributes;
 using Notio.Common.Connection;
-using Notio.Common.Models;
-using Notio.Common.Package;
+using Notio.Common.Enums;
+using Notio.Common.Interfaces;
 using Notio.Cryptography.Hash;
-using Notio.Network.Handlers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,7 +22,7 @@ public sealed class AccountService(AutoDbContext context) : BaseService
     /// <summary>
     /// Xử lý đăng ký tài khoản mới
     /// </summary>
-    [PacketCommand((int)Command.RegisterAccount, Authoritys.Guests)]
+    [PacketCommand((int)Command.RegisterAccount, Authoritys.Guest)]
     public void RegisterAccount(IPacket packet, IConnection connection)
     {
         if (!TryParsePayload(packet, 2, out string[] parts))
@@ -61,7 +62,7 @@ public sealed class AccountService(AutoDbContext context) : BaseService
     /// <summary>
     /// Xử lý đăng nhập người dùng
     /// </summary>
-    [PacketCommand((int)Command.Login, Authoritys.Guests)]
+    [PacketCommand((int)Command.Login, Authoritys.Guest)]
     public void Login(IPacket packet, IConnection connection)
     {
         if (!TryParsePayload(packet, 2, out string[] parts))

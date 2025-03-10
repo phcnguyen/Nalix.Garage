@@ -1,10 +1,11 @@
 ﻿using Auto.Common.Enums;
+using Auto.Server.Services.Base;
+using Notio.Common.Attributes;
 using Notio.Common.Connection;
-using Notio.Common.Models;
-using Notio.Common.Package;
+using Notio.Common.Enums;
+using Notio.Common.Interfaces;
 using Notio.Cryptography.Asymmetric;
 using Notio.Cryptography.Hash;
-using Notio.Network.Handlers;
 using Notio.Network.Package;
 using Notio.Network.Package.Enums;
 using Notio.Network.Package.Extensions;
@@ -24,7 +25,7 @@ internal sealed class SecureConnection : BaseService
     /// </summary>
     /// <param name="packet">Gói tin chứa khóa công khai X25519 của client.</param>
     /// <param name="connection">Đối tượng kết nối với client.</param>
-    [PacketCommand((int)Command.InitiateSecureConnection, Authoritys.Guests)]
+    [PacketCommand((int)Command.InitiateSecureConnection, Authoritys.Guest)]
     public static void InitiateSecureConnection(IPacket packet, IConnection connection)
     {
         if (packet.Payload.Length != 32)  // X25519 public key phải có đúng 32 byte
@@ -58,7 +59,7 @@ internal sealed class SecureConnection : BaseService
     /// </summary>
     /// <param name="packet">Gói tin chứa khóa công khai X25519 của client.</param>
     /// <param name="connection">Đối tượng kết nối với client.</param>
-    [PacketCommand((int)Command.FinalizeSecureConnection, Authoritys.Guests)]
+    [PacketCommand((int)Command.FinalizeSecureConnection, Authoritys.Guest)]
     public static void FinalizeSecureConnection(IPacket packet, IConnection connection)
     {
         if (packet.Payload.Length != 32)

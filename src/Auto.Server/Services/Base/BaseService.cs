@@ -1,5 +1,5 @@
 ﻿using Auto.Common.Enums;
-using Notio.Common.Package;
+using Notio.Common.Interfaces;
 using Notio.Network.Package;
 using Notio.Network.Package.Enums;
 using Notio.Network.Package.Extensions;
@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.Json;
 
-namespace Auto.Server.Services;
+namespace Auto.Server.Services.Base;
 
 /// <summary>
 /// Lớp cơ sở cung cấp các phương thức hỗ trợ cho các dịch vụ xử lý gói tin.
