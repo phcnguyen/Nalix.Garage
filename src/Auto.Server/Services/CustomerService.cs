@@ -1,7 +1,6 @@
 ﻿using Auto.Common.Entities.Customers;
 using Auto.Common.Enums;
 using Auto.Database;
-using Auto.Server.Services.Base;
 using Microsoft.EntityFrameworkCore;
 using Notio.Common.Attributes;
 using Notio.Common.Connection;
@@ -21,7 +20,7 @@ namespace Auto.Server.Services;
 /// Dịch vụ xử lý thông tin khách hàng.
 /// </summary>
 [PacketController]
-public sealed class CustomerService(AutoDbContext context) : BaseService
+public sealed class CustomerService(AutoDbContext context) : Base.BaseService
 {
     private readonly AutoDbContext _context = context;
 

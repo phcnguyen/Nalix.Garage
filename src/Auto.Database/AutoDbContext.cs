@@ -115,7 +115,7 @@ public class AutoDbContext(DbContextOptions<AutoDbContext> options) : DbContext(
         // 2.Hỗ trợ truy vấn nhanh theo người tạo hóa đơn
         // 3.Giúp tối ưu tìm kiếm hóa đơn theo ngày lập
         modelBuilder.Entity<Invoice>().HasIndex(i => i.OwnerId);
-        modelBuilder.Entity<Invoice>().HasIndex(i => i.CreatedBy);
+        modelBuilder.Entity<Invoice>().HasIndex(i => i.CreatedById);
         modelBuilder.Entity<Invoice>().HasIndex(i => i.InvoiceDate);
 
         // Bộ lọc toàn cục (Global Query Filter) để chỉ lấy hóa đơn chưa thanh toán

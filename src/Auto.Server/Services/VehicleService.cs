@@ -2,7 +2,6 @@
 using Auto.Common.Enums;
 using Auto.Common.Enums.Cars;
 using Auto.Database;
-using Auto.Server.Services.Base;
 using Microsoft.EntityFrameworkCore;
 using Notio.Common.Attributes;
 using Notio.Common.Connection;
@@ -16,7 +15,7 @@ namespace Auto.Server.Services;
 /// <summary>
 /// Dịch vụ quản lý thông tin phương tiện của khách hàng.
 /// </summary>
-public sealed class VehicleService(AutoDbContext context) : BaseService
+public sealed class VehicleService(AutoDbContext context) : Base.BaseService
 {
     private readonly AutoDbContext context = context;
 

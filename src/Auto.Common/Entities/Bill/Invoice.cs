@@ -64,13 +64,13 @@ public class Invoice
     /// Người tạo hóa đơn.
     /// </summary>
     [ForeignKey(nameof(Employee))]
-    public int CreatedBy { get; set; }
+    public int CreatedById { get; set; }
 
     /// <summary>
     /// Người chỉnh sửa hóa đơn.
     /// </summary>
     [ForeignKey(nameof(Employee))]
-    public int? ModifiedBy { get; set; }
+    public int? ModifiedById { get; set; }
 
     /// <summary>
     /// Ngày lập hóa đơn.

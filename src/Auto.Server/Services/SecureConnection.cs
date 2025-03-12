@@ -1,5 +1,4 @@
 ﻿using Auto.Common.Enums;
-using Auto.Server.Services.Base;
 using Notio.Common.Attributes;
 using Notio.Common.Connection;
 using Notio.Common.Enums;
@@ -18,7 +17,7 @@ namespace Auto.Server.Services;
 /// Dịch vụ xử lý kết nối bảo mật bằng X25519 và SHA-256.
 /// </summary>
 [PacketController]
-internal sealed class SecureConnection : BaseService
+internal sealed class SecureConnection : Base.BaseService
 {
     /// <summary>
     /// Khởi tạo kết nối bảo mật bằng thuật toán X25519.
