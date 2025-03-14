@@ -40,7 +40,7 @@ public class Account
     public string Username
     {
         get => _username;
-        set => _username = value?.Trim() ?? string.Empty;
+        set => _username = value?.Trim().ToLower() ?? string.Empty;
     }
 
     /// <summary>

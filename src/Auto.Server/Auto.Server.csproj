@@ -13,7 +13,7 @@
 		<ProjectReference Include="..\Auto.Database\Auto.Database.csproj" />
 		<PackageReference Include="Notio.Logging" Version="0.3.65" />
 		<PackageReference Include="Notio.Network" Version="0.3.65" />
-		<PackageReference Include="Notio.Serialization" Version="0.3.65" />
+		<PackageReference Include="Notio.Serialization" Version="0.3.67" />
 	</ItemGroup>
 
 </Project>

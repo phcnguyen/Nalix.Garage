@@ -56,6 +56,12 @@ public abstract class BaseService
         => new Packet(PacketFlags.None, PacketPriority.None, (ushort)Command.Error, message).Serialize();
 
     /// <summary>
+    /// Tạo gói tin chứa lỗi.
+    /// </summary>
+    protected static byte[] InvalidDataPacket()
+        => CreateErrorPacket("Invalid data format.");
+
+    /// <summary>
     /// Tạo gói tin phản hồi thành công.
     /// </summary>
     protected static byte[] CreateSuccessPacket(string message)

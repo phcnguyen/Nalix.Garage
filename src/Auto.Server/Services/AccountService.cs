@@ -1,5 +1,6 @@
 ﻿using Auto.Common.Entities.Authentication;
 using Auto.Common.Enums;
+using Auto.Common.Models;
 using Auto.Database;
 using Auto.Server.Services.Base;
 using Notio.Common.Attributes;
@@ -10,16 +11,18 @@ using Notio.Cryptography.Hash;
 using Notio.Network.Package.Enums;
 using Notio.Serialization;
 using System;
-using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
 
 namespace Auto.Server.Services;
 
 public sealed class AccountService(AutoDbContext context) : BaseService
 {
-    private readonly AutoDbContext context = context;
-    private const int iterations = 100_000;
-    private const int keyLength = 32;
+    private const int SaltSize = 32;
+    private const int KeyLength = 32;
+    private const int Iterations = 50_000;
+
+    private readonly AutoDbContext _context = context;
 
     /// <summary>
     /// Xử lý đăng ký tài khoản mới
@@ -27,37 +30,54 @@ public sealed class AccountService(AutoDbContext context) : BaseService
     [PacketCommand((int)Command.RegisterAccount, Authoritys.Guest)]
     public void RegisterAccount(IPacket packet, IConnection connection)
     {
-        if (!TryParsePayload(packet, 2, out string[] parts))
+        string username, password;
+
+        if (packet.Type == (byte)PacketType.String)
         {
-            // Không tiết lộ lỗi format
+            if (!TryParsePayload(packet, 2, out string[] parts) ||
+                string.IsNullOrWhiteSpace(parts[0]) ||
+                string.IsNullOrWhiteSpace(parts[1]) ||
+                parts[0].Length < 3 || parts[1].Length < 8)
+            {
+                connection.Send(CreateErrorPacket("Invalid username or password."));
+                return;
+            }
+
+            username = parts[0];
+            password = parts[1];
+        }
+        else if (packet.Type == (byte)PacketType.Json)
+        {
+            Account acc = Json.Deserialize<Account>(packet.Payload.Span);
+            username = acc.Username;
+            password = acc.PasswordHash;
+        }
+        else
+        {
+            connection.Send(InvalidDataPacket());
+            return;
+        }
+
+        // Kiểm tra username đã tồn tại chưa
+        if (_context.Accounts.Any(a => a.Username == username))
+        {
             connection.Send(CreateErrorPacket("Invalid username or password."));
             return;
         }
 
-        string username = parts[0];
-        string password = parts[1];
-
-        // Kiểm tra username đã tồn tại chưa (ẩn lỗi)
-        if (context.Accounts.Any(a => a.Username == username))
-        {
-            connection.Send(CreateErrorPacket("Invalid username or password."));
-            return;
-        }
-
-        // Tạo salt ngẫu nhiên
-        byte[] salt = Notio.Randomization.RandGenerator.CreateKey(32);
-        using var pbkdf2 = new Pbkdf2(salt, iterations, keyLength, Pbkdf2.HashAlgorithmType.Sha256);
+        // Hash mật khẩu
+        string passwordHash = HashPassword(password);
 
         Account newAccount = new()
         {
             Username = username,
-            PasswordHash = $"{Convert.ToHexString(salt)}:{Convert.ToHexString(pbkdf2.DeriveKey(password))}",
+            PasswordHash = passwordHash,
             Role = Authoritys.User,
             CreatedAt = DateTime.UtcNow
         };
 
-        context.Accounts.Add(newAccount);
-        context.SaveChanges();
+        _context.Accounts.Add(newAccount);
+        _context.SaveChanges();
         connection.Send(CreateSuccessPacket("Account registered successfully."));
     }
 
@@ -67,56 +87,49 @@ public sealed class AccountService(AutoDbContext context) : BaseService
     [PacketCommand((int)Command.Login, Authoritys.Guest)]
     public void Login(IPacket packet, IConnection connection)
     {
-        if (!TryParsePayload(packet, 2, out string[] parts))
+        string username, password;
+
+        if (packet.Type == (byte)PacketType.String)
+        {
+            if (!TryParsePayload(packet, 2, out string[] parts))
+            {
+                connection.Send(CreateErrorPacket("Invalid username or password."));
+                return;
+            }
+            username = parts[0];
+            password = parts[1];
+        }
+        else if (packet.Type == (byte)PacketType.Json)
+        {
+            Account acc = Json.Deserialize<Account>(packet.Payload.Span);
+            username = acc.Username;
+            password = acc.PasswordHash;
+        }
+        else
+        {
+            connection.Send(InvalidDataPacket());
+            return;
+        }
+
+        Account? account = _context.Accounts.FirstOrDefault(a => a.Username == username);
+
+        if (account == null || !VerifyPassword(password, account.PasswordHash))
         {
             connection.Send(CreateErrorPacket("Invalid username or password."));
             return;
         }
 
-        string username = parts[0];
-        string password = parts[1];
-
-        // Truy vấn tài khoản từ database
-        Account? account = context.Accounts.SingleOrDefault(a => a.Username == username);
-
-        if (account == null || account.FailedLoginAttempts >= 5 && account.LastFailedLogin?.AddMinutes(15) > DateTime.UtcNow)
-        {
-            connection.Send(CreateErrorPacket("Too many failed login attempts. Try again later."));
-            return;
-        }
-
-        // Kiểm tra tài khoản có bị vô hiệu hóa không
         if (!account.IsActive)
         {
             connection.Send(CreateErrorPacket("Account is disabled."));
             return;
         }
 
-        // Tách salt và hash
-        parts = account.PasswordHash.Split(':');
-        if (parts.Length != 2)
-        {
-            connection.Send(CreateErrorPacket("Invalid password format."));
-            return;
-        }
-
-        // Hash lại mật khẩu nhập vào
-        using var pbkdf2 = new Pbkdf2(Convert.FromHexString(parts[0]), iterations, keyLength, Pbkdf2.HashAlgorithmType.Sha256);
-        byte[] hashToVerify = pbkdf2.DeriveKey(password);
-
-        // Kiểm tra mật khẩu
-        if (!Pbkdf2.ConstantTimeEquals(hashToVerify, Convert.FromHexString(parts[1])))
-        {
-            connection.Send(CreateErrorPacket("Invalid username or password."));
-            return;
-        }
-
-        // Cập nhật thời gian đăng nhập gần nhất
-        account.IsActive = true;
+        // Cập nhật thông tin tài khoản
         account.LastLogin = DateTime.UtcNow;
-        context.SaveChanges();
+        _context.SaveChanges();
 
-        // Lưu thông tin đăng nhập vào connection
+        // Cập nhật phiên đăng nhập
         connection.Authority = account.Role;
         connection.Metadata["Username"] = account.Username;
         connection.Send(CreateSuccessPacket("Login successful."));
@@ -130,35 +143,33 @@ public sealed class AccountService(AutoDbContext context) : BaseService
     {
         int accountId;
 
-        if (packet.Type == (byte)PacketType.Json)
+        if (packet.Type == (byte)PacketType.String)
         {
-            accountId = Json.DeserializeFromBytes<Account>(packet.Payload.Span.ToArray()).Id;
-        }
-        else if (packet.Type == (byte)PacketType.String)
-        {
-            if (!TryParsePayload(packet, 1, out string[] parts) ||
-                !int.TryParse(parts[0], out accountId))
+            if (!TryParsePayload(packet, 1, out string[] parts) || !int.TryParse(parts[0], out accountId))
             {
                 connection.Send(CreateErrorPacket("Invalid account ID."));
                 return;
             }
         }
+        else if (packet.Type == (byte)PacketType.Json)
+        {
+            accountId = Json.Deserialize<Account>(packet.Payload.Span).Id;
+        }
         else
         {
-            connection.Send(CreateErrorPacket("Invalid data format."));
+            connection.Send(InvalidDataPacket());
             return;
         }
 
-        // Tìm tài khoản cần xóa
-        Account? account = context.Accounts.Find(accountId);
+        Account? account = _context.Accounts.FirstOrDefault(a => a.Id == accountId);
         if (account == null)
         {
             connection.Send(CreateErrorPacket("Account not found."));
             return;
         }
 
-        context.Accounts.Remove(account);
-        context.SaveChanges();
+        _context.Accounts.Remove(account);
+        _context.SaveChanges();
         connection.Send(CreateSuccessPacket("Account deleted successfully."));
     }
 
@@ -168,63 +179,99 @@ public sealed class AccountService(AutoDbContext context) : BaseService
     [PacketCommand((int)Command.UpdatePassword, Authoritys.User)]
     public void UpdatePassword(IPacket packet, IConnection connection)
     {
-        if (!TryParsePayload(packet, 3, out string[] parts))
+        string username, oldPassword, newPassword;
+
+        if (packet.Type == (byte)PacketType.String)
         {
-            connection.Send(CreateErrorPacket("Invalid data format."));
+            if (!TryParsePayload(packet, 3, out string[] parts))
+            {
+                connection.Send(InvalidDataPacket());
+                return;
+            }
+
+            username = parts[0];
+            oldPassword = parts[1];
+            newPassword = parts[2];
+        }
+        else
+        {
+            connection.Send(InvalidDataPacket());
             return;
         }
 
-        string username = parts[0];
-        string oldPassword = parts[1];
-        string newPassword = parts[2];
-
-        // Kiểm tra độ dài mật khẩu mới
         if (newPassword.Length < 8)
         {
             connection.Send(CreateErrorPacket("New password must be at least 8 characters long."));
             return;
         }
 
-        // Tìm tài khoản cần đổi mật khẩu
-        Account? account = context.Accounts.SingleOrDefault(a => a.Username == username);
+        Account? account = _context.Accounts.FirstOrDefault(a => a.Username == username);
         if (account == null)
         {
             connection.Send(CreateErrorPacket("Account not found."));
             return;
         }
 
-        // Kiểm tra người dùng có quyền thay đổi mật khẩu này không
-        if (connection.Metadata.GetValueOrDefault("Username") is not string sessionUsername
-            || account.Username != sessionUsername)
+        if (!connection.Metadata.TryGetValue("Username", out object? value) ||
+            value is not string sessionUsername ||
+            account.Username != sessionUsername)
         {
             connection.Send(CreateErrorPacket("You are not allowed to change this password."));
             return;
         }
 
-        // Tách salt và hash của mật khẩu hiện tại
-        string[] hashParts = account.PasswordHash.Split(':');
-        if (hashParts.Length != 2)
-        {
-            connection.Send(CreateErrorPacket("Invalid password format."));
-            return;
-        }
-
-        // Hash lại mật khẩu cũ để kiểm tra
-        byte[] salt = Convert.FromHexString(hashParts[0]);
-        using var pbkdf2 = new Pbkdf2(salt, iterations, keyLength, Pbkdf2.HashAlgorithmType.Sha256);
-        byte[] oldPasswordHash = pbkdf2.DeriveKey(oldPassword);
-
-        if (!Pbkdf2.ConstantTimeEquals(oldPasswordHash, Convert.FromHexString(hashParts[1])))
+        if (!VerifyPassword(oldPassword, account.PasswordHash))
         {
             connection.Send(CreateErrorPacket("Incorrect old password."));
             return;
         }
 
-        // Cập nhật mật khẩu mới
-        byte[] newPasswordHash = pbkdf2.DeriveKey(newPassword);
-        account.PasswordHash = $"{Convert.ToHexString(salt)}:{Convert.ToHexString(newPasswordHash)}";
-
-        context.SaveChanges();
+        // Tạo salt mới cho mật khẩu mới
+        account.PasswordHash = HashPassword(newPassword);
+        _context.SaveChanges();
         connection.Send(CreateSuccessPacket("Password updated successfully."));
+    }
+
+    /// <summary>
+    /// Tạo hash mật khẩu sử dụng PBKDF2
+    /// </summary>
+    private static string HashPassword(string password)
+    {
+        byte[] salt = RandomNumberGenerator.GetBytes(SaltSize);
+        using var pbkdf2 = new Pbkdf2(salt, Iterations, KeyLength, Pbkdf2.HashAlgorithmType.Sha256);
+        byte[] hash = pbkdf2.DeriveKey(password);
+
+        return Json.Serialize(new PasswordHashModel
+        {
+            Salt = Convert.ToHexString(salt),
+            Hash = Convert.ToHexString(hash)
+        }, false, null);
+    }
+
+    /// <summary>
+    /// Kiểm tra mật khẩu nhập vào có khớp với hash hay không
+    /// </summary>
+    private static bool VerifyPassword(string password, string storedHash)
+    {
+        try
+        {
+            // Deserialize JSON
+            PasswordHashModel data = Json.Deserialize<PasswordHashModel>(storedHash);
+
+            // Chuyển đổi về dạng byte
+            byte[] salt = Convert.FromHexString(data.Salt);
+            byte[] storedKey = Convert.FromHexString(data.Hash);
+
+            // Tạo key mới từ mật khẩu nhập vào
+            using var pbkdf2 = new Pbkdf2(salt, Iterations, KeyLength, Pbkdf2.HashAlgorithmType.Sha256);
+            byte[] computedKey = pbkdf2.DeriveKey(password);
+
+            // So sánh theo thời gian cố định để tránh timing attack
+            return CryptographicOperations.FixedTimeEquals(computedKey, storedKey);
+        }
+        catch
+        {
+            return false; // Trả về false nếu có lỗi khi parse dữ liệu
+        }
     }
 }
