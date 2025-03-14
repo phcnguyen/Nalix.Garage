@@ -44,18 +44,22 @@ public class Account
     }
 
     /// <summary>
-    /// Mật khẩu đã được băm (hashed password).
+    /// Chuỗi salt ngẫu nhiên được tạo ra để băm mật khẩu. 
+    /// Salt giúp bảo vệ mật khẩu khỏi các cuộc tấn công từ điển và rainbow table.
     /// </summary>
     [Required]
-    [MaxLength(512)]
-    [Column(TypeName = "char(128)")]
-    [JsonInclude]
-    [JsonProperty("Password")]
-    public string PasswordHash
-    {
-        get => _password;
-        set => _password = value?.Trim() ?? string.Empty;
-    }
+    [MaxLength(64)]
+    [Column(TypeName = "binary(64)")]
+    public byte[] Salt { get; set; }
+
+    /// <summary>
+    /// Mật khẩu sau khi được băm bằng thuật toán PBKDF2.
+    /// Giá trị này được lưu trữ trong cơ sở dữ liệu để xác minh mật khẩu khi đăng nhập.
+    /// </summary>
+    [Required]
+    [MaxLength(64)]
+    [Column(TypeName = "binary(64)")]
+    public byte[] Hash { get; set; }
 
     #endregion
 
