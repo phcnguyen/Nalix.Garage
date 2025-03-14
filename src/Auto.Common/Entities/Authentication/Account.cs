@@ -1,5 +1,5 @@
 ﻿using Notio.Common.Attributes;
-using Notio.Common.Enums;
+using Notio.Common.Authentication;
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;

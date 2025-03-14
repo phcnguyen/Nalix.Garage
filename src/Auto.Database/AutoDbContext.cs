@@ -24,12 +24,12 @@ public class AutoDbContext(DbContextOptions<AutoDbContext> options) : DbContext(
     public DbSet<Customer> Customers { get; set; }
     public DbSet<Employee> Employees { get; set; }
     public DbSet<Supplier> Suppliers { get; set; }
-    public DbSet<SupplierPhone> SupplierPhones { get; set; }
     public DbSet<SparePart> SpareParts { get; set; }
     public DbSet<RepairTask> RepairTasks { get; set; }
     public DbSet<ServiceItem> ServiceItems { get; set; }
     public DbSet<RepairOrder> RepairOrders { get; set; }
     public DbSet<Transaction> Transactions { get; set; }
+    public DbSet<SupplierPhone> SupplierPhones { get; set; }
     public DbSet<RepairHistory> RepairHistories { get; set; }
     public DbSet<ReplacementPart> ReplacementParts { get; set; }
 

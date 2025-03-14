@@ -3,10 +3,12 @@ using Auto.Common.Enums;
 using Auto.Database;
 using Auto.Server.Services.Base;
 using Notio.Common.Attributes;
+using Notio.Common.Authentication;
 using Notio.Common.Connection;
-using Notio.Common.Enums;
 using Notio.Common.Interfaces;
 using Notio.Cryptography.Hash;
+using Notio.Network.Package.Enums;
+using Notio.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -110,6 +112,7 @@ public sealed class AccountService(AutoDbContext context) : BaseService
         }
 
         // Cập nhật thời gian đăng nhập gần nhất
+        account.IsActive = true;
         account.LastLogin = DateTime.UtcNow;
         context.SaveChanges();
 
@@ -125,9 +128,24 @@ public sealed class AccountService(AutoDbContext context) : BaseService
     [PacketCommand((int)Command.DeleteAccount, Authoritys.Administrator)]
     public void DeleteAccount(IPacket packet, IConnection connection)
     {
-        if (!TryParsePayload(packet, 1, out string[] parts) || !int.TryParse(parts[0], out int accountId))
+        int accountId;
+
+        if (packet.Type == (byte)PacketType.Json)
         {
-            connection.Send(CreateErrorPacket("Invalid account ID."));
+            accountId = Json.DeserializeFromBytes<Account>(packet.Payload.Span.ToArray()).Id;
+        }
+        else if (packet.Type == (byte)PacketType.String)
+        {
+            if (!TryParsePayload(packet, 1, out string[] parts) ||
+                !int.TryParse(parts[0], out accountId))
+            {
+                connection.Send(CreateErrorPacket("Invalid account ID."));
+                return;
+            }
+        }
+        else
+        {
+            connection.Send(CreateErrorPacket("Invalid data format."));
             return;
         }
 

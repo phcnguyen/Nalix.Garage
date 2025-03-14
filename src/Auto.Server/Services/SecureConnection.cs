@@ -1,7 +1,7 @@
 ﻿using Auto.Common.Enums;
 using Notio.Common.Attributes;
+using Notio.Common.Authentication;
 using Notio.Common.Connection;
-using Notio.Common.Enums;
 using Notio.Common.Interfaces;
 using Notio.Cryptography.Asymmetric;
 using Notio.Cryptography.Hash;
