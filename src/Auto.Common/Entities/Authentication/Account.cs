@@ -1,5 +1,4 @@
-﻿using Notio.Common.Attributes;
-using Notio.Common.Authentication;
+﻿using Notio.Common.Authentication;
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -25,7 +24,6 @@ public class Account
     /// Khóa chính (ID tài khoản, tự động tạo).
     /// </summary>
     [Key]
-    [JsonInclude]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int Id { get; set; }
 
@@ -33,7 +31,6 @@ public class Account
     /// Tên đăng nhập (username). Dùng để đăng nhập hệ thống.
     /// </summary>
     [Required]
-    [JsonInclude]
     [MaxLength(50)]
     [RegularExpression(@"^[a-zA-Z0-9_-]+$",
         ErrorMessage = "Username can only contain letters, numbers, underscores, and hyphens.")]

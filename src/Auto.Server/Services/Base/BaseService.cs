@@ -5,7 +5,6 @@ using Notio.Network.Package.Enums;
 using Notio.Network.Package.Extensions;
 using System;
 using System.Buffers.Text;
-using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.Json;
@@ -27,26 +26,6 @@ public abstract class BaseService
         string payload = Encoding.UTF8.GetString(packet.Payload.Span);
         parts = payload.Split('|', StringSplitOptions.TrimEntries);
         return parts.Length >= expectedParts;
-    }
-
-    /// <summary>
-    /// Chuyển đổi danh sách đối tượng thành mảng byte sử dụng JSON.
-    /// </summary>
-    protected static byte[] ToBytes<T>(List<T> list) => JsonSerializer.SerializeToUtf8Bytes(list, JsonOptions);
-
-    /// <summary>
-    /// Giải mã mảng byte thành danh sách đối tượng sử dụng JSON.
-    /// </summary>
-    protected static List<T> FromBytes<T>(byte[] data)
-    {
-        try
-        {
-            return JsonSerializer.Deserialize<List<T>>(data, JsonOptions) ?? [];
-        }
-        catch
-        {
-            return [];
-        }
     }
 
     /// <summary>

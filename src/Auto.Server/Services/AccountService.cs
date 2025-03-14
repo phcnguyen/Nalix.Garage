@@ -9,6 +9,7 @@ using Notio.Common.Authentication;
 using Notio.Common.Connection;
 using Notio.Common.Interfaces;
 using Notio.Cryptography.Hash;
+using Notio.Logging;
 using Notio.Network.Package.Enums;
 using Notio.Serialization;
 using System;
@@ -77,23 +78,33 @@ public sealed class AccountService(AutoDbContext context) : BaseService
 
         if (await _context.Accounts.AnyAsync(a => a.Username == username))
         {
+            CLogging.Instance.Warn($"Username {username} already exists from connection {connection.Id}");
             await connection.SendAsync(CreateErrorPacket("Username already existed."));
             return;
         }
 
-        PasswordSecurity.HashPassword(password, out byte[] salt, out byte[] hash);
-        Account newAccount = new()
+        try
         {
-            Username = username,
-            Salt = salt,
-            Hash = hash,
-            Role = Authoritys.User,
-            CreatedAt = DateTime.UtcNow
-        };
+            PasswordSecurity.HashPassword(password, out byte[] salt, out byte[] hash);
+            Account newAccount = new()
+            {
+                Username = username,
+                Salt = salt,
+                Hash = hash,
+                Role = Authoritys.User,
+                CreatedAt = DateTime.UtcNow
+            };
 
-        _context.Accounts.Add(newAccount);
-        await _context.SaveChangesAsync();
-        await connection.SendAsync(CreateSuccessPacket("Account registered successfully."));
+            _context.Accounts.Add(newAccount);
+            await _context.SaveChangesAsync();
+            CLogging.Instance.Info($"Account {username} registered successfully from connection {connection.Id}");
+            await connection.SendAsync(CreateSuccessPacket("Account registered successfully."));
+        }
+        catch (Exception ex)
+        {
+            CLogging.Instance.Error($"Failed to register account {username} from connection {connection.Id}", ex);
+            await connection.SendAsync(CreateErrorPacket("Failed to register account due to an internal error."));
+        }
     }
 
     /// <summary>
@@ -142,6 +153,7 @@ public sealed class AccountService(AutoDbContext context) : BaseService
         Account? account = await _context.Accounts.FirstOrDefaultAsync(a => a.Username == username);
         if (account == null)
         {
+            CLogging.Instance.Warn($"Login attempt with non-existent username {username} from connection {connection.Id}");
             await connection.SendAsync(CreateErrorPacket("Username does not exist."));
             return;
         }
@@ -149,6 +161,7 @@ public sealed class AccountService(AutoDbContext context) : BaseService
         if (account.FailedLoginAttempts >= 5 && account.LastFailedLogin.HasValue &&
             DateTime.UtcNow < account.LastFailedLogin.Value.AddMinutes(15))
         {
+            CLogging.Instance.Warn($"Account {username} locked due to too many failed attempts from connection {connection.Id}");
             await connection.SendAsync(CreateErrorPacket("Account locked due to too many failed attempts."));
             return;
         }
@@ -158,23 +171,34 @@ public sealed class AccountService(AutoDbContext context) : BaseService
             account.FailedLoginAttempts++;
             account.LastFailedLogin = DateTime.UtcNow;
             await _context.SaveChangesAsync();
+            CLogging.Instance.Warn($"Incorrect password for {username}, attempt {account.FailedLoginAttempts} from connection {connection.Id}");
             await connection.SendAsync(CreateErrorPacket("Incorrect password."));
             return;
         }
 
         if (!account.IsActive)
         {
+            CLogging.Instance.Warn($"Login attempt on disabled account {username} from connection {connection.Id}");
             await connection.SendAsync(CreateErrorPacket("Account is disabled."));
             return;
         }
 
-        account.FailedLoginAttempts = 0;
-        account.LastLogin = DateTime.UtcNow;
-        await _context.SaveChangesAsync();
+        try
+        {
+            account.FailedLoginAttempts = 0;
+            account.LastLogin = DateTime.UtcNow;
+            await _context.SaveChangesAsync();
 
-        connection.Authority = account.Role;
-        connection.Metadata["Username"] = account.Username;
-        await connection.SendAsync(CreateSuccessPacket("Login successful."));
+            connection.Authority = account.Role;
+            connection.Metadata["Username"] = account.Username;
+            CLogging.Instance.Info($"User {username} logged in successfully from connection {connection.Id}");
+            await connection.SendAsync(CreateSuccessPacket("Login successful."));
+        }
+        catch (Exception ex)
+        {
+            CLogging.Instance.Error($"Failed to complete login for {username} from connection {connection.Id}", ex);
+            await connection.SendAsync(CreateErrorPacket("Failed to login due to an internal error."));
+        }
     }
 
     /// <summary>
@@ -212,17 +236,27 @@ public sealed class AccountService(AutoDbContext context) : BaseService
         Account? account = await _context.Accounts.FirstOrDefaultAsync(a => a.Id == accountId);
         if (account == null)
         {
+            CLogging.Instance.Warn($"Attempt to delete non-existent account ID {accountId} from connection {connection.Id}");
             await connection.SendAsync(CreateErrorPacket("Account not found."));
             return;
         }
 
-        _context.Accounts.Remove(account);
-        await _context.SaveChangesAsync();
-        await connection.SendAsync(CreateSuccessPacket("Account deleted successfully."));
+        try
+        {
+            _context.Accounts.Remove(account);
+            await _context.SaveChangesAsync();
+            CLogging.Instance.Info($"Account ID {accountId} (Username: {account.Username}) deleted successfully by connection {connection.Id}");
+            await connection.SendAsync(CreateSuccessPacket("Account deleted successfully."));
+        }
+        catch (Exception ex)
+        {
+            CLogging.Instance.Error($"Failed to delete account ID {accountId} from connection {connection.Id}", ex);
+            await connection.SendAsync(CreateErrorPacket("Failed to delete account due to an internal error."));
+        }
     }
 
     /// <summary>
-    /// Cập nhật mật khẩu tài khoản dựa trên phiên đăng nhập hiện tại (.chỉ cho chính chủ).
+    /// Cập nhật mật khẩu tài khoản dựa trên phiên đăng nhập hiện tại (chỉ cho chính chủ).
     /// Định dạng dữ liệu:
     /// - String: "{oldPassword}:{newPassword}" (phân tách bằng dấu hai chấm)
     /// - JSON: ChangePasswordModel { OldPassword, NewPassword }
@@ -273,6 +307,7 @@ public sealed class AccountService(AutoDbContext context) : BaseService
 
         if (!connection.Metadata.TryGetValue("Username", out object? value) || value is not string sessionUsername)
         {
+            CLogging.Instance.Warn($"Unauthorized password update attempt from connection {connection.Id}");
             await connection.SendAsync(CreateErrorPacket("You are not allowed to change this password."));
             return;
         }
@@ -280,20 +315,31 @@ public sealed class AccountService(AutoDbContext context) : BaseService
         Account? account = await _context.Accounts.FirstOrDefaultAsync(a => a.Username == sessionUsername);
         if (account == null)
         {
+            CLogging.Instance.Warn($"Account not found for username {sessionUsername} from connection {connection.Id}");
             await connection.SendAsync(CreateErrorPacket("Account not found."));
             return;
         }
 
         if (!PasswordSecurity.VerifyPassword(oldPassword, account.Salt, account.Hash))
         {
+            CLogging.Instance.Warn($"Incorrect old password for {sessionUsername} from connection {connection.Id}");
             await connection.SendAsync(CreateErrorPacket("Incorrect old password."));
             return;
         }
 
-        PasswordSecurity.HashPassword(newPassword, out byte[] salt, out byte[] hash);
-        account.Salt = salt;
-        account.Hash = hash;
-        await _context.SaveChangesAsync();
-        await connection.SendAsync(CreateSuccessPacket("Password updated successfully."));
+        try
+        {
+            PasswordSecurity.HashPassword(newPassword, out byte[] salt, out byte[] hash);
+            account.Salt = salt;
+            account.Hash = hash;
+            await _context.SaveChangesAsync();
+            CLogging.Instance.Info($"Password updated successfully for {sessionUsername} from connection {connection.Id}");
+            await connection.SendAsync(CreateSuccessPacket("Password updated successfully."));
+        }
+        catch (Exception ex)
+        {
+            CLogging.Instance.Error($"Failed to update password for {sessionUsername} from connection {connection.Id}", ex);
+            await connection.SendAsync(CreateErrorPacket("Failed to update password due to an internal error."));
+        }
     }
 }
