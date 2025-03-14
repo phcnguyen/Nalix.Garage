@@ -29,9 +29,15 @@ internal sealed class SecureConnection : Base.BaseService
     [PacketCommand((int)Command.InitiateSecureConnection, Authoritys.Guest)]
     public static void InitiateSecureConnection(IPacket packet, IConnection connection)
     {
-        if (packet.Type != (byte)PacketType.Binary || packet.Payload.Length != 32) // X25519 public key phải là 32 byte
+        if (packet.Type != (byte)PacketType.Binary)
         {
-            CLogging.Instance.Warn($"Invalid public key length {packet.Payload.Length} from connection {connection.Id}");
+            connection.Send(CreateErrorPacket("Unsupported packet type."));
+            return;
+        }
+        if (packet.Payload.Length != 32) // X25519 public key phải là 32 byte
+        {
+            CLogging.Instance.Warn(
+                $"Invalid public key length {packet.Payload.Length} from connection {connection.RemoteEndPoint}");
             connection.Send(CreateErrorPacket("Invalid public key."));
             return;
         }
@@ -77,9 +83,15 @@ internal sealed class SecureConnection : Base.BaseService
     [PacketCommand((int)Command.FinalizeSecureConnection, Authoritys.Guest)]
     public static void FinalizeSecureConnection(IPacket packet, IConnection connection)
     {
-        if (packet.Type != (byte)PacketType.Binary || packet.Payload.Length != 32)
+        if (packet.Type != (byte)PacketType.Binary)
         {
-            CLogging.Instance.Warn($"Invalid public key length {packet.Payload.Length} from connection {connection.Id}");
+            connection.Send(CreateErrorPacket("Unsupported packet type."));
+            return;
+        }
+        if (packet.Payload.Length != 32)
+        {
+            CLogging.Instance.Warn(
+                $"Invalid public key length {packet.Payload.Length} from connection {connection.RemoteEndPoint}");
             connection.Send(CreateErrorPacket("Invalid public key."));
             return;
         }

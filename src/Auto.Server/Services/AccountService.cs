@@ -72,7 +72,7 @@ public sealed class AccountService(AutoDbContext context) : BaseService
         }
         else
         {
-            await connection.SendAsync(InvalidDataPacket());
+            await connection.SendAsync(CreateErrorPacket("Unsupported packet type."));
             return;
         }
 
@@ -229,7 +229,7 @@ public sealed class AccountService(AutoDbContext context) : BaseService
         }
         else
         {
-            await connection.SendAsync(InvalidDataPacket());
+            await connection.SendAsync(CreateErrorPacket("Unsupported packet type."));
             return;
         }
 
@@ -295,7 +295,7 @@ public sealed class AccountService(AutoDbContext context) : BaseService
         }
         else
         {
-            await connection.SendAsync(InvalidDataPacket());
+            await connection.SendAsync(CreateErrorPacket("Unsupported packet type."));
             return;
         }
 
