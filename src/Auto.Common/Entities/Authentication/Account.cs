@@ -14,7 +14,6 @@ public class Account
     #region Fields
 
     private string _username;
-    private string _password;
 
     #endregion
 
