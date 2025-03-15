@@ -37,9 +37,10 @@
                 HorizontalAlignment="Center"
                 VerticalAlignment="Center">
             <Grid>
-                <TextBox Text="{Binding Username, UpdateSourceTrigger=PropertyChanged}"
+                <TextBox x:Name="txtUsername"
+                         KeyDown="TxtUsername_KeyDown"
+                         Text="{Binding Username, UpdateSourceTrigger=PropertyChanged}"
                          Background="Transparent"
-                         local:WatermarkBehavior.Watermark="Username"
                          BorderThickness="0"
                          Foreground="{DynamicResource PrimaryTextBrush}"
                          VerticalContentAlignment="Center"
@@ -49,6 +50,89 @@
                          Height="40"
                          Width="Auto" Margin="-1,-2,-1,35" />
 
+                <TextBlock Text="Username"
+                   Foreground="Gray"
+                   FontSize="16"
+                   VerticalAlignment="Top"
+                   HorizontalAlignment="Left"
+                   Margin="10,7,0,0" Width="80">
+                    <TextBlock.Style>
+                        <Style TargetType="TextBlock">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding ElementName=txtUsername, Path=Text.Length}" Value="0">
+                                    <Setter Property="Visibility" Value="Visible" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding ElementName=txtUsername, Path=Text.Length}" Value="1">
+                                    <Setter Property="Visibility" Value="Hidden" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding ElementName=txtUsername, Path=Text.Length}" Value="2">
+                                    <Setter Property="Visibility" Value="Hidden" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding ElementName=txtUsername, Path=Text.Length}" Value="3">
+                                    <Setter Property="Visibility" Value="Hidden" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding ElementName=txtUsername, Path=Text.Length}" Value="4">
+                                    <Setter Property="Visibility" Value="Hidden" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding ElementName=txtUsername, Path=Text.Length}" Value="5">
+                                    <Setter Property="Visibility" Value="Hidden" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding ElementName=txtUsername, Path=Text.Length}" Value="6">
+                                    <Setter Property="Visibility" Value="Hidden" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding ElementName=txtUsername, Path=Text.Length}" Value="7">
+                                    <Setter Property="Visibility" Value="Hidden" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding ElementName=txtUsername, Path=Text.Length}" Value="8">
+                                    <Setter Property="Visibility" Value="Hidden" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding ElementName=txtUsername, Path=Text.Length}" Value="9">
+                                    <Setter Property="Visibility" Value="Hidden" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding ElementName=txtUsername, Path=Text.Length}" Value="10">
+                                    <Setter Property="Visibility" Value="Hidden" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding ElementName=txtUsername, Path=Text.Length}" Value="11">
+                                    <Setter Property="Visibility" Value="Hidden" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding ElementName=txtUsername, Path=Text.Length}" Value="12">
+                                    <Setter Property="Visibility" Value="Hidden" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding ElementName=txtUsername, Path=Text.Length}" Value="13">
+                                    <Setter Property="Visibility" Value="Hidden" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding ElementName=txtUsername, Path=Text.Length}" Value="14">
+                                    <Setter Property="Visibility" Value="Hidden" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding ElementName=txtUsername, Path=Text.Length}" Value="15">
+                                    <Setter Property="Visibility" Value="Hidden" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding ElementName=txtUsername, Path=Text.Length}" Value="16">
+                                    <Setter Property="Visibility" Value="Hidden" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding ElementName=txtUsername, Path=Text.Length}" Value="17">
+                                    <Setter Property="Visibility" Value="Hidden" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding ElementName=txtUsername, Path=Text.Length}" Value="18">
+                                    <Setter Property="Visibility" Value="Hidden" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding ElementName=txtUsername, Path=Text.Length}" Value="19">
+                                    <Setter Property="Visibility" Value="Hidden" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding ElementName=txtUsername, Path=Text.Length}" Value="20">
+                                    <Setter Property="Visibility" Value="Hidden" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding ElementName=txtUsername, Path=Text.Length}" Value="21">
+                                    <Setter Property="Visibility" Value="Hidden" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding ElementName=txtUsername, Path=Text.Length}" Value="22">
+                                    <Setter Property="Visibility" Value="Hidden" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
+
                 <!-- Line Separator -->
                 <Rectangle Fill="{DynamicResource InputBorderBrush}"
                            Height="1"
@@ -57,6 +141,7 @@
 
                 <!-- PasswordBox -->
                 <PasswordBox x:Name="txtPass"
+                             KeyDown="TxtPass_KeyDown"
                              Background="Transparent"
                              Foreground="{DynamicResource PrimaryTextBrush}"
                              VerticalContentAlignment="Center"

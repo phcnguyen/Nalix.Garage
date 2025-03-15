@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel;
-using System.Diagnostics;
 using System.Windows;
 using System.Windows.Input;
 
@@ -13,13 +12,21 @@ public class LoginViewModel : INotifyPropertyChanged
     public string Username
     {
         get => _username;
-        set { _username = value; OnPropertyChanged(nameof(Username)); }
+        set
+        {
+            _username = value;
+            OnPropertyChanged(nameof(Username));
+        }
     }
 
     public string Password
     {
         get => _password;
-        set { _password = value; OnPropertyChanged(nameof(Password)); }
+        set
+        {
+            _password = value;
+            OnPropertyChanged(nameof(Password));
+        }
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
@@ -31,13 +38,10 @@ public class LoginViewModel : INotifyPropertyChanged
         LoginCommand = new RelayCommand(ExecuteLogin, CanExecuteLogin);
     }
 
-    private bool CanExecuteLogin(object parameter)
-    {
-        Debug.WriteLine($"🔎 CanExecuteLogin called - Username: '{Username}', Password: '{Password}'");
-        return !string.IsNullOrWhiteSpace(Username) && !string.IsNullOrWhiteSpace(Password);
-    }
+    private bool CanExecuteLogin()
+        => !string.IsNullOrWhiteSpace(Username) && !string.IsNullOrWhiteSpace(Password);
 
-    private void ExecuteLogin(object parameter)
+    private void ExecuteLogin()
     {
         if (Username == "admin" && Password == "1234")
             MessageBox.Show("Login successful!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
@@ -46,8 +50,5 @@ public class LoginViewModel : INotifyPropertyChanged
     }
 
     public void OnPropertyChanged(string propertyName)
-    {
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        CommandManager.InvalidateRequerySuggested(); // ✅ Cập nhật UI
-    }
+        => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 }
