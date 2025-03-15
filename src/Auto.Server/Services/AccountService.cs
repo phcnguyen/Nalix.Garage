@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Notio.Common.Attributes;
 using Notio.Common.Authentication;
 using Notio.Common.Connection;
-using Notio.Common.Interfaces;
+using Notio.Common.Data;
 using Notio.Cryptography.Hash;
 using Notio.Logging;
 using Notio.Network.Package.Enums;

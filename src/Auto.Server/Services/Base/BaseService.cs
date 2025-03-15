@@ -1,5 +1,5 @@
 ﻿using Auto.Common.Enums;
-using Notio.Common.Interfaces;
+using Notio.Common.Data;
 using Notio.Network.Package;
 using Notio.Network.Package.Enums;
 using Notio.Network.Package.Extensions;
@@ -7,7 +7,6 @@ using System;
 using System.Buffers.Text;
 using System.Runtime.InteropServices;
 using System.Text;
-using System.Text.Json;
 
 namespace Auto.Server.Services.Base;
 
@@ -16,8 +15,6 @@ namespace Auto.Server.Services.Base;
 /// </summary>
 public abstract class BaseService
 {
-    private static readonly JsonSerializerOptions JsonOptions = new() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
-
     /// <summary>
     /// Phân tích payload của gói tin thành một mảng chuỗi dựa trên ký tự phân cách '|'.
     /// </summary>

@@ -1,11 +1,20 @@
-﻿using System;
+﻿using Auto.Server.Main;
+using System;
+using System.Threading;
 
 namespace Auto.Server.Threading;
 
 internal class Program
 {
+    private static readonly CancellationTokenSource cancellationTokenSource = new();
     internal static void Main()
     {
-        Console.WriteLine("Hello, World!");
+        var server = AppConfig.InitializeServer(AppConfig.InitializeDatabase());
+        server.BeginListening(cancellationTokenSource.Token);
+
+        Console.WriteLine("Press any key to exit...");
+        Console.ReadLine();
+
+        server.EndListening();
     }
 }

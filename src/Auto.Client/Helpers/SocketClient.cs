@@ -1,7 +1,8 @@
 ﻿using Notio.Common.Authentication;
-using Notio.Common.Interfaces;
+using Notio.Common.Data;
 using Notio.Network.Package;
 using Notio.Network.Package.Extensions;
+using Notio.Shared.Injection;
 using System.Buffers;
 using System.IO;
 using System.Net.Sockets;
@@ -11,11 +12,11 @@ namespace Auto.Client.Helpers;
 /// <summary>
 /// Helper để thực hiện kết nối TCP với timeout và xử lý lỗi tốt hơn
 /// </summary>
-public sealed class SocketClient : IDisposable
+public sealed class SocketClient : SingletonBase<SocketClient>, IDisposable
 {
-    private readonly int _port;
-    private readonly string _server;
-    private readonly int _connectionTimeout;
+    private int _port = 7777;
+    private string _server = "127.0.0.1";
+    private readonly int _connectionTimeout = 30000;
 
     private bool _disposed;
     private TcpClient? _client;
@@ -39,14 +40,8 @@ public sealed class SocketClient : IDisposable
     /// <param name="connectionTimeoutMs">Thời gian timeout kết nối (ms), mặc định 30000ms</param>
     /// <exception cref="ArgumentNullException">Khi server là null</exception>
     /// <exception cref="ArgumentOutOfRangeException">Khi port không nằm trong khoảng 1-65535</exception>
-    public SocketClient(string server, int port, int connectionTimeoutMs = 30000)
+    private SocketClient()
     {
-        _server = server ?? throw new ArgumentNullException(nameof(server));
-        if (port is <= 0 or > 65535)
-            throw new ArgumentOutOfRangeException(nameof(port), "Port must be between 1 and 65535");
-
-        _port = port;
-        _connectionTimeout = connectionTimeoutMs;
         _client = new TcpClient
         {
             NoDelay = true // Tắt Nagle algorithm để cải thiện latency
@@ -60,8 +55,19 @@ public sealed class SocketClient : IDisposable
     /// </summary>
     /// <exception cref="ObjectDisposedException">Khi object đã bị dispose</exception>
     /// <exception cref="IOException">Khi có lỗi kết nối</exception>
-    public void Connect()
+    public void Connect(string? server, int? port)
     {
+        if (server != null && string.IsNullOrEmpty(server))
+            _server = server;
+
+        if (port != null)
+        {
+            if (port is <= 0 or > 65535)
+                throw new ArgumentOutOfRangeException(nameof(port), "Port must be between 1 and 65535");
+            else
+                _port = port.Value;
+        }
+
         ObjectDisposedException.ThrowIf(_disposed, nameof(SocketClient));
 
         if (_client?.Connected == true)
@@ -100,8 +106,7 @@ public sealed class SocketClient : IDisposable
             if (packet is not Packet concretePacket)
                 throw new ArgumentException("Invalid packet type.", nameof(packet));
 
-            ReadOnlyMemory<byte> data = concretePacket.Serialize();
-            _stream!.Write(data.Span);
+            _stream!.Write(concretePacket.Serialize());
             _stream.Flush();
         }
         catch (Exception ex) when (ex is IOException || ex is SocketException)
@@ -230,8 +235,7 @@ public sealed class SocketClient : IDisposable
             if (packet is not Packet concretePacket)
                 throw new ArgumentException("Invalid packet type.", nameof(packet));
 
-            ReadOnlyMemory<byte> data = concretePacket.Serialize();
-            await _stream!.WriteAsync(data, cancellationToken).ConfigureAwait(false);
+            await _stream!.WriteAsync(concretePacket.Serialize(), cancellationToken).ConfigureAwait(false);
             await _stream.FlushAsync(cancellationToken).ConfigureAwait(false);
         }
         catch (Exception ex) when (ex is IOException || ex is SocketException)
@@ -316,7 +320,7 @@ public sealed class SocketClient : IDisposable
     /// <summary>
     /// Giải phóng tài nguyên đồng bộ
     /// </summary>
-    public void Dispose()
+    public new void Dispose()
     {
         if (_disposed) return;
 

@@ -2,7 +2,7 @@
 using Notio.Common.Attributes;
 using Notio.Common.Authentication;
 using Notio.Common.Connection;
-using Notio.Common.Interfaces;
+using Notio.Common.Data;
 using Notio.Cryptography.Asymmetric;
 using Notio.Cryptography.Hash;
 using Notio.Logging;
@@ -29,11 +29,13 @@ internal sealed class SecureConnection : Base.BaseService
     [PacketCommand((int)Command.InitiateSecureConnection, Authoritys.Guest)]
     public static void InitiateSecureConnection(IPacket packet, IConnection connection)
     {
+        Console.WriteLine(11111111111);
         if (packet.Type != (byte)PacketType.Binary)
         {
             connection.Send(CreateErrorPacket("Unsupported packet type."));
             return;
         }
+
         if (packet.Payload.Length != 32) // X25519 public key phải là 32 byte
         {
             CLogging.Instance.Warn(
