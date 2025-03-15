@@ -1,7 +1,9 @@
 <Window x:Class="Auto.Client.Views.Login.LoginWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:local="clr-namespace:Auto.Client.Behaviors"
+        xmlns:local="clr-namespace:Auto.Client.Behaviors" 
+        xmlns:viewmodels="clr-namespace:Auto.Client.ViewModels"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
         Title="Login"
         Height="300"
         Width="380"
@@ -21,8 +23,6 @@
             <RowDefinition Height="50" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
         <!-- Input Fields -->
@@ -37,7 +37,7 @@
                 HorizontalAlignment="Center"
                 VerticalAlignment="Center">
             <Grid>
-                <TextBox x:Name="txtUsername"
+                <TextBox Text="{Binding Username, UpdateSourceTrigger=PropertyChanged}"
                          Background="Transparent"
                          local:WatermarkBehavior.Watermark="Username"
                          BorderThickness="0"
@@ -56,7 +56,7 @@
                            Margin="-4,0,-4,0" />
 
                 <!-- PasswordBox -->
-                <PasswordBox x:Name="txtPassword"
+                <PasswordBox x:Name="txtPass"
                              Background="Transparent"
                              Foreground="{DynamicResource PrimaryTextBrush}"
                              VerticalContentAlignment="Center"
@@ -72,8 +72,9 @@
         </Border>
 
         <!-- Login Button -->
-        <Button Grid.Row="3"
+        <Button Grid.Row="2"
                 Content="Login"
+                Command="{Binding LoginCommand}"
                 Width="240" Height="40"
                 Background="{DynamicResource ButtonBackgroundBrush}"
                 Foreground="White"
@@ -81,6 +82,7 @@
                 Cursor="Hand"
                 BorderThickness="0"
                 FontWeight="Bold"
-                HorizontalAlignment="Center" />
+                IsEnabled="True"
+                HorizontalAlignment="Center" Margin="0,54,0,-94" />
     </Grid>
 </Window>

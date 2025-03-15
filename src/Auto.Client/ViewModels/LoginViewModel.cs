@@ -1,8 +1,11 @@
-﻿using System.Windows.Input;
+﻿using System.ComponentModel;
+using System.Diagnostics;
+using System.Windows;
+using System.Windows.Input;
 
 namespace Auto.Client.ViewModels;
 
-public class LoginViewModel : BaseViewModel
+public class LoginViewModel : INotifyPropertyChanged
 {
     private string _username = string.Empty;
     private string _password = string.Empty;
@@ -10,27 +13,41 @@ public class LoginViewModel : BaseViewModel
     public string Username
     {
         get => _username;
-        set => SetProperty(ref _username, value);
+        set { _username = value; OnPropertyChanged(nameof(Username)); }
     }
 
     public string Password
     {
         get => _password;
-        set => SetProperty(ref _password, value);
+        set { _password = value; OnPropertyChanged(nameof(Password)); }
     }
 
-    public LoginViewModel()
-    {
-        LoginCommand = new RelayCommand(Login, CanLogin);
-    }
+    public event PropertyChangedEventHandler? PropertyChanged;
 
     public ICommand LoginCommand { get; }
 
-    private bool CanLogin(object parameter)
-        => !string.IsNullOrEmpty(Username) && !string.IsNullOrEmpty(Password);
-
-    private void Login(object parameter)
+    public LoginViewModel()
     {
-        string data = $"{Username}|{Password}";
+        LoginCommand = new RelayCommand(ExecuteLogin, CanExecuteLogin);
+    }
+
+    private bool CanExecuteLogin(object parameter)
+    {
+        Debug.WriteLine($"🔎 CanExecuteLogin called - Username: '{Username}', Password: '{Password}'");
+        return !string.IsNullOrWhiteSpace(Username) && !string.IsNullOrWhiteSpace(Password);
+    }
+
+    private void ExecuteLogin(object parameter)
+    {
+        if (Username == "admin" && Password == "1234")
+            MessageBox.Show("Login successful!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+        else
+            MessageBox.Show("Invalid username or password.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+    }
+
+    public void OnPropertyChanged(string propertyName)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        CommandManager.InvalidateRequerySuggested(); // ✅ Cập nhật UI
     }
 }
