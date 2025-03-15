@@ -5,7 +5,7 @@ using Notio.Common.Connection;
 using Notio.Common.Interfaces;
 using Notio.Cryptography.Asymmetric;
 using Notio.Cryptography.Hash;
-using Notio.Logging; // Thêm namespace cho CLogging
+using Notio.Logging;
 using Notio.Network.Package;
 using Notio.Network.Package.Enums;
 using Notio.Network.Package.Extensions;
@@ -96,9 +96,10 @@ internal sealed class SecureConnection : Base.BaseService
             return;
         }
 
-        if (!connection.Metadata.TryGetValue("X25519_PrivateKey", out object? privateKeyObj) || privateKeyObj is not byte[] privateKey)
+        if (!connection.Metadata.TryGetValue("X25519_PrivateKey", out object? privateKeyObj) ||
+            privateKeyObj is not byte[] privateKey)
         {
-            CLogging.Instance.Warn($"Missing or invalid X25519 private key for connection {connection.Id}");
+            CLogging.Instance.Warn($"Missing or invalid X25519 private key for connection {connection.RemoteEndPoint}");
             connection.Send(CreateErrorPacket("Invalid public key."));
             return;
         }
@@ -112,18 +113,18 @@ internal sealed class SecureConnection : Base.BaseService
             // Kiểm tra khóa đã khớp với giá trị trước đó chưa
             if (connection.EncryptionKey.SequenceEqual(derivedKey))
             {
-                CLogging.Instance.Info($"Secure connection finalized successfully for connection {connection.Id}");
+                CLogging.Instance.Info($"Secure connection finalized successfully for connection {connection.RemoteEndPoint}");
                 connection.Send(CreateSuccessPacket("Secure connection established."));
             }
             else
             {
-                CLogging.Instance.Warn($"Key mismatch during finalization for connection {connection.Id}");
+                CLogging.Instance.Warn($"Key mismatch during finalization for connection {connection.RemoteEndPoint}");
                 connection.Send(CreateErrorPacket("Key mismatch."));
             }
         }
         catch (Exception ex)
         {
-            CLogging.Instance.Error($"Failed to finalize secure connection for connection {connection.Id}", ex);
+            CLogging.Instance.Error($"Failed to finalize secure connection for connection {connection.RemoteEndPoint}", ex);
             connection.Send(CreateErrorPacket("Internal error during secure connection finalization."));
         }
     }
