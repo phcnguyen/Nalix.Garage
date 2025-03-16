@@ -1,7 +1,6 @@
 ﻿using Auto.Common.Enums;
-using Notio.Common.Data;
+using Notio.Common.Package;
 using Notio.Network.Package;
-using Notio.Network.Package.Enums;
 using Notio.Network.Package.Extensions;
 using System;
 using System.Buffers.Text;

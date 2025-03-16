@@ -1,11 +1,10 @@
 ﻿using Auto.Client.Helpers;
 using Auto.Common.Enums;
 using Auto.Common.Models;
-using Notio.Common.Data;
+using Notio.Common.Package;
 using Notio.Cryptography.Asymmetric;
 using Notio.Cryptography.Hash;
 using Notio.Network.Package;
-using Notio.Network.Package.Enums;
 using Notio.Serialization;
 using System.ComponentModel;
 using System.Text;
@@ -49,7 +48,8 @@ public class LoginViewModel : INotifyPropertyChanged
         try
         {
             SocketClient.Instance.Connect("192.168.1.4", 5000);
-            //InitiateSecureConnection();
+            Thread.Sleep(5);
+            InitiateSecureConnection();
         }
         catch (Exception ex)
         {

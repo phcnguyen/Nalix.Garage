@@ -2,12 +2,11 @@
 using Notio.Common.Attributes;
 using Notio.Common.Authentication;
 using Notio.Common.Connection;
-using Notio.Common.Data;
+using Notio.Common.Package;
 using Notio.Cryptography.Asymmetric;
 using Notio.Cryptography.Hash;
 using Notio.Logging;
 using Notio.Network.Package;
-using Notio.Network.Package.Enums;
 using Notio.Network.Package.Extensions;
 using System;
 using System.Linq;
