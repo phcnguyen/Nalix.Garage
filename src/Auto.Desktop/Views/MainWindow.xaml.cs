@@ -28,18 +28,18 @@ public partial class MainWindow : Window
 
         try
         {
-            bool serverConnected = MainViewModel.EstablishServerConnection(out string serverError);
-            if (!serverConnected)
+            (bool Status, string Message) = await MainViewModel.EstablishServerConnectionAsync();
+            if (!Status)
             {
-                throw new Exception(serverError);
+                throw new Exception(Message);
             }
 
-            await Task.Delay(1000);
+            await Task.Delay(2000);
 
-            bool secureConnected = MainViewModel.EstablishSecureConnection(out string secureError);
-            if (!secureConnected)
+            (bool Status, string Message) secureConnected = await MainViewModel.EstablishSecureConnectionAsync();
+            if (!secureConnected.Status)
             {
-                throw new Exception(secureError);
+                throw new Exception(secureConnected.Message);
             }
 
             await Task.Delay(2000);

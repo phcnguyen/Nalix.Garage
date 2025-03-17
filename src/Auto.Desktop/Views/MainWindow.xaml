@@ -5,7 +5,10 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Auto.Desktop"
         mc:Ignorable="d"
-        Title="MainWindow" ResizeMode="NoResize">
+        Height="0"
+        Width="0"
+        WindowStyle="None"
+        ResizeMode="NoResize">
     <Grid>
     </Grid>
 </Window>

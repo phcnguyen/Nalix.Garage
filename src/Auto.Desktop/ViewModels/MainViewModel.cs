@@ -5,6 +5,7 @@ using Notio.Cryptography.Asymmetric;
 using Notio.Cryptography.Hash;
 using Notio.Network.Package;
 using System;
+using System.Threading.Tasks;
 
 namespace Auto.Desktop.ViewModels;
 
@@ -13,66 +14,58 @@ public sealed class MainViewModel : BaseViewModel
     /// <summary>
     /// Establishes a basic connection to the server at the specified IP and port.
     /// </summary>
-    /// <param name="errorMessage">Output parameter containing the error message if the connection fails.</param>
     /// <returns>True if the connection is successful, false otherwise.</returns>
-    public static bool EstablishServerConnection(out string errorMessage)
+    public static async Task<(bool Status, string Message)> EstablishServerConnectionAsync()
     {
-        errorMessage = string.Empty;
         string ip = "192.168.1.3";
         int port = 5000;
 
         try
         {
-            SocketClient.Instance.Connect(ip, port);
-            return true;
+            await SocketClient.Instance.ConnectAsync(ip, port); // Chuyển sang async
+            return (true, string.Empty);
         }
         catch (Exception ex)
         {
-            errorMessage = $"Server connection failed\nIP: {ip}, Port: {port}\n{ex.Message}";
-            return false;
+            return (false, $"Server connection failed\nIP: {ip}, Port: {port}\n{ex.Message}");
         }
     }
 
     /// <summary>
     /// Initializes a secure connection with the server using X25519 key exchange.
     /// </summary>
-    /// <param name="errorMessage">Output parameter containing the error message if the secure connection fails.</param>
     /// <returns>True if the secure connection is established, false otherwise.</returns>
-    public static bool EstablishSecureConnection(out string errorMessage)
+    public static async Task<(bool Status, string Message)> EstablishSecureConnectionAsync()
     {
         try
         {
-            // Generate key pair for X25519 encryption
+            // Tạo key pair cho X25519
             (byte[] privateKey, byte[] publicKey) = X25519.GenerateKeyPair();
 
-            // Create packet to initiate secure connection
+            // Gửi public key cho server
             Packet packet = new(
                 PacketType.Binary, PacketFlags.None, PacketPriority.None,
                 (ushort)Command.InitiateSecureConnection, publicKey);
 
-            // Send public key and receive server's response
-            SocketClient.Instance.Send(packet);
-            IPacket packetReceive = SocketClient.Instance.Receive();
+            await SocketClient.Instance.SendAsync(packet);
+            IPacket packetReceive = await SocketClient.Instance.ReceiveAsync();
 
-            // Validate received packet
+            // Kiểm tra phản hồi từ server
             if (packetReceive == null || packetReceive.Payload.Length != 32)
             {
-                errorMessage = $"Invalid server response - Expected 32-byte payload." +
-                               $"\nReceived: {packetReceive?.Payload.Length ?? 0} bytes.";
-                return false;
+                return (false, $"Invalid server response - Expected 32-byte payload." +
+                               $"\nReceived: {packetReceive?.Payload.Length ?? 0} bytes.");
             }
 
-            // Compute shared secret and set encryption key
+            // Tính toán shared secret và đặt khóa mã hóa
             byte[] sharedSecret = X25519.ComputeSharedSecret(privateKey, packetReceive.Payload.ToArray());
             SocketClient.Instance.EncryptionKey = Sha256.HashData(sharedSecret);
 
-            errorMessage = string.Empty;
-            return true;
+            return (true, string.Empty);
         }
         catch (Exception ex)
         {
-            errorMessage = $"Secure connection failed\n{ex.Message}";
-            return false;
+            return (false, $"Secure connection failed\n{ex.Message}");
         }
     }
 }
