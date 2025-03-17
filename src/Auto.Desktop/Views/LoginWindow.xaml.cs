@@ -12,6 +12,14 @@ public partial class LoginWindow : Window
         ProgressWindow progressWindow = new();
         LoginViewModel viewModel = new();
 
+        viewModel.ShowError += (message, title) =>
+        {
+            MessageBox.Show(message, title, MessageBoxButton.OK, MessageBoxImage.Error);
+        };
+
+        viewModel.ShowLogin += () => this.Show();
+        viewModel.HideLogin += () => this.Hide();
+
         viewModel.ShowProgress += () => progressWindow.Show();
         viewModel.HideProgress += () => progressWindow.Hide();
 

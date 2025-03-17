@@ -6,6 +6,7 @@ using Notio.Network.Package;
 using Notio.Serialization;
 using System;
 using System.ComponentModel;
+using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 
@@ -17,11 +18,15 @@ public sealed class LoginViewModel : INotifyPropertyChanged
     public event Action? ShowProgress;
     public event Action? HideProgress;
 
+    public event Action? ShowLogin;
+    public event Action? HideLogin;
+
+    public event Action<string, string>? ShowError;
+
     private string _username = string.Empty;
     private string _password = string.Empty;
 
     public ICommand LoginCommand { get; }
-    public event Action<string, string>? ShowMessage;
     public event PropertyChangedEventHandler? PropertyChanged;
 
     public string Username
@@ -51,6 +56,7 @@ public sealed class LoginViewModel : INotifyPropertyChanged
 
     private async Task ExecuteLoginAsync()
     {
+        HideLogin?.Invoke();
         ShowProgress?.Invoke();
 
         AccountModel account = new()
@@ -65,16 +71,34 @@ public sealed class LoginViewModel : INotifyPropertyChanged
                 PacketType.Json, PacketFlags.None, PacketPriority.None,
                 (ushort)Command.Login, Json.Serialize(account)));
 
-            IPacket packetReceive = await SocketClient.Instance.ReceiveAsync();
+            int timeoutMilliseconds = 10000;
+            var receiveTask = SocketClient.Instance.ReceiveAsync();
+            var timeoutTask = Task.Delay(timeoutMilliseconds);
 
-            NewWindow?.Invoke();
+            var completedTask = await Task.WhenAny(receiveTask, timeoutTask);
+
+            if (completedTask == timeoutTask)
+                throw new TimeoutException("Server did not respond in time.");
+
+            IPacket packetReceive = await receiveTask;
+
+            if (packetReceive.Command == 1)
+            {
+                NewWindow?.Invoke();
+            }
+            else
+            {
+                if (packetReceive.Type == (byte)PacketType.String)
+                    ShowError?.Invoke(Encoding.UTF8.GetString(packetReceive.Payload.Span), "Error");
+            }
         }
         catch (Exception ex)
         {
-            ShowMessage?.Invoke($"Login failed: {ex.Message}", "Error");
+            ShowError?.Invoke($"Login failed: {ex.Message}", "Error");
         }
         finally
         {
+            ShowLogin?.Invoke();
             HideProgress?.Invoke();
         }
     }

@@ -28,9 +28,9 @@ public static class AppConfig
                     (packet, connnect) => PacketEncryptionHelper
                         .DecryptPayload((Packet)packet, connnect.EncryptionKey, connnect.Mode))
                .WithPacketCompression(null, null)
+               .WithHandler<SecureConnection>()
                .WithHandler<AccountService>(() => new AccountService(dbContext))
                .WithHandler<VehicleService>(() => new VehicleService(dbContext))
                .WithHandler<CustomerService>(() => new CustomerService(dbContext))
-               .WithHandler<SecureConnection>()
         )), new BufferAllocator(), CLogging.Instance);
 }
