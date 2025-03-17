@@ -1,6 +1,6 @@
 ﻿namespace Auto.Common.Enums;
 
-public enum Command
+public enum Command : ushort
 {
     Error = 000,
     Success = 001,
