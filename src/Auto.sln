@@ -7,7 +7,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Auto.Common", "Auto.Common\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Auto.Database", "Auto.Database\Auto.Database.csproj", "{11442015-8177-461E-9E7A-6048C2355737}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Auto.Client", "Auto.Client\Auto.Client.csproj", "{B736BF57-F5F5-4508-992A-F8C805452D45}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Auto.Application", "Auto.Client\Auto.Application.csproj", "{B736BF57-F5F5-4508-992A-F8C805452D45}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Auto.Server", "Auto.Server\Auto.Server.csproj", "{4F7CC541-32A6-4276-BECC-696AFBDE04DA}"
 EndProject

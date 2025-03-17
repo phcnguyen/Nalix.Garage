@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
-namespace Auto.Client.ViewModels;
+namespace Auto.Application.ViewModels;
 
 /// <summary>
 /// Lớp cơ sở triển khai <see cref="INotifyPropertyChanged"/> để hỗ trợ thông báo khi thuộc tính thay đổi.

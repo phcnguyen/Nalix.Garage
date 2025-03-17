@@ -1,6 +1,7 @@
-﻿using System.Windows.Input;
+﻿using System;
+using System.Windows.Input;
 
-namespace Auto.Client.ViewModels;
+namespace Auto.Application.Helpers;
 
 /// <summary>
 /// Lớp triển khai <see cref="ICommand"/> để hỗ trợ tạo lệnh có thể thực thi trong MVVM.

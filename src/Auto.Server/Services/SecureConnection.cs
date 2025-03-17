@@ -28,7 +28,6 @@ internal sealed class SecureConnection : Base.BaseService
     [PacketCommand((int)Command.InitiateSecureConnection, Authoritys.Guest)]
     public static void InitiateSecureConnection(IPacket packet, IConnection connection)
     {
-        Console.WriteLine(11111111111);
         if (packet.Type != (byte)PacketType.Binary)
         {
             connection.Send(CreateErrorPacket("Unsupported packet type."));

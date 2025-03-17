@@ -1,0 +1,17 @@
+﻿<Window x:Class="Auto.Application.Views.ProgressWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Loading" 
+		Height="120" 
+		Width="300"
+        WindowStartupLocation="CenterScreen" 
+		ResizeMode="NoResize">
+	
+	<Window.Resources>
+		<ResourceDictionary Source="/Auto.Client;component/Resources/Themes/Theme.xaml" />
+	</Window.Resources>
+	
+    <Grid>
+		<ProgressBar IsIndeterminate="True" Width="250" Height="20" VerticalAlignment="Center"/>
+    </Grid>
+</Window>

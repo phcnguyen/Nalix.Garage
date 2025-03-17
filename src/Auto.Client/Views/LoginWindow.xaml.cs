@@ -1,7 +1,7 @@
-﻿using Auto.Client.ViewModels;
+﻿using Auto.Application.ViewModels;
 using System.Windows;
 
-namespace Auto.Client.Views.Login;
+namespace Auto.Application.Views.Login;
 
 public partial class LoginWindow : Window
 {

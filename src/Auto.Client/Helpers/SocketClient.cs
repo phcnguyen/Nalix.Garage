@@ -3,11 +3,15 @@ using Notio.Common.Package;
 using Notio.Network.Package;
 using Notio.Network.Package.Extensions;
 using Notio.Shared.Injection;
+using System;
 using System.Buffers;
+using System.Diagnostics;
 using System.IO;
 using System.Net.Sockets;
+using System.Threading;
+using System.Threading.Tasks;
 
-namespace Auto.Client.Helpers;
+namespace Auto.Application.Helpers;
 
 /// <summary>
 /// Helper để thực hiện kết nối TCP với timeout và xử lý lỗi tốt hơn
@@ -106,11 +110,14 @@ public sealed class SocketClient : SingletonBase<SocketClient>, IDisposable
             if (packet is not Packet concretePacket)
                 throw new ArgumentException("Invalid packet type.", nameof(packet));
 
+            Debug.WriteLine($"Sending packet: {concretePacket}");
             _stream!.Write(concretePacket.Serialize());
             _stream.Flush();
+            Debug.WriteLine("Packet sent.");
         }
         catch (Exception ex) when (ex is IOException || ex is SocketException)
         {
+            Debug.WriteLine($"[ERROR] Failed to send data: {ex.Message}");
             throw new IOException($"Error sending data to {_server}:{_port}: {ex.Message}", ex);
         }
     }
@@ -135,11 +142,15 @@ public sealed class SocketClient : SingletonBase<SocketClient>, IDisposable
                 _stream!.ReadExactly(buffer, 0, 2);
                 ushort packetLength = BitConverter.ToUInt16(buffer, 0);
 
+                Debug.WriteLine($"Receiving packet of length {packetLength} bytes...");
+
                 byte[] packetBuffer = ArrayPool<byte>.Shared.Rent(2 + packetLength);
                 try
                 {
                     buffer.AsSpan(0, 2).CopyTo(packetBuffer);
-                    _stream.ReadExactly(packetBuffer, 2, packetLength);
+                    _stream.ReadExactly(packetBuffer, 2, packetLength - 2);
+
+                    Debug.WriteLine("Packet received successfully.");
                     return packetBuffer.Deserialize();
                 }
                 finally
@@ -154,6 +165,7 @@ public sealed class SocketClient : SingletonBase<SocketClient>, IDisposable
         }
         catch (Exception ex) when (ex is IOException || ex is SocketException)
         {
+            Debug.WriteLine($"[ERROR] Failed to receive data: {ex.Message}");
             throw new IOException($"Error receiving data from {_server}:{_port}: {ex.Message}", ex);
         }
     }
@@ -165,6 +177,7 @@ public sealed class SocketClient : SingletonBase<SocketClient>, IDisposable
     {
         if (_disposed || _client == null) return;
 
+        Debug.WriteLine($"Closing connection to {_server}:{_port}...");
         try
         {
             _stream?.Dispose();
@@ -174,6 +187,7 @@ public sealed class SocketClient : SingletonBase<SocketClient>, IDisposable
         {
             _stream = null;
             _client = null;
+            Debug.WriteLine("Connection closed.");
         }
     }
 
@@ -271,7 +285,7 @@ public sealed class SocketClient : SingletonBase<SocketClient>, IDisposable
                 {
                     buffer.AsSpan(0, 2).CopyTo(packetBuffer);
                     await _stream.ReadExactlyAsync(
-                        packetBuffer.AsMemory(2, packetLength),
+                        packetBuffer.AsMemory(2, packetLength - 2),
                         cancellationToken).ConfigureAwait(false);
 
                     return packetBuffer.Deserialize();

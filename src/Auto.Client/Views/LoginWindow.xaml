@@ -1,7 +1,7 @@
-<Window x:Class="Auto.Client.Views.Login.LoginWindow"
+<Window x:Class="Auto.Application.Views.Login.LoginWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:viewmodels="clr-namespace:Auto.Client.ViewModels"
+        xmlns:viewmodels="clr-namespace:Auto.Application.ViewModels"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
         Title="Login"
         Height="300"
@@ -19,7 +19,7 @@
     <Grid>
         <!-- Đảm bảo layout đúng bằng cách đặt RowDefinitions -->
         <Grid.RowDefinitions>
-            <RowDefinition Height="50" />
+            <RowDefinition Height="80" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
@@ -157,7 +157,7 @@
 
         <!-- Login Button -->
         <Button Grid.Row="2"
-                Content="Login"
+                Content="LOG IN"
                 Command="{Binding LoginCommand}"
                 Width="240" Height="40"
                 Background="{DynamicResource ButtonBackgroundBrush}"
