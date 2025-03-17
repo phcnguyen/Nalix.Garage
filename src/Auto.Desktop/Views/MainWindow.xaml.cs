@@ -15,8 +15,7 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
-        this.Hide();
-        this.Loaded += MainWindow_Loaded;
+        Loaded += MainWindow_Loaded;
     }
 
     private async void MainWindow_Loaded(object sender, RoutedEventArgs e)
@@ -25,6 +24,7 @@ public partial class MainWindow : Window
         ProgressWindow progressWindow = new();
 
         progressWindow.Show();
+        this.Hide();
 
         try
         {

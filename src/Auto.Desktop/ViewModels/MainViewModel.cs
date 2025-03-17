@@ -1,5 +1,5 @@
-﻿using Auto.Desktop.Helpers;
-using Auto.Common.Enums;
+﻿using Auto.Common.Enums;
+using Auto.Desktop.Helpers;
 using Notio.Common.Package;
 using Notio.Cryptography.Asymmetric;
 using Notio.Cryptography.Hash;
@@ -28,7 +28,7 @@ public sealed class MainViewModel : BaseViewModel
         }
         catch (Exception ex)
         {
-            errorMessage = $"Server connection failed - IP: {ip}, Port: {port}. Error: {ex.Message}";
+            errorMessage = $"Server connection failed\nIP: {ip}, Port: {port}\n{ex.Message}";
             return false;
         }
     }
@@ -57,8 +57,8 @@ public sealed class MainViewModel : BaseViewModel
             // Validate received packet
             if (packetReceive == null || packetReceive.Payload.Length != 32)
             {
-                errorMessage = $"Invalid server response - Expected 32-byte payload, " +
-                               $"received: {packetReceive?.Payload.Length ?? 0} bytes.";
+                errorMessage = $"Invalid server response - Expected 32-byte payload." +
+                               $"\nReceived: {packetReceive?.Payload.Length ?? 0} bytes.";
                 return false;
             }
 
@@ -71,7 +71,7 @@ public sealed class MainViewModel : BaseViewModel
         }
         catch (Exception ex)
         {
-            errorMessage = $"Secure connection failed - Error: {ex.Message}";
+            errorMessage = $"Secure connection failed\n{ex.Message}";
             return false;
         }
     }

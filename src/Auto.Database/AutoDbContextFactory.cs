@@ -2,8 +2,10 @@
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Configuration;
 using Notio.Logging;
+using Npgsql;
 using System;
 using System.IO;
+using System.Net.NetworkInformation;
 
 namespace Auto.Database;
 
@@ -33,6 +35,13 @@ public class AutoDbContextFactory : IDesignTimeDbContextFactory<AutoDbContext>
         // Đọc loại database và connection string
         string dbType = configuration["DatabaseType"] ?? "PostgreSQL";
         string connectionString = configuration.GetConnectionString("DefaultConnection");
+
+        // Kiểm tra kết nối đến database
+        if (!CanConnectToDatabase(connectionString))
+        {
+            CLogging.Instance.Error($"Cannot connect to the database at {connectionString}");
+            throw new InvalidOperationException($"Cannot connect to the database at {connectionString}");
+        }
 
         DbContextOptionsBuilder<AutoDbContext> optionsBuilder = new();
 
@@ -84,5 +93,34 @@ public class AutoDbContextFactory : IDesignTimeDbContextFactory<AutoDbContext>
         var dbContext = new AutoDbContext(optionsBuilder.Options);
         CLogging.Instance.Info("AutoDbContext successfully created.");
         return dbContext;
+    }
+
+    private static bool CanConnectToDatabase(string connectionString)
+    {
+        try
+        {
+            var builder = new NpgsqlConnectionStringBuilder(connectionString);
+            string host = builder.Host;
+            int port = builder.Port;
+
+            CLogging.Instance.Info($"Pinging database server {host}:{port}...");
+
+            using var ping = new Ping();
+            PingReply reply = ping.Send(host, 1000); // Timeout 1 giây
+
+            if (reply.Status == IPStatus.Success)
+            {
+                CLogging.Instance.Info($"Ping to {host} successful.");
+                return true;
+            }
+
+            CLogging.Instance.Error($"Ping to {host} failed: {reply.Status}");
+            return false;
+        }
+        catch (Exception ex)
+        {
+            CLogging.Instance.Error("Error pinging database server.", ex);
+            return false;
+        }
     }
 }
