@@ -6,12 +6,16 @@ using Notio.Network.Package;
 using Notio.Network.Package.Helpers;
 using Notio.Shared.Memory.Buffers;
 
-namespace Auto.Host.Main;
+namespace Auto.Host.Threading;
 
 public static class AppConfig
 {
     public static AutoDbContext InitializeDatabase()
-        => new AutoDbContextFactory().CreateDbContext([]);
+    {
+        AutoDbContext context = new AutoDbContextFactory().CreateDbContext([]);
+        context.Database.EnsureCreated();
+        return context;
+    }
 
     public static Network.ServerListener InitializeServer(AutoDbContext dbContext)
         => new(new Network.ServerProtocol(
@@ -29,8 +33,8 @@ public static class AppConfig
                         .DecryptPayload((Packet)packet, connnect.EncryptionKey, connnect.Mode))
                .WithPacketCompression(null, null)
                .WithHandler<SecureConnection>()
-               .WithHandler<AccountService>(() => new AccountService(dbContext))
-               .WithHandler<VehicleService>(() => new VehicleService(dbContext))
-               .WithHandler<CustomerService>(() => new CustomerService(dbContext))
+               .WithHandler(() => new AccountService(dbContext))
+               .WithHandler(() => new VehicleService(dbContext))
+               .WithHandler(() => new CustomerService(dbContext))
         )), new BufferAllocator(), CLogging.Instance);
 }

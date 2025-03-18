@@ -37,7 +37,8 @@ public class AutoDbContextFactory : IDesignTimeDbContextFactory<AutoDbContext>
         string connectionString = configuration.GetConnectionString("DefaultConnection");
 
         // Kiểm tra kết nối đến database
-        if (!CanConnectToDatabase(connectionString))
+        if (!dbType.Equals("SQLite", StringComparison.OrdinalIgnoreCase) &&
+            !CanConnectToDatabase(connectionString))
         {
             CLogging.Instance.Error($"Cannot connect to the database at {connectionString}");
             throw new InvalidOperationException($"Cannot connect to the database at {connectionString}");
@@ -78,6 +79,18 @@ public class AutoDbContextFactory : IDesignTimeDbContextFactory<AutoDbContext>
 
                 CLogging.Instance.Info("DbContext configured for SQL Server.");
             }
+            else if (dbType.Equals("SQLite", StringComparison.OrdinalIgnoreCase))
+            {
+                optionsBuilder.UseSqlite(connectionString, sqliteOptions =>
+                {
+                    sqliteOptions.CommandTimeout(60);
+                    sqliteOptions.MigrationsHistoryTable("__MigrationsHistory");
+                })
+                .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking)
+                .EnableServiceProviderCaching();
+
+                CLogging.Instance.Info("DbContext configured for SQLite.");
+            }
             else
             {
                 CLogging.Instance.Warn($"Unsupported database type: {dbType}");
@@ -106,7 +119,7 @@ public class AutoDbContextFactory : IDesignTimeDbContextFactory<AutoDbContext>
             CLogging.Instance.Info($"Pinging database server {host}:{port}...");
 
             using var ping = new Ping();
-            PingReply reply = ping.Send(host, 1000); // Timeout 1 giây
+            PingReply reply = ping.Send(host, 3000); // Timeout 1 giây
 
             if (reply.Status == IPStatus.Success)
             {
