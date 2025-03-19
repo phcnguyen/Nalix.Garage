@@ -1,4 +1,5 @@
 ﻿using Auto.Database;
+using Auto.Host.Network;
 using Auto.Host.Services;
 using Notio.Common.Logging;
 using Notio.Logging;
@@ -12,7 +13,6 @@ using Notio.Shared;
 using Notio.Shared.Memory.Buffers;
 using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
 using System.Threading;
@@ -22,169 +22,136 @@ namespace Auto.Host.Threading;
 
 public static class AppConfig
 {
+    private static ServerListener? Server;
+    private static AutoDbContext? DbContext;
+    private static ILogger Logger = CLogging.Instance;
+
     public static readonly bool IsDebug = Debugger.IsAttached;
     public static readonly CancellationTokenSource CTokenSrc = new();
     public static readonly ManualResetEventSlim ExitEvent = new(false);
 
-    public static readonly string VersionInfo =
+    public static string VersionInfo =>
         $"Version {AssemblyMetadata.GetAssemblyInformationalVersion()} | {(IsDebug ? "Debug" : "Release")}";
 
-    // Lưu các phím tắt có thể chỉnh sửa
     private static readonly ConcurrentDictionary<ConsoleKey, Action> Shortcuts = new()
     {
+        [ConsoleKey.H] = () => ShowHelp(),
         [ConsoleKey.Q] = () =>
         {
-            CLogging.Instance.Info("Ctrl+Q pressed: Exiting application...");
-            Process.GetCurrentProcess().Kill();
+            Logger.Info("Ctrl+Q pressed: Exiting application...");
+            System.Environment.Exit(0);
         },
-        [ConsoleKey.R] = () => ThreadPool.QueueUserWorkItem(_ =>
+        [ConsoleKey.R] = () =>
         {
-            Server?.BeginListening(CTokenSrc.Token);
-        }),
-        [ConsoleKey.O] = () => ThreadPool.QueueUserWorkItem(_ =>
+            if (Server != null) ThreadPool.QueueUserWorkItem(_ => Server.BeginListening(CTokenSrc.Token));
+        },
+        [ConsoleKey.P] = () =>
         {
-            Server?.EndListening();
-        })
+            if (Server != null) Task.Run(() => Server.EndListening());
+        }
     };
 
-    private static Network.ServerListener? Server;
-
-    // Khởi tạo Console
-    public static void InitializeConsole(Network.ServerListener server)
+    public static void InitializeConsole()
     {
-        Server = server;
-        Console.BackgroundColor = ConsoleColor.Black;
-        Console.Title = $"Auto ({VersionInfo})";
-        Console.OutputEncoding = Encoding.UTF8;
-        Console.TreatControlCAsInput = false;
         Console.CursorVisible = false;
+        Console.TreatControlCAsInput = false;
+        Console.OutputEncoding = Encoding.UTF8;
+        Console.Title = $"Auto ({VersionInfo})";
+        Console.ResetColor(); // Tự động reset màu thay vì đặt màu nền thủ công
 
-        Console.CancelKeyPress += (sender, e) =>
+        Console.CancelKeyPress += (_, e) =>
         {
             e.Cancel = true;
-            CLogging.Instance.Warn("Ctrl+C has been disabled. Use an alternative shutdown method.");
+            Logger.Warn("Ctrl+C is disabled. Use Ctrl+Q to exit.");
         };
 
-        //Console.Clear();
-
-        PrintDynamicAsciiShortcutTable();
+        Console.Clear();
         ListenForKeyPresses();
     }
 
     public static AutoDbContext InitializeDatabase()
     {
-        AutoDbContext context = new AutoDbContextFactory().CreateDbContext([]);
+        var context = new AutoDbContextFactory().CreateDbContext([]);
         context.Database.EnsureCreated();
         return context;
     }
 
-    public static CLogging InitializeLogging()
+    public static ILogger InitializeLogging()
     {
         FileLoggerOptions options = new()
         {
             LogFileName = "Auto",
-            LogDirectory = DirectoriesDefault.LogsPath
+            LogDirectory = DirectoriesDefault.LogsPath,
         };
 
         return new CLogging(cfg =>
         {
-            cfg.SetMinLevel(LoggingLevel.Trace)
+            cfg.SetMinLevel(LoggingLevel.Information)
                .AddTarget(new FileLoggingTarget(options))
                .AddTarget(new ConsoleLoggingTarget());
         });
     }
 
-    public static Network.ServerListener InitializeServer(AutoDbContext dbContext)
+    public static ServerListener InitializeServer()
     {
-        return new(new Network.ServerProtocol(
-            new PacketDispatcher(cfg => cfg.WithLogging(CLogging.Instance)
+        if (DbContext == null)
+        {
+            throw new InvalidOperationException("Database context is not initialized.");
+        }
+
+        return new(new ServerProtocol(
+            new PacketDispatcher(cfg => cfg.WithLogging(Logger)
                .WithPacketSerialization(
-                    packet => new System.Memory<byte>(PackageSerializeHelper.Serialize((Packet)packet)),
+                    packet => new Memory<byte>(PackageSerializeHelper.Serialize((Packet)packet)),
                     data => PackageSerializeHelper.Deserialize(data.Span))
-               .WithErrorHandler(
-                    (exception, command) => CLogging.Instance
-                        .Error($"Error handling command:{command}", exception))
+               .WithErrorHandler((exception, command) =>
+                   Logger.Error($"Error handling command: {command}", exception))
                .WithPacketCrypto(
-                    (packet, connect) => PacketEncryptionHelper
-                        .EncryptPayload((Packet)packet, connect.EncryptionKey, connect.Mode),
-                    (packet, connect) => PacketEncryptionHelper
-                        .DecryptPayload((Packet)packet, connect.EncryptionKey, connect.Mode))
+                    (packet, connect) => PacketEncryptionHelper.EncryptPayload((Packet)packet, connect.EncryptionKey, connect.Mode),
+                    (packet, connect) => PacketEncryptionHelper.DecryptPayload((Packet)packet, connect.EncryptionKey, connect.Mode))
                .WithPacketCompression(null, null)
                .WithHandler<SecureConnection>()
-               .WithHandler(() => new AccountService(dbContext))
-               .WithHandler(() => new VehicleService(dbContext))
-               .WithHandler(() => new CustomerService(dbContext))
-        )), new BufferAllocator(), CLogging.Instance);
+               .WithHandler(() => new AccountService(DbContext))
+               .WithHandler(() => new VehicleService(DbContext))
+               .WithHandler(() => new CustomerService(DbContext))
+        )), new BufferAllocator(), Logger);
     }
 
-    // Hàm lắng nghe phím tắt
+    public static void SetServer(ServerListener server) => Server = server;
+    public static void SetDbContext(AutoDbContext dbContext) => DbContext = dbContext;
+    public static void SetLogger(ILogger logger) => Logger = logger;
+
     private static void ListenForKeyPresses()
     {
-        Task.Run(() =>
+        Logger.Warn("Ctrl+H detected → Showing help menu...");
+
+        Task.Run(async () =>
         {
             while (!ExitEvent.IsSet)
             {
                 if (Console.KeyAvailable)
                 {
-                    ConsoleKeyInfo keyInfo = Console.ReadKey(true);
+                    var keyInfo = Console.ReadKey(true);
                     if (keyInfo.Modifiers.HasFlag(ConsoleModifiers.Control) &&
                         Shortcuts.TryGetValue(keyInfo.Key, out var action))
                     {
                         action?.Invoke();
                     }
                 }
-                Thread.Sleep(10);
+                await Task.Delay(10);
             }
         });
     }
 
-    // Cho phép thay đổi phím tắt từ bên ngoài
-    public static void SetShortcut(ConsoleKey key, Action action)
-        => Shortcuts[key] = action;
-
-    private static void PrintDynamicAsciiShortcutTable(Dictionary<string, string>? shortcuts = null, char borderChar = '─', ConsoleColor color = ConsoleColor.White)
+    private static void ShowHelp()
     {
-        shortcuts ??= new Dictionary<string, string>
-        {
-            ["Ctrl+Q"] = "Quit",
-            ["Ctrl+R"] = "Start Server",
-            ["Ctrl+O"] = "Stop Server"
-        };
-
-        var (maxKeyWidth, maxValueWidth) = GetColumnWidths(shortcuts);
-        int col1Width = maxKeyWidth + 2;
-        int col2Width = maxValueWidth + 2;
-
-        var sb = new StringBuilder();
-        ConsoleColor originalColor = Console.ForegroundColor;
-        Console.ForegroundColor = color;
-
-        sb.Append('┌').Append(new string(borderChar, col1Width)).Append('┬').Append(new string(borderChar, col2Width)).Append('┐').AppendLine();
-        sb.Append('│').Append(" SHORTCUTS".PadRight(col1Width)).Append('│').Append("".PadRight(col2Width)).Append('│').AppendLine();
-        sb.Append('├').Append(new string(borderChar, col1Width)).Append('┬').Append(new string(borderChar, col2Width)).Append('┤').AppendLine();
-
-        foreach (var (key, value) in shortcuts)
-        {
-            sb.Append('│').Append($" {key}".PadRight(col1Width)).Append('│').Append($" {value}".PadRight(col2Width)).Append('│').AppendLine();
-        }
-
-        sb.Append('└').Append(new string(borderChar, col1Width)).Append('┴').Append(new string(borderChar, col2Width)).Append('┘');
-
-        Console.WriteLine(sb.ToString());
-        Console.ForegroundColor = originalColor; // Khôi phục màu gốc
+        Logger.Info(@"Available shortcuts:
+                                            Ctrl+H → Show help
+                                            Ctrl+Q → Exit application
+                                            Ctrl+R → Restart server
+                                            Ctrl+P → Stop server
+        ");
     }
 
-    private static (int maxKeyWidth, int maxValueWidth) GetColumnWidths(Dictionary<string, string> shortcuts)
-    {
-        int maxKeyWidth = "SHORTCUTS".Length; // So sánh với tiêu đề
-        int maxValueWidth = 0;
-
-        foreach (var (key, value) in shortcuts)
-        {
-            if (key.Length > maxKeyWidth) maxKeyWidth = key.Length;
-            if (value.Length > maxValueWidth) maxValueWidth = value.Length;
-        }
-
-        return (maxKeyWidth, maxValueWidth);
-    }
+    public static void SetShortcut(ConsoleKey key, Action action) => Shortcuts[key] = action;
 }

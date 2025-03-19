@@ -16,7 +16,8 @@ namespace Auto.Database;
 /// <summary>
 /// DbContext cho ứng dụng quản lý gara ô tô.
 /// </summary>
-public class AutoDbContext(DbContextOptions<AutoDbContext> options) : DbContext(options)
+public class AutoDbContext(DbContextOptions<AutoDbContext> options)
+    : DbContext(options), IAutoDbContext
 {
     public DbSet<Vehicle> Vehicles { get; set; }
     public DbSet<Account> Accounts { get; set; }
@@ -32,6 +33,7 @@ public class AutoDbContext(DbContextOptions<AutoDbContext> options) : DbContext(
     public DbSet<SupplierPhone> SupplierPhones { get; set; }
     public DbSet<ReplacementPart> ReplacementParts { get; set; }
     public DbSet<RepairOrderSparePart> RepairOrderSpareParts { get; set; }
+    public new int SaveChanges() => base.SaveChanges();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

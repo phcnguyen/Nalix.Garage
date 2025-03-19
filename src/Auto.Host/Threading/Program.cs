@@ -1,16 +1,14 @@
-﻿using Auto.Database;
-using Auto.Host.Network;
-
-namespace Auto.Host.Threading;
+﻿namespace Auto.Host.Threading;
 
 internal class Program
 {
     internal static void Main()
     {
-        AutoDbContext database = AppConfig.InitializeDatabase();
-        ServerListener server = AppConfig.InitializeServer(database);
+        AppConfig.SetLogger(AppConfig.InitializeLogging());
 
-        AppConfig.InitializeConsole(server);
+        AppConfig.InitializeConsole();
+        AppConfig.SetDbContext(AppConfig.InitializeDatabase());
+        AppConfig.SetServer(AppConfig.InitializeServer());
 
         AppConfig.ExitEvent.Wait();
     }
