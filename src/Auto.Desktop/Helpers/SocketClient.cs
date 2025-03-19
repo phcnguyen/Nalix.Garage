@@ -1,5 +1,5 @@
-﻿using Notio.Common.Authentication;
-using Notio.Common.Package;
+﻿using Notio.Common.Package;
+using Notio.Common.Security;
 using Notio.Network.Package;
 using Notio.Network.Package.Extensions;
 using Notio.Shared.Injection;

@@ -13,7 +13,7 @@
 		<!-- Target framework setting for all projects -->
 		<DebugType>none</DebugType>
 		<GenerateJson>false</GenerateJson>
-		<OutputPath>..\build\bin</OutputPath>
-		<IntermediateOutputPath>..\build\obj</IntermediateOutputPath>
+		<OutputPath>..\..\build\bin</OutputPath>
+		<IntermediateOutputPath>..\..\build\obj</IntermediateOutputPath>
 	</PropertyGroup>
 </Project>

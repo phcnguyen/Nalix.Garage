@@ -5,9 +5,9 @@ using Auto.Database;
 using Auto.Host.Services.Base;
 using Microsoft.EntityFrameworkCore;
 using Notio.Common.Attributes;
-using Notio.Common.Authentication;
 using Notio.Common.Connection;
 using Notio.Common.Package;
+using Notio.Common.Security;
 using Notio.Cryptography.Hash;
 using Notio.Logging;
 using Notio.Utilities;
@@ -37,7 +37,7 @@ public sealed class AccountService(AutoDbContext context) : BaseService
     /// <param name="packet">Gói dữ liệu chứa thông tin đăng ký.</param>
     /// <param name="connection">Kết nối với client để gửi phản hồi.</param>
     /// <returns>Task đại diện cho quá trình xử lý bất đồng bộ.</returns>
-    [PacketCommand((int)Command.RegisterAccount, Authoritys.Guest)]
+    [PacketCommand((int)Command.RegisterAccount, AuthorityLevel.Guest)]
     public async Task RegisterAccountAsync(IPacket packet, IConnection connection)
     {
         string username, password;
@@ -58,7 +58,7 @@ public sealed class AccountService(AutoDbContext context) : BaseService
         }
         else if (packet.Type == (byte)PacketType.Json)
         {
-            AccountDto? acc = JsonBinary.Deserialize(
+            AccountDto? acc = JsonBinary.DeserializeFromBytes(
                 packet.Payload.Span, JsonContext.Default.AccountDto);
             if (acc == null || string.IsNullOrWhiteSpace(acc.Username) || string.IsNullOrWhiteSpace(acc.Password) ||
                 acc.Username.Length < 3 || acc.Username.Length > 50 ||
@@ -92,7 +92,7 @@ public sealed class AccountService(AutoDbContext context) : BaseService
                 Username = username,
                 Salt = salt,
                 Hash = hash,
-                Role = Authoritys.User,
+                Role = AuthorityLevel.User,
                 CreatedAt = DateTime.UtcNow
             };
 
@@ -117,7 +117,7 @@ public sealed class AccountService(AutoDbContext context) : BaseService
     /// <param name="packet">Gói dữ liệu chứa thông tin đăng nhập.</param>
     /// <param name="connection">Kết nối với client để gửi phản hồi và cập nhật phiên.</param>
     /// <returns>Task đại diện cho quá trình xử lý bất đồng bộ.</returns>
-    [PacketCommand((int)Command.Login, Authoritys.Guest)]
+    [PacketCommand((int)Command.Login, AuthorityLevel.Guest)]
     public async Task LoginAsync(IPacket packet, IConnection connection)
     {
         string username, password;
@@ -136,7 +136,7 @@ public sealed class AccountService(AutoDbContext context) : BaseService
         }
         else if (packet.Type == (byte)PacketType.Json)
         {
-            AccountDto? acc = JsonBinary.Deserialize(
+            AccountDto? acc = JsonBinary.DeserializeFromBytes(
                 packet.Payload.Span, JsonContext.Default.AccountDto);
             if (acc == null ||
                 string.IsNullOrWhiteSpace(acc.Username) ||
@@ -214,7 +214,7 @@ public sealed class AccountService(AutoDbContext context) : BaseService
     /// <param name="packet">Gói dữ liệu chứa ID tài khoản cần xóa.</param>
     /// <param name="connection">Kết nối với client để gửi phản hồi.</param>
     /// <returns>Task đại diện cho quá trình xử lý bất đồng bộ.</returns>
-    [PacketCommand((int)Command.DeleteAccount, Authoritys.Administrator)]
+    [PacketCommand((int)Command.DeleteAccount, AuthorityLevel.Administrator)]
     public async Task DeleteAccountAsync(IPacket packet, IConnection connection)
     {
         int accountId;
@@ -265,7 +265,7 @@ public sealed class AccountService(AutoDbContext context) : BaseService
     /// <param name="packet">Gói dữ liệu chứa mật khẩu cũ và mới.</param>
     /// <param name="connection">Kết nối với client để xác thực và gửi phản hồi.</param>
     /// <returns>Task đại diện cho quá trình xử lý bất đồng bộ.</returns>
-    [PacketCommand((int)Command.UpdatePassword, Authoritys.User)]
+    [PacketCommand((int)Command.UpdatePassword, AuthorityLevel.User)]
     public async Task UpdatePasswordAsync(IPacket packet, IConnection connection)
     {
         string oldPassword, newPassword;
@@ -284,7 +284,7 @@ public sealed class AccountService(AutoDbContext context) : BaseService
         }
         else if (packet.Type == (byte)PacketType.Json)
         {
-            PasswordChangeDto? acc = JsonBinary.Deserialize(
+            PasswordChangeDto? acc = JsonBinary.DeserializeFromBytes(
                 packet.Payload.Span, JsonContext.Default.PasswordChangeDto);
 
             if (acc == null ||

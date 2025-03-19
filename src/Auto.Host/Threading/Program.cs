@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Notio.Shared;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -9,6 +10,8 @@ internal class Program
     private static readonly CancellationTokenSource cancellationTokenSource = new();
     internal static void Main()
     {
+        string _ = DirectoriesDefault.DataPath;
+
         var server = AppConfig.InitializeServer(AppConfig.InitializeDatabase());
 
         // Chạy server trong một task riêng

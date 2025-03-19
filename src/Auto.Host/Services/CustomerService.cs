@@ -3,9 +3,9 @@ using Auto.Common.Enums;
 using Auto.Database;
 using Microsoft.EntityFrameworkCore;
 using Notio.Common.Attributes;
-using Notio.Common.Authentication;
 using Notio.Common.Connection;
 using Notio.Common.Package;
+using Notio.Common.Security;
 using Notio.Logging;
 using Notio.Network.Package;
 using Notio.Network.Package.Extensions;
@@ -37,7 +37,7 @@ public sealed class CustomerService(AutoDbContext context) : Base.BaseService
     /// - JSON: Customer { Name, PhoneNumber, Email, Address, TaxCode, Type }
     /// Yêu cầu: Phone và Email không được trùng với khách hàng hiện có.
     /// </summary>
-    [PacketCommand((int)Command.AddCustomer, Authoritys.User)]
+    [PacketCommand((int)Command.AddCustomer, AuthorityLevel.User)]
     public async Task AddCustomerAsync(IPacket packet, IConnection connection)
     {
         string name, phone, email, address, taxCode;
@@ -121,7 +121,7 @@ public sealed class CustomerService(AutoDbContext context) : Base.BaseService
     /// - String: "{customerId}:{name}:{phone}:{email}:{address}:{taxCode}"
     /// - JSON: Customer { Id, Name, PhoneNumber, Email, Address, TaxCode }
     /// </summary>
-    [PacketCommand((int)Command.UpdateCustomer, Authoritys.User)]
+    [PacketCommand((int)Command.UpdateCustomer, AuthorityLevel.User)]
     public async Task UpdateCustomerAsync(IPacket packet, IConnection connection)
     {
         int customerId;
@@ -196,7 +196,7 @@ public sealed class CustomerService(AutoDbContext context) : Base.BaseService
     /// - String: "{customerId}"
     /// - JSON: Customer { Id }
     /// </summary>
-    [PacketCommand((int)Command.RemoveCustomer, Authoritys.Administrator)]
+    [PacketCommand((int)Command.RemoveCustomer, AuthorityLevel.Administrator)]
     public async Task RemoveCustomerAsync(IPacket packet, IConnection connection)
     {
         int customerId;
@@ -262,7 +262,7 @@ public sealed class CustomerService(AutoDbContext context) : Base.BaseService
     /// - String: "{keyword}:{pageIndex}:{pageSize}"
     /// - JSON: { "Keyword": string, "PageIndex": int, "PageSize": int }
     /// </summary>
-    [PacketCommand((int)Command.SearchCustomer, Authoritys.User)]
+    [PacketCommand((int)Command.SearchCustomer, AuthorityLevel.User)]
     public async Task SearchCustomerAsync(IPacket packet, IConnection connection)
     {
         string keyword;
@@ -337,7 +337,7 @@ public sealed class CustomerService(AutoDbContext context) : Base.BaseService
     /// - String: "{customerId}"
     /// - JSON: Customer { Id }
     /// </summary>
-    [PacketCommand((int)Command.GetCustomerById, Authoritys.User)]
+    [PacketCommand((int)Command.GetCustomerById, AuthorityLevel.User)]
     public async Task GetCustomerByIdAsync(IPacket packet, IConnection connection)
     {
         int customerId;

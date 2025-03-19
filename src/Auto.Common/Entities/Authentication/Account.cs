@@ -1,4 +1,4 @@
-﻿using Notio.Common.Authentication;
+﻿using Notio.Common.Security;
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -65,7 +65,7 @@ public class Account
     /// Vai trò của tài khoản trong hệ thống.
     /// </summary>
     [Required]
-    public Authoritys Role { get; set; } = Authoritys.Guest;
+    public AuthorityLevel Role { get; set; } = AuthorityLevel.Guest;
 
     /// <summary>
     /// Trạng thái hoạt động của tài khoản.

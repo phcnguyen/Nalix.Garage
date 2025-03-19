@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Configuration;
 using Notio.Logging;
+using Notio.Shared;
 using Npgsql;
 using System;
 using System.IO;
@@ -23,7 +24,7 @@ public class AutoDbContextFactory : IDesignTimeDbContextFactory<AutoDbContext>
             configuration = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-                .AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production"}.json", optional: true)
+                .AddJsonFile($"appsettings.{System.Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production"}.json", optional: true)
                 .AddEnvironmentVariables()
                 .Build();
         }
@@ -82,7 +83,9 @@ public class AutoDbContextFactory : IDesignTimeDbContextFactory<AutoDbContext>
             }
             else if (dbType.Equals("SQLite", StringComparison.OrdinalIgnoreCase))
             {
-                optionsBuilder.UseSqlite(connectionString, sqliteOptions =>
+                optionsBuilder.UseSqlite(
+                    $"Data Source={DirectoriesDefault.DatabasePath}\\Auto.db",
+                    sqliteOptions =>
                 {
                     sqliteOptions.CommandTimeout(60);
                     sqliteOptions.MigrationsHistoryTable("__MigrationsHistory");

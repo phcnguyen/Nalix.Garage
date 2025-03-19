@@ -5,13 +5,18 @@
 		<Nullable>enable</Nullable>
 		<TargetFramework>net9.0</TargetFramework>
 
+		<PublishSingleFile>true</PublishSingleFile>
+		
+		<AssemblyName>AutoHost</AssemblyName>
+		<ApplicationIcon>..\..\assets\SwitchHost.ico</ApplicationIcon>
 		<StartupObject>Auto.Host.Threading.Program</StartupObject>
 	</PropertyGroup>
 
 	<ItemGroup>
 		<ProjectReference Include="..\Auto.Common\Auto.Common.csproj" />
 		<ProjectReference Include="..\Auto.Database\Auto.Database.csproj" />
-		<PackageReference Include="Notio.Network" Version="0.3.94" />
+		
+		<PackageReference Include="Notio.Network" Version="0.4.0" />
 	</ItemGroup>
 
 </Project>

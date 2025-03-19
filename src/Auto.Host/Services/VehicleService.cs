@@ -4,9 +4,9 @@ using Auto.Common.Enums.Cars;
 using Auto.Database;
 using Microsoft.EntityFrameworkCore;
 using Notio.Common.Attributes;
-using Notio.Common.Authentication;
 using Notio.Common.Connection;
 using Notio.Common.Package;
+using Notio.Common.Security;
 using Notio.Logging;
 using System;
 using System.Linq;
@@ -32,7 +32,7 @@ public sealed class VehicleService(AutoDbContext context) : Base.BaseService
     /// <param name="packet">Gói dữ liệu chứa thông tin phương tiện.</param>
     /// <param name="connection">Kết nối với client để gửi phản hồi.</param>
     /// <returns>Task đại diện cho quá trình xử lý bất đồng bộ.</returns>
-    [PacketCommand((int)Command.AddVehicle, Authoritys.User)]
+    [PacketCommand((int)Command.AddVehicle, AuthorityLevel.User)]
     public async Task AddVehicleAsync(IPacket packet, IConnection connection)
     {
         int customerId;
@@ -161,7 +161,7 @@ public sealed class VehicleService(AutoDbContext context) : Base.BaseService
     /// <param name="packet">Gói dữ liệu chứa thông tin cập nhật.</param>
     /// <param name="connection">Kết nối với client để gửi phản hồi.</param>
     /// <returns>Task đại diện cho quá trình xử lý bất đồng bộ.</returns>
-    [PacketCommand((int)Command.UpdateVehicle, Authoritys.User)]
+    [PacketCommand((int)Command.UpdateVehicle, AuthorityLevel.User)]
     public async Task UpdateVehicleAsync(IPacket packet, IConnection connection)
     {
         int vehicleId;
@@ -280,7 +280,7 @@ public sealed class VehicleService(AutoDbContext context) : Base.BaseService
     /// <param name="packet">Gói dữ liệu chứa ID phương tiện cần xóa.</param>
     /// <param name="connection">Kết nối với client để gửi phản hồi.</param>
     /// <returns>Task đại diện cho quá trình xử lý bất đồng bộ.</returns>
-    [PacketCommand((int)Command.RemoveVehicle, Authoritys.Administrator)]
+    [PacketCommand((int)Command.RemoveVehicle, AuthorityLevel.Administrator)]
     public async Task RemoveVehicleAsync(IPacket packet, IConnection connection)
     {
         int vehicleId;

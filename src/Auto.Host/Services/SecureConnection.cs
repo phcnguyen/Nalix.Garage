@@ -1,8 +1,8 @@
 ﻿using Auto.Common.Enums;
 using Notio.Common.Attributes;
-using Notio.Common.Authentication;
 using Notio.Common.Connection;
 using Notio.Common.Package;
+using Notio.Common.Security;
 using Notio.Cryptography.Asymmetric;
 using Notio.Cryptography.Hash;
 using Notio.Logging;
@@ -25,7 +25,7 @@ internal sealed class SecureConnection : Base.BaseService
     /// </summary>
     /// <param name="packet">Gói tin chứa khóa công khai X25519 của client.</param>
     /// <param name="connection">Đối tượng kết nối với client.</param>
-    [PacketCommand((int)Command.InitiateSecureConnection, Authoritys.Guest)]
+    [PacketCommand((int)Command.InitiateSecureConnection, AuthorityLevel.Guest)]
     public static void InitiateSecureConnection(IPacket packet, IConnection connection)
     {
         if (packet.Type != (byte)PacketType.Binary)
@@ -59,7 +59,7 @@ internal sealed class SecureConnection : Base.BaseService
                 (int)Command.Success, publicKey).Serialize()))
             {
                 // Nâng quyền user
-                connection.Authority = Authoritys.User;
+                connection.Authority = AuthorityLevel.User;
                 CLogging.Instance.Info($"Secure connection initiated successfully for connection {connection.Id}");
             }
             else
@@ -80,7 +80,7 @@ internal sealed class SecureConnection : Base.BaseService
     /// </summary>
     /// <param name="packet">Gói tin chứa khóa công khai X25519 của client.</param>
     /// <param name="connection">Đối tượng kết nối với client.</param>
-    [PacketCommand((int)Command.FinalizeSecureConnection, Authoritys.Guest)]
+    [PacketCommand((int)Command.FinalizeSecureConnection, AuthorityLevel.Guest)]
     public static void FinalizeSecureConnection(IPacket packet, IConnection connection)
     {
         if (packet.Type != (byte)PacketType.Binary)
