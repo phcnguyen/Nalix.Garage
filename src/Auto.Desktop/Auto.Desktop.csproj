@@ -17,10 +17,10 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\Auto.Common\Auto.Common.csproj" />
-		
-		<PackageReference Include="Notio.Shared" Version="0.3.85" />
-		<PackageReference Include="Notio.Serialization" Version="0.3.81" />
-		<PackageReference Include="Notio.Network.Package" Version="0.3.81" />
+
+		<PackageReference Include="Notio" Version="0.3.94" />
+		<PackageReference Include="Notio.Shared" Version="0.3.94" />
+		<PackageReference Include="Notio.Network.Package" Version="0.3.94" />
 	</ItemGroup>
 
 </Project>

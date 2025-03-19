@@ -158,7 +158,7 @@ public class Customer
     /// <summary>
     /// Lịch sử sửa chữa của khách hàng.
     /// </summary>
-    public virtual ICollection<RepairHistory> RepairHistory { get; set; } = [];
+    public virtual ICollection<RepairOrder> RepairOrder { get; set; } = [];
 
     #endregion
 }

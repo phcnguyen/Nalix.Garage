@@ -30,8 +30,8 @@ public class AutoDbContext(DbContextOptions<AutoDbContext> options) : DbContext(
     public DbSet<RepairOrder> RepairOrders { get; set; }
     public DbSet<Transaction> Transactions { get; set; }
     public DbSet<SupplierPhone> SupplierPhones { get; set; }
-    public DbSet<RepairHistory> RepairHistories { get; set; }
     public DbSet<ReplacementPart> ReplacementParts { get; set; }
+    public DbSet<RepairOrderSparePart> RepairOrderSpareParts { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -49,8 +49,8 @@ public class AutoDbContext(DbContextOptions<AutoDbContext> options) : DbContext(
         ConfigureServiceItem(modelBuilder);
         ConfigureRepairOrder(modelBuilder);
         ConfigureTransaction(modelBuilder);
-        ConfigureRepairHistory(modelBuilder);
         ConfigureReplacementPart(modelBuilder);
+        ConfigureRepairOrderSparePart(modelBuilder);
     }
 
     private static void ConfigureAccount(ModelBuilder modelBuilder)
@@ -240,7 +240,9 @@ public class AutoDbContext(DbContextOptions<AutoDbContext> options) : DbContext(
 
         // Ràng buộc kiểm tra CompletionDate phải lớn hơn hoặc bằng StartDate hoặc null
         modelBuilder.Entity<RepairTask>()
-            .ToTable(tb => tb.HasCheckConstraint("CK_RepairTask_CompletionDate", "CompletionDate >= StartDate OR CompletionDate IS NULL"));
+            .ToTable(tb => tb.HasCheckConstraint(
+                "CK_RepairTask_CompletionDate",
+                "CompletionDate >= StartDate OR CompletionDate IS NULL"));
     }
 
     private static void ConfigureServiceItem(ModelBuilder modelBuilder)
@@ -252,6 +254,19 @@ public class AutoDbContext(DbContextOptions<AutoDbContext> options) : DbContext(
         modelBuilder.Entity<ServiceItem>()
             .Property(si => si.UnitPrice)
             .HasPrecision(18, 2);
+    }
+
+    private static void ConfigureRepairOrderSparePart(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<RepairOrderSparePart>()
+            .HasOne(rsp => rsp.RepairOrder)
+            .WithMany(ro => ro.RepairOrderSpareParts)
+            .HasForeignKey(rsp => rsp.RepairOrderId);
+
+        modelBuilder.Entity<RepairOrderSparePart>()
+            .HasOne(rsp => rsp.SparePart)
+            .WithMany()
+            .HasForeignKey(rsp => rsp.SparePartId);
     }
 
     private static void ConfigureRepairOrder(ModelBuilder modelBuilder)
@@ -277,13 +292,15 @@ public class AutoDbContext(DbContextOptions<AutoDbContext> options) : DbContext(
 
         modelBuilder.Entity<RepairOrder>()
             .HasMany(ro => ro.RepairTaskList)
-            .WithOne()
+            .WithOne(rt => rt.RepairOrder) // Chỉ định rõ ràng quan hệ với RepairTask
+            .HasForeignKey(rt => rt.RepairOrderId) // Đảm bảo có thuộc tính khoá ngoại trong RepairTask
             .OnDelete(DeleteBehavior.Cascade); // Xóa RepairOrder sẽ xóa luôn RepairTask
 
         modelBuilder.Entity<RepairOrder>()
             .HasMany(ro => ro.RepairOrderSpareParts)
-            .WithOne()
-            .OnDelete(DeleteBehavior.Cascade); // Xóa RepairOrder sẽ xóa luôn ReplacementPart
+            .WithOne(rsp => rsp.RepairOrder) // Chỉ định rõ ràng quan hệ với RepairOrderSparePart
+            .HasForeignKey(rsp => rsp.RepairOrderId) // Đảm bảo có thuộc tính khoá ngoại trong RepairOrderSparePart
+            .OnDelete(DeleteBehavior.Cascade); // Xóa RepairOrder sẽ xóa luôn RepairOrderSparePart
 
         // Tạo index tối ưu truy vấn
         modelBuilder.Entity<RepairOrder>().HasIndex(ro => ro.OwnerId);
@@ -316,27 +333,8 @@ public class AutoDbContext(DbContextOptions<AutoDbContext> options) : DbContext(
         modelBuilder.Entity<Transaction>()
             .ToTable(tb => tb.HasCheckConstraint("CK_Transaction_Amount", "Amount > 0"));
 
-        modelBuilder.Entity<Transaction>()
-            .ToTable(tb => tb.HasCheckConstraint("CK_Transaction_Date", "TransactionDate <= GETUTCDATE()"));
-    }
-
-    private static void ConfigureRepairHistory(ModelBuilder modelBuilder)
-    {
-        // Định dạng kiểu dữ liệu chính xác cho TotalCost
-        modelBuilder.Entity<RepairHistory>()
-            .Property(rh => rh.TotalCost)
-            .HasPrecision(18, 2);
-
-        // Thiết lập quan hệ với Vehicle
-        modelBuilder.Entity<RepairHistory>()
-            .HasOne(rh => rh.Vehicle)
-            .WithMany(v => v.RepairHistories)
-            .HasForeignKey(rh => rh.VehicleId)
-            .OnDelete(DeleteBehavior.Restrict); // Không xóa RepairHistory nếu Vehicle bị xóa
-
-        // Tạo index để tối ưu truy vấn
-        modelBuilder.Entity<RepairHistory>().HasIndex(rh => rh.VehicleId);
-        modelBuilder.Entity<RepairHistory>().HasIndex(rh => rh.RepairDate);
+        //modelBuilder.Entity<Transaction>()
+        //    .ToTable(tb => tb.HasCheckConstraint("CK_Transaction_Date", "TransactionDate <= GETUTCDATE()"));
     }
 
     private static void ConfigureReplacementPart(ModelBuilder modelBuilder)

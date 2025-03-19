@@ -1,4 +1,5 @@
 ﻿using Auto.Common.Entities.Part;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Auto.Common.Entities.Repair;
@@ -18,9 +19,16 @@ public class RepairOrderSparePart
     #region Foreign Key Properties
 
     /// <summary>
+    /// Primary key property
+    /// </summary>
+    [Key]
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+    public int Id { get; set; }
+
+    /// <summary>
     /// Khóa ngoại tới RepairOrder.
     /// </summary>
-    [ForeignKey(nameof(RepairOrder))]
+    [ForeignKey(nameof(Repair.RepairOrder))]
     public int RepairOrderId { get; set; }
 
     /// <summary>

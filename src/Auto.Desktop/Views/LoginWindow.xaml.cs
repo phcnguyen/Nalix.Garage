@@ -14,6 +14,7 @@ public partial class LoginWindow : Window
 
         viewModel.ShowError += (message, title) =>
         {
+            progressWindow.Hide();
             MessageBox.Show(message, title, MessageBoxButton.OK, MessageBoxImage.Error);
         };
 

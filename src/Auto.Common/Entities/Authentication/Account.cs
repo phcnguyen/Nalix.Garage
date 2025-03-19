@@ -100,7 +100,7 @@ public class Account
     /// Ngày tạo tài khoản.
     /// </summary>
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    public DateTime CreatedAt { get; set; }
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
     #endregion
 }

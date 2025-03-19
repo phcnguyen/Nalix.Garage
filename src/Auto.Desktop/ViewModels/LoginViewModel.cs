@@ -3,10 +3,10 @@ using Auto.Common.Models;
 using Auto.Desktop.Helpers;
 using Notio.Common.Package;
 using Notio.Network.Package;
-using Notio.Serialization;
 using System;
 using System.ComponentModel;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using System.Windows.Input;
 
@@ -67,9 +67,9 @@ public sealed class LoginViewModel : INotifyPropertyChanged
 
         try
         {
-            SocketClient.Instance.Send(new Packet(
+            await SocketClient.Instance.SendAsync(new Packet(
                 PacketType.Json, PacketFlags.None, PacketPriority.None,
-                (ushort)Command.Login, Json.Serialize(account)));
+                (ushort)Command.Login, JsonSerializer.Serialize(account)));
 
             int timeoutMilliseconds = 10000;
             var receiveTask = SocketClient.Instance.ReceiveAsync();

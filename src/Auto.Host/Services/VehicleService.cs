@@ -8,9 +8,9 @@ using Notio.Common.Authentication;
 using Notio.Common.Connection;
 using Notio.Common.Package;
 using Notio.Logging;
-using Notio.Serialization;
 using System;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace Auto.Host.Services;
@@ -69,7 +69,7 @@ public sealed class VehicleService(AutoDbContext context) : Base.BaseService
         }
         else if (packet.Type == (byte)PacketType.Json)
         {
-            Vehicle? vehicleData = Json.Deserialize<Vehicle>(packet.Payload.Span);
+            Vehicle? vehicleData = JsonSerializer.Deserialize<Vehicle>(packet.Payload.Span);
             if (vehicleData == null || string.IsNullOrWhiteSpace(vehicleData.CarLicensePlate) ||
                 string.IsNullOrWhiteSpace(vehicleData.CarModel) || string.IsNullOrWhiteSpace(vehicleData.FrameNumber) ||
                 string.IsNullOrWhiteSpace(vehicleData.EngineNumber))
@@ -198,9 +198,11 @@ public sealed class VehicleService(AutoDbContext context) : Base.BaseService
         }
         else if (packet.Type == (byte)PacketType.Json)
         {
-            Vehicle? vehicleData = Json.Deserialize<Vehicle>(packet.Payload.Span);
-            if (vehicleData == null || string.IsNullOrWhiteSpace(vehicleData.CarLicensePlate) ||
-                string.IsNullOrWhiteSpace(vehicleData.CarModel) || string.IsNullOrWhiteSpace(vehicleData.FrameNumber) ||
+            Vehicle? vehicleData = JsonSerializer.Deserialize<Vehicle>(packet.Payload.Span, JsonSettings.Tcp);
+            if (vehicleData == null ||
+                string.IsNullOrWhiteSpace(vehicleData.CarLicensePlate) ||
+                string.IsNullOrWhiteSpace(vehicleData.CarModel) ||
+                string.IsNullOrWhiteSpace(vehicleData.FrameNumber) ||
                 string.IsNullOrWhiteSpace(vehicleData.EngineNumber))
             {
                 await connection.SendAsync(InvalidDataPacket());
@@ -292,7 +294,7 @@ public sealed class VehicleService(AutoDbContext context) : Base.BaseService
         }
         else if (packet.Type == (byte)PacketType.Json)
         {
-            Vehicle? vehicleData = Json.Deserialize<Vehicle>(packet.Payload.Span);
+            Vehicle? vehicleData = JsonSerializer.Deserialize<Vehicle>(packet.Payload.Span, JsonSettings.Tcp);
             if (vehicleData == null || vehicleData.Id <= 0)
             {
                 await connection.SendAsync(InvalidDataPacket());

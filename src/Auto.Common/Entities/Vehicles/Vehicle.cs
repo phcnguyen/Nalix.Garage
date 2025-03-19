@@ -137,7 +137,7 @@ public class Vehicle
     /// <summary>
     /// Lịch sử sửa chữa của xe.
     /// </summary>
-    public virtual ICollection<RepairHistory> RepairHistories { get; set; } = [];
+    public virtual ICollection<RepairOrder> RepairOrder { get; set; } = [];
 
     #endregion
 }

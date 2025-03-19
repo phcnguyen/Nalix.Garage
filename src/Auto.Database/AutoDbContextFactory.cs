@@ -17,6 +17,7 @@ public class AutoDbContextFactory : IDesignTimeDbContextFactory<AutoDbContext>
 
         // Load cấu hình từ appsettings.json
         IConfigurationRoot configuration;
+
         try
         {
             configuration = new ConfigurationBuilder()
@@ -88,6 +89,7 @@ public class AutoDbContextFactory : IDesignTimeDbContextFactory<AutoDbContext>
                 })
                 .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking)
                 .EnableServiceProviderCaching();
+                //.LogTo(Console.WriteLine, LogLevel.Information);
 
                 CLogging.Instance.Info("DbContext configured for SQLite.");
             }
@@ -103,7 +105,7 @@ public class AutoDbContextFactory : IDesignTimeDbContextFactory<AutoDbContext>
             throw;
         }
 
-        var dbContext = new AutoDbContext(optionsBuilder.Options);
+        AutoDbContext dbContext = new(optionsBuilder.Options);
         CLogging.Instance.Info("AutoDbContext successfully created.");
         return dbContext;
     }

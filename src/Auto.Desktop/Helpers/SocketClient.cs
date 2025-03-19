@@ -108,7 +108,6 @@ public sealed class SocketClient : SingletonBase<SocketClient>, IDisposable
             Console.WriteLine($"Sending packet: {concretePacket}");
             _stream!.Write(concretePacket.Serialize());
             _stream.Flush();
-            Console.WriteLine("Packet sent.");
         }
         catch (Exception ex) when (ex is IOException || ex is SocketException)
         {
@@ -147,7 +146,6 @@ public sealed class SocketClient : SingletonBase<SocketClient>, IDisposable
 
                     IPacket packet = packetBuffer.Deserialize();
 
-                    Console.WriteLine("Packet received successfully.");
                     Console.WriteLine($"Received packet: {packet}");
 
                     return packet;
@@ -261,11 +259,13 @@ public sealed class SocketClient : SingletonBase<SocketClient>, IDisposable
             if (packet is not Packet concretePacket)
                 throw new ArgumentException("Invalid packet type.", nameof(packet));
 
+            Console.WriteLine($"Sending packet: {concretePacket}");
             await _stream!.WriteAsync(concretePacket.Serialize(), cancellationToken).ConfigureAwait(false);
             await _stream.FlushAsync(cancellationToken).ConfigureAwait(false);
         }
         catch (Exception ex) when (ex is IOException || ex is SocketException)
         {
+            Console.WriteLine($"[ERROR] Failed to send data: {ex.Message}");
             throw new IOException($"Error sending data to {_server}:{_port}: {ex.Message}", ex);
         }
     }
@@ -300,7 +300,10 @@ public sealed class SocketClient : SingletonBase<SocketClient>, IDisposable
                         packetBuffer.AsMemory(2, packetLength - 2),
                         cancellationToken).ConfigureAwait(false);
 
-                    return packetBuffer.Deserialize();
+                    Packet packet = packetBuffer.Deserialize();
+                    Console.WriteLine($"Received packet: {packet}");
+
+                    return packet;
                 }
                 finally
                 {

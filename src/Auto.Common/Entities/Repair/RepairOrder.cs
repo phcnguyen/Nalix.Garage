@@ -33,7 +33,7 @@ public class RepairOrder
     /// <summary>
     /// Id hóa đơn.
     /// </summary>
-    [ForeignKey(nameof(Invoice))]
+    [ForeignKey(nameof(Bill.Invoice))]
     public int InvoiceId { get; set; }
 
     /// <summary>
@@ -68,9 +68,21 @@ public class RepairOrder
     #region Order Details Properties
 
     /// <summary>
-    /// Ngày lập đơn.
+    /// Ngày tạo lệnh sửa chữa.
     /// </summary>
+    [Required]
     public DateTime OrderDate { get; set; } = DateTime.UtcNow;
+
+    /// <summary>
+    /// Ngày hoàn thành lệnh sửa chữa.
+    /// </summary>
+    public DateTime? CompletionDate { get; set; }
+
+    /// <summary>
+    /// Trạng thái của lệnh sửa chữa.
+    /// </summary>
+    [Required]
+    public RepairOrderStatus Status { get; set; } = RepairOrderStatus.None;
 
     /// <summary>
     /// Danh sách công việc sửa chữa liên quan.
@@ -89,6 +101,12 @@ public class RepairOrder
     public decimal TotalRepairCost =>
         (RepairTaskList?.Sum(task => task.ServiceItem.UnitPrice) ?? 0) +
         (RepairOrderSpareParts?.Sum(sp => sp.SparePart.SellingPrice * sp.Quantity) ?? 0);
+
+    /// <summary>
+    /// Xác định xem lệnh sửa chữa đã hoàn thành hay chưa.
+    /// </summary>
+    [NotMapped]
+    public bool IsCompleted => Status == RepairOrderStatus.Completed;
 
     #endregion
 }

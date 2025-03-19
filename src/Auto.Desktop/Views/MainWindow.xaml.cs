@@ -34,8 +34,6 @@ public partial class MainWindow : Window
                 throw new Exception(Message);
             }
 
-            await Task.Delay(2000);
-
             (bool Status, string Message) secureConnected = await MainViewModel.EstablishSecureConnectionAsync();
             if (!secureConnected.Status)
             {

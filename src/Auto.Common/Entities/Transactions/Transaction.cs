@@ -79,6 +79,7 @@ public class Transaction
     /// Ngày thực hiện giao dịch
     /// - Mặc định là thời điểm tạo giao dịch.
     /// </summary>
+    [Column(TypeName = "TEXT")]
     public DateTime TransactionDate { get; set; } = DateTime.UtcNow;
 
     #endregion
@@ -98,6 +99,7 @@ public class Transaction
     /// <summary>
     /// Ngày chỉnh sửa gần nhất.
     /// </summary>
+    [Column(TypeName = "TEXT")]
     public DateTime? UpdatedAt { get; set; }
 
     #endregion

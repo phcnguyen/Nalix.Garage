@@ -10,8 +10,9 @@ using Notio.Common.Connection;
 using Notio.Common.Package;
 using Notio.Cryptography.Hash;
 using Notio.Logging;
-using Notio.Serialization;
+using Notio.Utilities;
 using System;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace Auto.Host.Services;
@@ -58,14 +59,15 @@ public sealed class AccountService(AutoDbContext context) : BaseService
         }
         else if (packet.Type == (byte)PacketType.Json)
         {
-            AccountModel acc = Json.Deserialize<AccountModel>(packet.Payload.Span);
-            if (string.IsNullOrWhiteSpace(acc.Username) || string.IsNullOrWhiteSpace(acc.Password) ||
+            AccountModel? acc = JsonBinary.DeserializeFromBytes<AccountModel>(packet.Payload.Span);
+            if (acc == null || string.IsNullOrWhiteSpace(acc.Username) || string.IsNullOrWhiteSpace(acc.Password) ||
                 acc.Username.Length < 3 || acc.Username.Length > 50 ||
                 acc.Password.Length < 8 || acc.Password.Length > 128)
             {
                 await connection.SendAsync(CreateErrorPacket("Invalid username or password."));
                 return;
             }
+
             username = acc.Username;
             password = acc.Password;
         }
@@ -134,8 +136,10 @@ public sealed class AccountService(AutoDbContext context) : BaseService
         }
         else if (packet.Type == (byte)PacketType.Json)
         {
-            AccountModel acc = Json.Deserialize<AccountModel>(packet.Payload.Span);
-            if (string.IsNullOrWhiteSpace(acc.Username) || string.IsNullOrWhiteSpace(acc.Password))
+            AccountModel? acc = JsonSerializer.Deserialize<AccountModel>(packet.Payload.Span, JsonSettings.Tcp);
+            if (acc == null ||
+                string.IsNullOrWhiteSpace(acc.Username) ||
+                string.IsNullOrWhiteSpace(acc.Password))
             {
                 await connection.SendAsync(CreateErrorPacket("Invalid username or password."));
                 return;
@@ -224,7 +228,14 @@ public sealed class AccountService(AutoDbContext context) : BaseService
         }
         else if (packet.Type == (byte)PacketType.Json)
         {
-            accountId = Json.Deserialize<Account>(packet.Payload.Span).Id;
+            Account? acc = JsonSerializer.Deserialize<Account>(packet.Payload.Span, JsonSettings.Tcp);
+            if (acc == null || acc.Id <= 0)
+            {
+                await connection.SendAsync(CreateErrorPacket("Invalid account ID."));
+                return;
+            }
+
+            accountId = acc.Id;
         }
         else
         {
@@ -283,8 +294,12 @@ public sealed class AccountService(AutoDbContext context) : BaseService
         }
         else if (packet.Type == (byte)PacketType.Json)
         {
-            ChangePasswordModel acc = Json.Deserialize<ChangePasswordModel>(packet.Payload.Span);
-            if (string.IsNullOrWhiteSpace(acc.OldPassword) || string.IsNullOrWhiteSpace(acc.NewPassword))
+            ChangePasswordModel? acc = JsonSerializer.Deserialize<ChangePasswordModel>
+                (packet.Payload.Span, JsonSettings.Tcp);
+
+            if (acc == null ||
+                string.IsNullOrWhiteSpace(acc.OldPassword) ||
+                string.IsNullOrWhiteSpace(acc.NewPassword))
             {
                 await connection.SendAsync(InvalidDataPacket());
                 return;

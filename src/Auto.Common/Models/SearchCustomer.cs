@@ -3,7 +3,7 @@
 /// <summary>
 /// Yêu cầu tìm kiếm khách hàng.
 /// </summary>
-public sealed class SearchCustomerRequest
+public sealed class SearchCustomer
 {
     /// <summary>
     /// Từ khóa dùng để tìm kiếm khách hàng.  

@@ -31,7 +31,7 @@ public class RepairTask
     /// <summary>
     /// Nhân viên thực hiện công việc sửa chữa.
     /// </summary>
-    [ForeignKey(nameof(Employee))]
+    [ForeignKey(nameof(Employees.Employee))]
     public int EmployeeId { get; set; }
 
     /// <summary>
@@ -49,6 +49,17 @@ public class RepairTask
     /// Thông tin dịch vụ liên quan (Navigation Property).
     /// </summary>
     public virtual ServiceItem ServiceItem { get; set; }
+
+    /// <summary>
+    /// Id đơn sửa chữa liên quan.
+    /// </summary>
+    [ForeignKey(nameof(Repair.RepairOrder))]
+    public int RepairOrderId { get; set; }
+
+    /// <summary>
+    /// Thông tin đơn sửa chữa liên quan (Navigation Property).
+    /// </summary>
+    public virtual RepairOrder RepairOrder { get; set; }
 
     #endregion
 
