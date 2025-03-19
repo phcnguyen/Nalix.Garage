@@ -1,27 +1,17 @@
-﻿using Notio.Shared;
-using System;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using Auto.Database;
+using Auto.Host.Network;
 
 namespace Auto.Host.Threading;
 
 internal class Program
 {
-    private static readonly CancellationTokenSource cancellationTokenSource = new();
     internal static void Main()
     {
-        string _ = DirectoriesDefault.DataPath;
+        AutoDbContext database = AppConfig.InitializeDatabase();
+        ServerListener server = AppConfig.InitializeServer(database);
 
-        var server = AppConfig.InitializeServer(AppConfig.InitializeDatabase());
+        AppConfig.InitializeConsole(server);
 
-        // Chạy server trong một task riêng
-        Task.Run(() => server.BeginListening(cancellationTokenSource.Token), cancellationTokenSource.Token);
-
-        Console.WriteLine("Press any key to exit...");
-        Console.ReadLine();
-
-        // Hủy task và dừng server
-        cancellationTokenSource.Cancel();
-        server.EndListening();
+        AppConfig.ExitEvent.Wait();
     }
 }

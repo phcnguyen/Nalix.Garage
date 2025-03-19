@@ -1,19 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<OutputType>WinExe</OutputType>
-		<TargetFramework>net9.0-windows</TargetFramework>
-		<Nullable>enable</Nullable>
 		<UseWPF>true</UseWPF>
-		<StartupObject>Auto.Desktop.App</StartupObject>
+		<Nullable>enable</Nullable>
+		<OutputType>WinExe</OutputType>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-
-		<!-- Đóng gói thành 1 file -->
-		<PublishSingleFile>true</PublishSingleFile>
-		<EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
-
-		<!-- Tuỳ chọn: Tạo file chạy độc lập, không cần cài .NET 9 -->
-		<SelfContained>true</SelfContained>
+		<StartupObject>Auto.Desktop.App</StartupObject>
+		<TargetFramework>net9.0-windows</TargetFramework>
 
 		<!-- Đặt icon cho file .exe -->
 		<ApplicationIcon>..\..\assets\Automation.ico</ApplicationIcon>
