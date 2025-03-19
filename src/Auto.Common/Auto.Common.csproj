@@ -16,6 +16,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<PackageReference Include="Notio" Version="0.3.95" />
 		<PackageReference Include="Notio.Common" Version="0.3.94" />
 		<PackageReference Include="Notio.Logging" Version="0.3.94" />
 		<PackageReference Include="Notio.Cryptography" Version="0.3.94" />

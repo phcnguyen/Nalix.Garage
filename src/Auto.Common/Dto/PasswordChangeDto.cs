@@ -1,9 +1,9 @@
-﻿namespace Auto.Common.Models;
+﻿namespace Auto.Common.Dto;
 
 /// <summary>
 /// Mô hình chứa thông tin mật khẩu khi thay đổi hoặc xác thực.
 /// </summary>
-public class ChangePasswordModel
+public class PasswordChangeDto
 {
     /// <summary>
     /// Mật khẩu hiện tại hoặc mật khẩu cần xác thực.

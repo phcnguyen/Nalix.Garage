@@ -1,12 +1,12 @@
-﻿using Auto.Common.Enums;
-using Auto.Common.Models;
+﻿using Auto.Common.Dto;
+using Auto.Common.Enums;
 using Auto.Desktop.Helpers;
 using Notio.Common.Package;
 using Notio.Network.Package;
+using Notio.Utilities;
 using System;
 using System.ComponentModel;
 using System.Text;
-using System.Text.Json;
 using System.Threading.Tasks;
 using System.Windows.Input;
 
@@ -59,7 +59,7 @@ public sealed class LoginViewModel : INotifyPropertyChanged
         HideLogin?.Invoke();
         ShowProgress?.Invoke();
 
-        AccountModel account = new()
+        AccountDto account = new()
         {
             Username = Username,
             Password = Password
@@ -69,7 +69,7 @@ public sealed class LoginViewModel : INotifyPropertyChanged
         {
             await SocketClient.Instance.SendAsync(new Packet(
                 PacketType.Json, PacketFlags.None, PacketPriority.None,
-                (ushort)Command.Login, JsonSerializer.Serialize(account)));
+                (ushort)Command.Login, JsonBinary.SerializeToBytes(account, JsonContext.Default.AccountDto)));
 
             int timeoutMilliseconds = 10000;
             var receiveTask = SocketClient.Instance.ReceiveAsync();

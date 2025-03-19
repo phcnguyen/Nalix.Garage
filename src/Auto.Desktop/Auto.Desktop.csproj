@@ -18,7 +18,6 @@
 	<ItemGroup>
 		<ProjectReference Include="..\Auto.Common\Auto.Common.csproj" />
 
-		<PackageReference Include="Notio" Version="0.3.94" />
 		<PackageReference Include="Notio.Shared" Version="0.3.94" />
 		<PackageReference Include="Notio.Network.Package" Version="0.3.94" />
 	</ItemGroup>

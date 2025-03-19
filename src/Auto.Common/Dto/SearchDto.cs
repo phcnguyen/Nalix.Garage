@@ -1,9 +1,9 @@
-﻿namespace Auto.Common.Models;
+﻿namespace Auto.Common.Dto;
 
 /// <summary>
 /// Yêu cầu tìm kiếm khách hàng.
 /// </summary>
-public sealed class SearchCustomer
+public sealed class SearchDto
 {
     /// <summary>
     /// Từ khóa dùng để tìm kiếm khách hàng.  

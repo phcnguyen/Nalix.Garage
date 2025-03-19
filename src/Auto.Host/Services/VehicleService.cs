@@ -198,7 +198,8 @@ public sealed class VehicleService(AutoDbContext context) : Base.BaseService
         }
         else if (packet.Type == (byte)PacketType.Json)
         {
-            Vehicle? vehicleData = JsonSerializer.Deserialize<Vehicle>(packet.Payload.Span, JsonSettings.Tcp);
+            Vehicle? vehicleData = JsonSerializer.Deserialize(
+                packet.Payload.Span, JsonContext.Default.Vehicle);
             if (vehicleData == null ||
                 string.IsNullOrWhiteSpace(vehicleData.CarLicensePlate) ||
                 string.IsNullOrWhiteSpace(vehicleData.CarModel) ||
@@ -294,7 +295,8 @@ public sealed class VehicleService(AutoDbContext context) : Base.BaseService
         }
         else if (packet.Type == (byte)PacketType.Json)
         {
-            Vehicle? vehicleData = JsonSerializer.Deserialize<Vehicle>(packet.Payload.Span, JsonSettings.Tcp);
+            Vehicle? vehicleData = JsonSerializer.Deserialize(
+                packet.Payload.Span, JsonContext.Default.Vehicle);
             if (vehicleData == null || vehicleData.Id <= 0)
             {
                 await connection.SendAsync(InvalidDataPacket());

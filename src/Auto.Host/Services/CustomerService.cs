@@ -1,6 +1,5 @@
 ﻿using Auto.Common.Entities.Customers;
 using Auto.Common.Enums;
-using Auto.Common.Models;
 using Auto.Database;
 using Microsoft.EntityFrameworkCore;
 using Notio.Common.Attributes;
@@ -61,7 +60,8 @@ public sealed class CustomerService(AutoDbContext context) : Base.BaseService
         }
         else if (packet.Type == (byte)PacketType.Json)
         {
-            Customer? customerData = JsonSerializer.Deserialize<Customer>(packet.Payload.Span, JsonSettings.Tcp);
+            Customer? customerData = JsonSerializer.Deserialize(
+                packet.Payload.Span, JsonContext.Default.Customer);
             if (customerData == null ||
                 string.IsNullOrWhiteSpace(customerData.Name) ||
                 string.IsNullOrWhiteSpace(customerData.PhoneNumber) ||
@@ -143,7 +143,8 @@ public sealed class CustomerService(AutoDbContext context) : Base.BaseService
         }
         else if (packet.Type == (byte)PacketType.Json)
         {
-            Customer? customerData = JsonSerializer.Deserialize<Customer>(packet.Payload.Span, JsonSettings.Tcp);
+            Customer? customerData = JsonSerializer.Deserialize(
+                packet.Payload.Span, JsonContext.Default.Customer);
             if (customerData == null || customerData.Id <= 0)
             {
                 await connection.SendAsync(CreateErrorPacket("Invalid JSON data or customer ID."));
@@ -210,7 +211,8 @@ public sealed class CustomerService(AutoDbContext context) : Base.BaseService
         }
         else if (packet.Type == (byte)PacketType.Json)
         {
-            Customer? customerData = JsonSerializer.Deserialize<Customer>(packet.Payload.Span, JsonSettings.Tcp);
+            Customer? customerData = JsonSerializer.Deserialize(
+                packet.Payload.Span, JsonContext.Default.Customer);
             if (customerData == null || customerData.Id <= 0)
             {
                 await connection.SendAsync(CreateErrorPacket("Invalid JSON data or customer ID."));
@@ -279,7 +281,8 @@ public sealed class CustomerService(AutoDbContext context) : Base.BaseService
         }
         else if (packet.Type == (byte)PacketType.Json)
         {
-            var searchData = JsonSerializer.Deserialize<SearchCustomer>(packet.Payload.Span, JsonSettings.Tcp);
+            var searchData = JsonSerializer.Deserialize(
+                packet.Payload.Span, JsonContext.Default.SearchDto);
             if (searchData == null || string.IsNullOrWhiteSpace(searchData.Keyword) || searchData.PageIndex < 0 || searchData.PageSize <= 0)
             {
                 await connection.SendAsync(CreateErrorPacket("Invalid JSON search parameters."));
@@ -349,7 +352,7 @@ public sealed class CustomerService(AutoDbContext context) : Base.BaseService
         }
         else if (packet.Type == (byte)PacketType.Json)
         {
-            Customer? customerData = JsonSerializer.Deserialize<Customer>(packet.Payload.Span, JsonSettings.Tcp);
+            Customer? customerData = JsonSerializer.Deserialize(packet.Payload.Span, JsonContext.Default.Customer);
             if (customerData == null || customerData.Id <= 0)
             {
                 await connection.SendAsync(CreateErrorPacket("Invalid JSON data or customer ID."));

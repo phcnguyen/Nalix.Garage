@@ -1,6 +1,6 @@
-﻿using Auto.Common.Entities.Authentication;
+﻿using Auto.Common.Dto;
+using Auto.Common.Entities.Authentication;
 using Auto.Common.Enums;
-using Auto.Common.Models;
 using Auto.Database;
 using Auto.Host.Services.Base;
 using Microsoft.EntityFrameworkCore;
@@ -12,7 +12,6 @@ using Notio.Cryptography.Hash;
 using Notio.Logging;
 using Notio.Utilities;
 using System;
-using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace Auto.Host.Services;
@@ -32,7 +31,7 @@ public sealed class AccountService(AutoDbContext context) : BaseService
     /// Đăng ký tài khoản mới cho người dùng.
     /// Định dạng dữ liệu:
     /// - String: "{username}:{password}" (phân tách bằng dấu hai chấm)
-    /// - JSON: AccountModel { Username, Password }
+    /// - JSON: AccountDto { Username, Password }
     /// Yêu cầu: Username >= 3 ký tự, Password >= 8 ký tự.
     /// </summary>
     /// <param name="packet">Gói dữ liệu chứa thông tin đăng ký.</param>
@@ -59,7 +58,8 @@ public sealed class AccountService(AutoDbContext context) : BaseService
         }
         else if (packet.Type == (byte)PacketType.Json)
         {
-            AccountModel? acc = JsonBinary.DeserializeFromBytes<AccountModel>(packet.Payload.Span);
+            AccountDto? acc = JsonBinary.Deserialize(
+                packet.Payload.Span, JsonContext.Default.AccountDto);
             if (acc == null || string.IsNullOrWhiteSpace(acc.Username) || string.IsNullOrWhiteSpace(acc.Password) ||
                 acc.Username.Length < 3 || acc.Username.Length > 50 ||
                 acc.Password.Length < 8 || acc.Password.Length > 128)
@@ -112,7 +112,7 @@ public sealed class AccountService(AutoDbContext context) : BaseService
     /// Đăng nhập người dùng vào hệ thống.
     /// Định dạng dữ liệu:
     /// - String: "{username}:{password}" (phân tách bằng dấu hai chấm)
-    /// - JSON: AccountModel { Username, Password }
+    /// - JSON: AccountDto { Username, Password }
     /// </summary>
     /// <param name="packet">Gói dữ liệu chứa thông tin đăng nhập.</param>
     /// <param name="connection">Kết nối với client để gửi phản hồi và cập nhật phiên.</param>
@@ -136,7 +136,8 @@ public sealed class AccountService(AutoDbContext context) : BaseService
         }
         else if (packet.Type == (byte)PacketType.Json)
         {
-            AccountModel? acc = JsonSerializer.Deserialize<AccountModel>(packet.Payload.Span, JsonSettings.Tcp);
+            AccountDto? acc = JsonBinary.Deserialize(
+                packet.Payload.Span, JsonContext.Default.AccountDto);
             if (acc == null ||
                 string.IsNullOrWhiteSpace(acc.Username) ||
                 string.IsNullOrWhiteSpace(acc.Password))
@@ -226,17 +227,6 @@ public sealed class AccountService(AutoDbContext context) : BaseService
                 return;
             }
         }
-        else if (packet.Type == (byte)PacketType.Json)
-        {
-            Account? acc = JsonSerializer.Deserialize<Account>(packet.Payload.Span, JsonSettings.Tcp);
-            if (acc == null || acc.Id <= 0)
-            {
-                await connection.SendAsync(CreateErrorPacket("Invalid account ID."));
-                return;
-            }
-
-            accountId = acc.Id;
-        }
         else
         {
             await connection.SendAsync(CreateErrorPacket("Unsupported packet type."));
@@ -269,7 +259,7 @@ public sealed class AccountService(AutoDbContext context) : BaseService
     /// Cập nhật mật khẩu tài khoản dựa trên phiên đăng nhập hiện tại (chỉ cho chính chủ).
     /// Định dạng dữ liệu:
     /// - String: "{oldPassword}:{newPassword}" (phân tách bằng dấu hai chấm)
-    /// - JSON: ChangePasswordModel { OldPassword, NewPassword }
+    /// - JSON: PasswordChangeDto { OldPassword, NewPassword }
     /// Yêu cầu: NewPassword >= 8 ký tự.
     /// </summary>
     /// <param name="packet">Gói dữ liệu chứa mật khẩu cũ và mới.</param>
@@ -294,8 +284,8 @@ public sealed class AccountService(AutoDbContext context) : BaseService
         }
         else if (packet.Type == (byte)PacketType.Json)
         {
-            ChangePasswordModel? acc = JsonSerializer.Deserialize<ChangePasswordModel>
-                (packet.Payload.Span, JsonSettings.Tcp);
+            PasswordChangeDto? acc = JsonBinary.Deserialize(
+                packet.Payload.Span, JsonContext.Default.PasswordChangeDto);
 
             if (acc == null ||
                 string.IsNullOrWhiteSpace(acc.OldPassword) ||

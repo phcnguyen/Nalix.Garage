@@ -1,9 +1,9 @@
-﻿namespace Auto.Common.Models;
+﻿namespace Auto.Common.Dto;
 
 /// <summary>
 /// Mô hình tài khoản người dùng, chứa thông tin cơ bản về tài khoản.
 /// </summary>
-public class AccountModel
+public class AccountDto
 {
     /// <summary>
     /// Khóa chính của tài khoản (ID). 
