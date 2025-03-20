@@ -57,7 +57,7 @@ public static class AppConfig
         Console.TreatControlCAsInput = false;
         Console.OutputEncoding = Encoding.UTF8;
         Console.Title = $"Auto ({VersionInfo})";
-        Console.ResetColor(); // Tự động reset màu thay vì đặt màu nền thủ công
+        Console.ResetColor();
 
         Console.CancelKeyPress += (_, e) =>
         {

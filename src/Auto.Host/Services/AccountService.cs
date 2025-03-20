@@ -40,42 +40,8 @@ public sealed class AccountService(AutoDbContext context) : BaseService
     [PacketCommand((int)Command.RegisterAccount, AuthorityLevel.Guest)]
     public async Task RegisterAccountAsync(IPacket packet, IConnection connection)
     {
-        string username, password;
-
-        if (packet.Type == (byte)PacketType.String)
-        {
-            if (!TryParsePayload(packet, 2, out string[] parts) ||
-                string.IsNullOrWhiteSpace(parts[0]) ||
-                string.IsNullOrWhiteSpace(parts[1]) ||
-                parts[0].Length < 3 || parts[0].Length > 50 ||
-                parts[1].Length < 8 || parts[1].Length > 128)
-            {
-                await connection.SendAsync(CreateErrorPacket("Invalid username or password."));
-                return;
-            }
-            username = parts[0];
-            password = parts[1];
-        }
-        else if (packet.Type == (byte)PacketType.Json)
-        {
-            AccountDto? acc = JsonBinary.DeserializeFromBytes(
-                packet.Payload.Span, JsonContext.Default.AccountDto);
-            if (acc == null || string.IsNullOrWhiteSpace(acc.Username) || string.IsNullOrWhiteSpace(acc.Password) ||
-                acc.Username.Length < 3 || acc.Username.Length > 50 ||
-                acc.Password.Length < 8 || acc.Password.Length > 128)
-            {
-                await connection.SendAsync(CreateErrorPacket("Invalid username or password."));
-                return;
-            }
-
-            username = acc.Username;
-            password = acc.Password;
-        }
-        else
-        {
-            await connection.SendAsync(CreateErrorPacket("Unsupported packet type."));
-            return;
-        }
+        var (isValid, username, password) = await ValidatePacketAsync(packet, connection);
+        if (!isValid) return;
 
         if (await _context.Accounts.AnyAsync(a => a.Username == username))
         {
@@ -120,39 +86,8 @@ public sealed class AccountService(AutoDbContext context) : BaseService
     [PacketCommand((int)Command.Login, AuthorityLevel.Guest)]
     public async Task LoginAsync(IPacket packet, IConnection connection)
     {
-        string username, password;
-
-        if (packet.Type == (byte)PacketType.String)
-        {
-            if (!TryParsePayload(packet, 2, out string[] parts) ||
-                string.IsNullOrWhiteSpace(parts[0]) ||
-                string.IsNullOrWhiteSpace(parts[1]))
-            {
-                await connection.SendAsync(CreateErrorPacket("Invalid username or password."));
-                return;
-            }
-            username = parts[0];
-            password = parts[1];
-        }
-        else if (packet.Type == (byte)PacketType.Json)
-        {
-            AccountDto? acc = JsonBinary.DeserializeFromBytes(
-                packet.Payload.Span, JsonContext.Default.AccountDto);
-            if (acc == null ||
-                string.IsNullOrWhiteSpace(acc.Username) ||
-                string.IsNullOrWhiteSpace(acc.Password))
-            {
-                await connection.SendAsync(CreateErrorPacket("Invalid username or password."));
-                return;
-            }
-            username = acc.Username;
-            password = acc.Password;
-        }
-        else
-        {
-            await connection.SendAsync(InvalidDataPacket());
-            return;
-        }
+        var (isValid, username, password) = await ValidatePacketAsync(packet, connection);
+        if (!isValid) return;
 
         Account? account = await _context.Accounts.FirstOrDefaultAsync(a => a.Username == username);
         if (account == null)
@@ -345,5 +280,52 @@ public sealed class AccountService(AutoDbContext context) : BaseService
             CLogging.Instance.Error($"Failed to update password for {sessionUsername} from connection {connection.Id}", ex);
             await connection.SendAsync(CreateErrorPacket("Failed to update password due to an internal error."));
         }
+    }
+
+    private static async Task<(bool isValid, string username, string password)> ValidatePacketAsync(
+        IPacket packet, IConnection connection)
+    {
+        string username, password;
+
+        if (packet.Type == (byte)PacketType.String)
+        {
+            if (!TryParsePayload(packet, 2, out string[] parts) ||
+                string.IsNullOrWhiteSpace(parts[0]) ||
+                string.IsNullOrWhiteSpace(parts[1]) ||
+                parts[0].Length < 3 || parts[0].Length > 50 ||
+                parts[1].Length < 8 || parts[1].Length > 128)
+            {
+                await connection.SendAsync(CreateErrorPacket("Invalid username or password."));
+                return (false, string.Empty, string.Empty);
+            }
+
+            username = parts[0];
+            password = parts[1];
+        }
+        else if (packet.Type == (byte)PacketType.Json)
+        {
+            AccountDto? acc = JsonBinary.DeserializeFromBytes(
+                packet.Payload.Span, JsonContext.Default.AccountDto);
+
+            if (acc == null ||
+                string.IsNullOrWhiteSpace(acc.Username) ||
+                string.IsNullOrWhiteSpace(acc.Password) ||
+                acc.Username.Length < 3 || acc.Username.Length > 50 ||
+                acc.Password.Length < 8 || acc.Password.Length > 128)
+            {
+                await connection.SendAsync(CreateErrorPacket("Invalid username or password."));
+                return (false, string.Empty, string.Empty);
+            }
+
+            username = acc.Username;
+            password = acc.Password;
+        }
+        else
+        {
+            await connection.SendAsync(CreateErrorPacket("Unsupported packet type."));
+            return (false, string.Empty, string.Empty);
+        }
+
+        return (true, username, password);
     }
 }

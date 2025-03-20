@@ -1,0 +1,12 @@
+<Window x:Class="Auto.Desktop.Views.DisconnectedWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Connection" 
+		Height="120" 
+		Width="300"
+        WindowStartupLocation="CenterScreen" 
+		ResizeMode="NoResize">
+
+    <Grid>
+    </Grid>
+</Window>
