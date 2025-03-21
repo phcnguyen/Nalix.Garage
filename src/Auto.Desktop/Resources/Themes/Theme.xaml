@@ -4,5 +4,7 @@
         <ResourceDictionary Source="pack://application:,,,/Resources/Styles/Colors.xaml" />
         <ResourceDictionary Source="pack://application:,,,/Resources/Styles/Buttons.xaml" />
         <ResourceDictionary Source="pack://application:,,,/Resources/Styles/TextStyles.xaml" />
+        <ResourceDictionary Source="/Resources/Styles/TextBlockStyle.xaml" />
+        <ResourceDictionary Source="/Resources/Styles/BorderStyles.xaml" />
     </ResourceDictionary.MergedDictionaries>
 </ResourceDictionary>

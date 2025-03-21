@@ -1,5 +1,8 @@
-﻿using Notio.Common.Package;
+﻿using Auto.Common.Enums;
+using Notio.Common.Package;
 using Notio.Common.Security;
+using Notio.Cryptography.Asymmetric;
+using Notio.Cryptography.Hash;
 using Notio.Network.Package;
 using Notio.Network.Package.Extensions;
 using Notio.Shared.Injection;
@@ -35,6 +38,11 @@ public sealed class SocketClient : SingletonBase<SocketClient>, IDisposable
     public EncryptionMode Mode { get; set; }
 
     /// <summary>
+    /// Check that the client is connected.
+    /// </summary>
+    public bool IsConnected => _client?.Connected == true && _stream != null;
+
+    /// <summary>
     /// Khởi tạo một SocketClient mới
     /// </summary>
     /// <exception cref="ArgumentNullException">Khi server là null</exception>
@@ -47,6 +55,81 @@ public sealed class SocketClient : SingletonBase<SocketClient>, IDisposable
         };
     }
 
+    /// <summary>
+    /// Sets the server address and port for the connection.
+    /// </summary>
+    /// <param name="server">The server IP or hostname. If null or empty, the current value remains unchanged.</param>
+    /// <param name="port">The port number. Must be between 1 and 65535. If null, the current value remains unchanged.</param>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown if <paramref name="port"/> is outside the valid range.</exception>
+    public void Set(string? server, int? port)
+    {
+        if (!string.IsNullOrWhiteSpace(server))
+            _server = server;
+
+        if (port.HasValue)
+        {
+            if (port.Value is <= 0 or > 65535)
+                throw new ArgumentOutOfRangeException(nameof(port), "Port must be between 1 and 65535");
+
+            _port = port.Value;
+        }
+    }
+
+    #region Secure Handshake
+
+    /// <summary>
+    /// Initializes a secure connection with the server using X25519 key exchange.
+    /// </summary>
+    /// <returns>True if the secure connection is established, false otherwise.</returns>
+    public async Task<(bool Status, string Message)> SecureHandshakeAsync()
+    {
+        if (!Instance.IsConnected)
+        {
+            try
+            {
+                await Instance.ConnectAsync(_server, _port);
+            }
+            catch (Exception ex)
+            {
+                return (false, $"Server connection failed\nIP: {_server}, Port: {_port}\n{ex.Message}");
+            }
+        }
+
+        try
+        {
+            // Tạo key pair cho X25519
+            (byte[] privateKey, byte[] publicKey) = X25519.GenerateKeyPair();
+
+            // Gửi public key cho server
+            Packet packet = new(
+                PacketType.Binary, PacketFlags.None, PacketPriority.None,
+                (ushort)Command.InitiateSecureConnection, publicKey
+            );
+
+            await Instance.SendAsync(packet);
+            IPacket packetReceive = await Instance.ReceiveAsync();
+
+            // Kiểm tra phản hồi từ server
+            if (packetReceive == null || packetReceive.Payload.Length != 32)
+            {
+                return (false, $"Invalid server response - Expected 32-byte payload." +
+                               $"\nReceived: {packetReceive?.Payload.Length ?? 0} bytes.");
+            }
+
+            // Tính toán shared secret và đặt khóa mã hóa
+            byte[] sharedSecret = X25519.ComputeSharedSecret(privateKey, packetReceive.Payload.ToArray());
+            Instance.EncryptionKey = Sha256.HashData(sharedSecret);
+
+            return (true, "Unknown");
+        }
+        catch (Exception ex)
+        {
+            return (false, $"Secure connection failed\n{ex.Message}");
+        }
+    }
+
+    #endregion
+
     #region Synchronous Methods
 
     /// <summary>
@@ -54,7 +137,7 @@ public sealed class SocketClient : SingletonBase<SocketClient>, IDisposable
     /// </summary>
     /// <exception cref="ObjectDisposedException">Khi object đã bị dispose</exception>
     /// <exception cref="IOException">Khi có lỗi kết nối</exception>
-    public void Connect(string? server = null, int? port = -1)
+    public void Connect(string? server, int? port)
     {
         if (!string.IsNullOrWhiteSpace(server))
             _server = server;
@@ -200,7 +283,7 @@ public sealed class SocketClient : SingletonBase<SocketClient>, IDisposable
     /// <exception cref="ObjectDisposedException">Khi object đã bị dispose</exception>
     /// <exception cref="TimeoutException">Khi kết nối timeout</exception>
     public async Task ConnectAsync(
-        string? server = null, int? port = -1, int timeout = 30000,
+        string? server, int? port, int timeout = 30000,
         CancellationToken cancellationToken = default)
     {
         if (!string.IsNullOrWhiteSpace(server))

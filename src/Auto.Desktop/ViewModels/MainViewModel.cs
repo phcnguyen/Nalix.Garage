@@ -45,7 +45,8 @@ public sealed class MainViewModel : BaseViewModel
             // Gửi public key cho server
             Packet packet = new(
                 PacketType.Binary, PacketFlags.None, PacketPriority.None,
-                (ushort)Command.InitiateSecureConnection, publicKey);
+                (ushort)Command.InitiateSecureConnection, publicKey
+            );
 
             await SocketClient.Instance.SendAsync(packet);
             IPacket packetReceive = await SocketClient.Instance.ReceiveAsync();
