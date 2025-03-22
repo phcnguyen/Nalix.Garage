@@ -102,11 +102,4 @@ public partial class LoginWindow : Window
             viewModel.Password = txtPass.Password;
         }
     }
-
-    private void ReloadLoginWindow()
-    {
-        LoginWindow newLoginWindow = new();
-        newLoginWindow.Show();
-        this.Close();
-    }
 }
