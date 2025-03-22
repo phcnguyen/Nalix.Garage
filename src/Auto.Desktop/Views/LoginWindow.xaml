@@ -3,7 +3,6 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
         xmlns:viewmodels="clr-namespace:Auto.Desktop.ViewModels"
-        xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
         Title="Login"
         Height="300"
         Width="380"
@@ -37,7 +36,7 @@
                 HorizontalAlignment="Center"
                 VerticalAlignment="Center">
             <Grid>
-                <controls:TextBox x:Name="txtUsername"
+                <TextBox x:Name="txtUsername"
                          KeyDown="TxtUsername_KeyDown"
                          Text="{Binding Username, UpdateSourceTrigger=PropertyChanged}"
                          Background="Transparent"
