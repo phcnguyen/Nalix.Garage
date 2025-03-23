@@ -13,12 +13,12 @@ using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Auto.Desktop.Helpers;
+namespace Auto.Desktop.Sockets;
 
 /// <summary>
 /// Helper để thực hiện kết nối TCP với timeout và xử lý lỗi tốt hơn
 /// </summary>
-public sealed class SocketClient : SingletonBase<SocketClient>, IDisposable
+public sealed class NetworkClient : SingletonBase<NetworkClient>, IDisposable, IAsyncDisposable
 {
     private int _port = 7777;
     private string _server = "127.0.0.1";
@@ -28,14 +28,14 @@ public sealed class SocketClient : SingletonBase<SocketClient>, IDisposable
     private NetworkStream? _stream;
 
     /// <summary>
-    /// Gets the encryption key used for securing communication.
-    /// </summary>
-    public byte[] EncryptionKey = [];
-
-    /// <summary>
     /// Gets or sets the encryption mode used.
     /// </summary>
     public EncryptionMode Mode { get; set; }
+
+    /// <summary>
+    /// Gets the encryption key used for securing communication.
+    /// </summary>
+    public byte[] EncryptionKey { get; private set; } = [];
 
     /// <summary>
     /// Check that the client is connected.
@@ -43,11 +43,11 @@ public sealed class SocketClient : SingletonBase<SocketClient>, IDisposable
     public bool IsConnected => _client?.Connected == true && _stream != null;
 
     /// <summary>
-    /// Khởi tạo một SocketClient mới
+    /// Khởi tạo một NetworkClient mới
     /// </summary>
     /// <exception cref="ArgumentNullException">Khi server là null</exception>
     /// <exception cref="ArgumentOutOfRangeException">Khi port không nằm trong khoảng 1-65535</exception>
-    private SocketClient()
+    private NetworkClient()
     {
         _client = new TcpClient
         {
@@ -120,7 +120,7 @@ public sealed class SocketClient : SingletonBase<SocketClient>, IDisposable
             byte[] sharedSecret = X25519.ComputeSharedSecret(privateKey, packetReceive.Payload.ToArray());
             Instance.EncryptionKey = Sha256.HashData(sharedSecret);
 
-            return (true, "Unknown");
+            return (true, "Secure connection established successfully.");
         }
         catch (Exception ex)
         {
@@ -150,7 +150,7 @@ public sealed class SocketClient : SingletonBase<SocketClient>, IDisposable
             _port = port.Value;
         }
 
-        ObjectDisposedException.ThrowIf(_disposed, nameof(SocketClient));
+        ObjectDisposedException.ThrowIf(_disposed, nameof(NetworkClient));
 
         if (_client?.Connected == true)
         {
@@ -180,7 +180,7 @@ public sealed class SocketClient : SingletonBase<SocketClient>, IDisposable
     /// <exception cref="IOException">Khi có lỗi gửi dữ liệu</exception>
     public void Send(IPacket packet)
     {
-        ObjectDisposedException.ThrowIf(_disposed, nameof(SocketClient));
+        ObjectDisposedException.ThrowIf(_disposed, nameof(NetworkClient));
         EnsureConnected();
 
         try
@@ -208,7 +208,7 @@ public sealed class SocketClient : SingletonBase<SocketClient>, IDisposable
     /// <exception cref="IOException">Khi có lỗi nhận dữ liệu</exception>
     public IPacket Receive()
     {
-        ObjectDisposedException.ThrowIf(_disposed, nameof(SocketClient));
+        ObjectDisposedException.ThrowIf(_disposed, nameof(NetworkClient));
         EnsureConnected();
 
         try
@@ -297,7 +297,7 @@ public sealed class SocketClient : SingletonBase<SocketClient>, IDisposable
             _port = port.Value;
         }
 
-        ObjectDisposedException.ThrowIf(_disposed, nameof(SocketClient));
+        ObjectDisposedException.ThrowIf(_disposed, nameof(NetworkClient));
 
         if (_client?.Connected == true)
         {
@@ -334,7 +334,7 @@ public sealed class SocketClient : SingletonBase<SocketClient>, IDisposable
     /// <exception cref="IOException">Khi có lỗi gửi dữ liệu</exception>
     public async Task SendAsync(IPacket packet, CancellationToken cancellationToken = default)
     {
-        ObjectDisposedException.ThrowIf(_disposed, nameof(SocketClient));
+        ObjectDisposedException.ThrowIf(_disposed, nameof(NetworkClient));
         EnsureConnected();
 
         try
@@ -363,7 +363,7 @@ public sealed class SocketClient : SingletonBase<SocketClient>, IDisposable
     /// <exception cref="IOException">Khi có lỗi nhận dữ liệu</exception>
     public async Task<IPacket> ReceiveAsync(CancellationToken cancellationToken = default)
     {
-        ObjectDisposedException.ThrowIf(_disposed, nameof(SocketClient));
+        ObjectDisposedException.ThrowIf(_disposed, nameof(NetworkClient));
         EnsureConnected();
 
         try

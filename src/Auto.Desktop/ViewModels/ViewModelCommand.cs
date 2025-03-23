@@ -2,13 +2,13 @@
 using System.Threading.Tasks;
 using System.Windows.Input;
 
-namespace Auto.Desktop.Helpers;
+namespace Auto.Desktop.ViewModels;
 
 /// <summary>
-/// Lớp <c>RelayCommand</c> giúp thực thi lệnh trong MVVM.
+/// Lớp <c>ViewModelCommand</c> giúp thực thi lệnh trong MVVM.
 /// Hỗ trợ cả phương thức đồng bộ (<c>void</c>) và bất đồng bộ (<c>async Task</c>).
 /// </summary>
-public sealed class RelayCommand : ICommand
+public sealed class ViewModelCommand : ICommand
 {
     private readonly Func<Task>? _executeAsync;
     private readonly Action? _execute;
@@ -25,24 +25,24 @@ public sealed class RelayCommand : ICommand
     }
 
     /// <summary>
-    /// Khởi tạo một <c>RelayCommand</c> với phương thức đồng bộ (<c>void</c>).
+    /// Khởi tạo một <c>ViewModelCommand</c> với phương thức đồng bộ (<c>void</c>).
     /// </summary>
     /// <param name="execute">Phương thức đồng bộ được thực thi khi lệnh chạy.</param>
     /// <param name="canExecute">Hàm kiểm tra xem lệnh có thể thực thi không.</param>
     /// <exception cref="ArgumentNullException">Ném ra nếu <paramref name="execute"/> là <c>null</c>.</exception>
-    public RelayCommand(Action execute, Func<bool>? canExecute = null)
+    public ViewModelCommand(Action execute, Func<bool>? canExecute = null)
     {
         _execute = execute ?? throw new ArgumentNullException(nameof(execute));
         _canExecute = canExecute;
     }
 
     /// <summary>
-    /// Khởi tạo một <c>RelayCommand</c> với phương thức bất đồng bộ (<c>async Task</c>).
+    /// Khởi tạo một <c>ViewModelCommand</c> với phương thức bất đồng bộ (<c>async Task</c>).
     /// </summary>
     /// <param name="executeAsync">Phương thức bất đồng bộ được thực thi khi lệnh chạy.</param>
     /// <param name="canExecute">Hàm kiểm tra xem lệnh có thể thực thi không.</param>
     /// <exception cref="ArgumentNullException">Ném ra nếu <paramref name="executeAsync"/> là <c>null</c>.</exception>
-    public RelayCommand(Func<Task> executeAsync, Func<bool>? canExecute = null)
+    public ViewModelCommand(Func<Task> executeAsync, Func<bool>? canExecute = null)
     {
         _executeAsync = executeAsync ?? throw new ArgumentNullException(nameof(executeAsync));
         _canExecute = canExecute;

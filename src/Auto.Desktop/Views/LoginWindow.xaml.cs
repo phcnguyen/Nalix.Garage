@@ -1,4 +1,4 @@
-﻿using Auto.Desktop.Helpers;
+﻿using Auto.Desktop.Sockets;
 using Auto.Desktop.ViewModels;
 using Notio.Logging;
 using System;
@@ -9,25 +9,25 @@ namespace Auto.Desktop.Views.Login;
 
 public partial class LoginWindow : Window
 {
-    private readonly ProgressWindow _progressWindow = new();
+    public static readonly ProgressWindow ProgressWindow = new();
     public LoginWindow()
     {
         InitializeComponent();
 
-        SocketClient.Instance.Set("192.168.1.3", 5000);
+        NetworkClient.Instance.Set("192.168.1.3", 5000);
         LoginViewModel viewModel = new();
 
-        viewModel.ShowError += (message, title) =>
+        viewModel.MessageBox += (message, title, messageBoxImage) =>
         {
-            _progressWindow.Hide();
-            MessageBox.Show(message, title, MessageBoxButton.OK, MessageBoxImage.Error);
+            ProgressWindow.Hide();
+            MessageBox.Show(message, title, MessageBoxButton.OK, messageBoxImage);
         };
 
-        viewModel.ShowLogin += () => this.Show();
-        viewModel.HideLogin += () => this.Hide();
+        viewModel.ShowWindow += () => this.Show();
+        viewModel.HideWindow += () => this.Hide();
 
-        viewModel.ShowProgress += () => _progressWindow.Show();
-        viewModel.HideProgress += () => _progressWindow.Hide();
+        viewModel.ShowProgress += () => ProgressWindow.Show();
+        viewModel.HideProgress += () => ProgressWindow.Hide();
 
         DataContext = viewModel;
 
@@ -43,11 +43,11 @@ public partial class LoginWindow : Window
     private async Task PerformLogin()
     {
         this.Hide();
-        _progressWindow.Show();
+        ProgressWindow.Show();
 
         try
         {
-            (bool Status, string Message) = await SocketClient.Instance.SecureHandshakeAsync();
+            (bool Status, string Message) = await NetworkClient.Instance.SecureHandshakeAsync();
             if (!Status)
             {
                 throw new Exception(Message);
@@ -55,13 +55,13 @@ public partial class LoginWindow : Window
 
             await Task.Delay(2000);
 
-            _progressWindow.Hide();
+            ProgressWindow.Hide();
             this.Show();
         }
         catch (Exception ex)
         {
             ex.Error(nameof(LoginWindow), "Connection");
-            _progressWindow.Hide();
+            ProgressWindow.Hide();
             MessageBoxResult result = MessageBox.Show(
                 $"{ex.Message}\nDo you want reload ?", "Connection", MessageBoxButton.YesNo, MessageBoxImage.Error);
             if (result == MessageBoxResult.No)

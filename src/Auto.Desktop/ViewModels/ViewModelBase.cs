@@ -6,7 +6,7 @@ namespace Auto.Desktop.ViewModels;
 /// <summary>
 /// Lớp cơ sở triển khai <see cref="INotifyPropertyChanged"/> để hỗ trợ thông báo khi thuộc tính thay đổi.
 /// </summary>
-public class BaseViewModel : INotifyPropertyChanged
+public abstract class ViewModelBase : INotifyPropertyChanged
 {
     /// <summary>
     /// Sự kiện được kích hoạt khi giá trị của một thuộc tính thay đổi.
