@@ -28,6 +28,5 @@ public interface IAutoDbContext
     DbSet<SupplierPhone> SupplierPhones { get; set; }
     DbSet<ReplacementPart> ReplacementParts { get; set; }
     DbSet<RepairOrderSparePart> RepairOrderSpareParts { get; set; }
-
     int SaveChanges();
 }

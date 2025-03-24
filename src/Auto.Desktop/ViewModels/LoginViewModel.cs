@@ -55,7 +55,7 @@ public sealed class LoginViewModel : ViewModelBase
         {
             NetworkClient.Instance.Send(new Packet(
                 PacketType.Json, PacketFlags.None, PacketPriority.None,
-                (ushort)Command.Login, JsonBinary.SerializeToBytes(account, JsonContext.Default.AccountDto)));
+                (ushort)Command.Login, JsonBuffer.SerializeToBytes(account, JsonContext.Default.AccountDto)));
 
             IPacket packetReceive = NetworkClient.Instance.Receive();
 

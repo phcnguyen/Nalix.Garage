@@ -1,8 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Configuration;
+using Notio;
 using Notio.Logging;
-using Notio.Shared;
 using Npgsql;
 using System;
 using System.IO;

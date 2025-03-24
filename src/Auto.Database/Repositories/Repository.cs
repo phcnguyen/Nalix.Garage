@@ -1,4 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Notio.Common.Repositories.Async;
+using Notio.Common.Repositories.Sync;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,11 +30,17 @@ public class Repository<T>(AutoDbContext context) : IRepository<T>, IRepositoryA
 
     public int Count() => _dbSet.Count();
 
+    public bool Exists(int id) => _dbSet.Find(id) != null;
+
+    public T GetFirstOrDefault(Expression<Func<T, bool>> predicate) => _dbSet.FirstOrDefault(predicate);
+
     public bool Any(Expression<Func<T, bool>> predicate) => _dbSet.Any(predicate);
 
     public T GetById(int id) => _dbSet.Find(id);
 
-    public IEnumerable<T> Find(Expression<Func<T, bool>> predicate, int pageNumber = 1, int pageSize = 10)
+    public IEnumerable<T> Find(
+        Expression<Func<T, bool>> predicate,
+        int pageNumber = 1, int pageSize = 10)
         => [.. _dbSet.AsNoTracking()
                  .Where(predicate)
                  .Skip((pageNumber - 1) * pageSize)
@@ -66,6 +74,10 @@ public class Repository<T>(AutoDbContext context) : IRepository<T>, IRepositoryA
     public void Delete(T entity) => _dbSet.Remove(entity);
 
     public void DeleteRange(IEnumerable<T> entities) => _dbSet.RemoveRange(entities);
+
+    public void Detach(T entity) => _context.Entry(entity).State = EntityState.Detached;
+
+    public IQueryable<T> AsQueryable() => _dbSet.AsQueryable();
 
     public int SaveChanges() => _context.SaveChanges();
 
@@ -123,4 +135,12 @@ public class Repository<T>(AutoDbContext context) : IRepository<T>, IRepositoryA
 
     public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         => await _context.SaveChangesAsync(cancellationToken);
+
+    public async Task<bool> ExistsAsync(int id, CancellationToken cancellationToken = default)
+        => await _dbSet.FindAsync([id], cancellationToken) != null;
+
+    public async Task<T> GetFirstOrDefaultAsync(
+        Expression<Func<T, bool>> predicate,
+        CancellationToken cancellationToken = default)
+        => await _dbSet.FirstOrDefaultAsync(predicate, cancellationToken);
 }

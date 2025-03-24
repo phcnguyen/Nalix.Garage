@@ -2,8 +2,8 @@
 using Auto.Common.Entities.Authentication;
 using Auto.Common.Enums;
 using Auto.Database;
+using Auto.Database.Repositories;
 using Auto.Host.Services.Base;
-using Microsoft.EntityFrameworkCore;
 using Notio.Common.Attributes;
 using Notio.Common.Connection;
 using Notio.Common.Package;
@@ -25,7 +25,7 @@ namespace Auto.Host.Services;
 /// <param name="context">Context của cơ sở dữ liệu để thao tác với bảng Accounts.</param>
 public sealed class AccountService(AutoDbContext context) : BaseService
 {
-    private readonly AutoDbContext _context = context;
+    private readonly Repository<Account> _accountRepository = new(context);
 
     /// <summary>
     /// Đăng ký tài khoản mới cho người dùng.
@@ -43,7 +43,7 @@ public sealed class AccountService(AutoDbContext context) : BaseService
         var (isValid, username, password) = await ValidatePacketAsync(packet, connection);
         if (!isValid) return;
 
-        if (await _context.Accounts.AnyAsync(a => a.Username == username))
+        if (await _accountRepository.AnyAsync(a => a.Username == username))
         {
             CLogging.Instance.Warn($"Username {username} already exists from connection {connection.Id}");
             await connection.SendAsync(CreateErrorPacket("Username already existed."));
@@ -62,8 +62,8 @@ public sealed class AccountService(AutoDbContext context) : BaseService
                 CreatedAt = DateTime.UtcNow
             };
 
-            _context.Accounts.Add(newAccount);
-            await _context.SaveChangesAsync();
+            _accountRepository.Add(newAccount);
+            await _accountRepository.SaveChangesAsync();
             CLogging.Instance.Info($"Account {username} registered successfully from connection {connection.Id}");
             await connection.SendAsync(CreateSuccessPacket("Account registered successfully."));
         }
@@ -82,14 +82,14 @@ public sealed class AccountService(AutoDbContext context) : BaseService
     /// </summary>
     /// <param name="packet">Gói dữ liệu chứa thông tin đăng nhập.</param>
     /// <param name="connection">Kết nối với client để gửi phản hồi và cập nhật phiên.</param>
-    /// <returns>Task đại diện cho quá trình xử lý bất đồng bộ.</returns>
+    /// <returns>Task đại diện cho quá trình xử lý bất đồng bộ.</param>
     [PacketCommand((int)Command.Login, AuthorityLevel.Guest)]
     public async Task LoginAsync(IPacket packet, IConnection connection)
     {
         var (isValid, username, password) = await ValidatePacketAsync(packet, connection);
         if (!isValid) return;
 
-        Account? account = await _context.Accounts.FirstOrDefaultAsync(a => a.Username == username);
+        Account? account = await _accountRepository.GetFirstOrDefaultAsync(a => a.Username == username);
         if (account == null)
         {
             CLogging.Instance.Warn($"Login attempt with non-existent username {username} from connection {connection.Id}");
@@ -109,7 +109,7 @@ public sealed class AccountService(AutoDbContext context) : BaseService
         {
             account.FailedLoginAttempts++;
             account.LastFailedLogin = DateTime.UtcNow;
-            await _context.SaveChangesAsync();
+            await _accountRepository.SaveChangesAsync();
             CLogging.Instance.Warn($"Incorrect password for {username}, attempt {account.FailedLoginAttempts} from connection {connection.Id}");
             await connection.SendAsync(CreateErrorPacket("Incorrect password."));
             return;
@@ -126,7 +126,7 @@ public sealed class AccountService(AutoDbContext context) : BaseService
         {
             account.FailedLoginAttempts = 0;
             account.LastLogin = DateTime.UtcNow;
-            await _context.SaveChangesAsync();
+            await _accountRepository.SaveChangesAsync();
 
             connection.Authority = account.Role;
             connection.Metadata["Username"] = account.Username;
@@ -168,7 +168,7 @@ public sealed class AccountService(AutoDbContext context) : BaseService
             return;
         }
 
-        Account? account = await _context.Accounts.FirstOrDefaultAsync(a => a.Id == accountId);
+        Account? account = await _accountRepository.GetByIdAsync(accountId);
         if (account == null)
         {
             CLogging.Instance.Warn($"Attempt to delete non-existent account ID {accountId} from connection {connection.Id}");
@@ -178,8 +178,8 @@ public sealed class AccountService(AutoDbContext context) : BaseService
 
         try
         {
-            _context.Accounts.Remove(account);
-            await _context.SaveChangesAsync();
+            _accountRepository.Delete(account);
+            await _accountRepository.SaveChangesAsync();
             CLogging.Instance.Info($"Account ID {accountId} (Username: {account.Username}) deleted successfully by connection {connection.Id}");
             await connection.SendAsync(CreateSuccessPacket("Account deleted successfully."));
         }
@@ -219,7 +219,7 @@ public sealed class AccountService(AutoDbContext context) : BaseService
         }
         else if (packet.Type == (byte)PacketType.Json)
         {
-            PasswordChangeDto? acc = JsonBinary.DeserializeFromBytes(
+            PasswordChangeDto? acc = JsonBuffer.DeserializeFromBytes(
                 packet.Payload.Span, JsonContext.Default.PasswordChangeDto);
 
             if (acc == null ||
@@ -251,7 +251,7 @@ public sealed class AccountService(AutoDbContext context) : BaseService
             return;
         }
 
-        Account? account = await _context.Accounts.FirstOrDefaultAsync(a => a.Username == sessionUsername);
+        Account? account = await _accountRepository.GetFirstOrDefaultAsync(a => a.Username == sessionUsername);
         if (account == null)
         {
             CLogging.Instance.Warn($"Account not found for username {sessionUsername} from connection {connection.Id}");
@@ -271,7 +271,7 @@ public sealed class AccountService(AutoDbContext context) : BaseService
             PasswordSecurity.HashPassword(newPassword, out byte[] salt, out byte[] hash);
             account.Salt = salt;
             account.Hash = hash;
-            await _context.SaveChangesAsync();
+            await _accountRepository.SaveChangesAsync();
             CLogging.Instance.Info($"Password updated successfully for {sessionUsername} from connection {connection.Id}");
             await connection.SendAsync(CreateSuccessPacket("Password updated successfully."));
         }
@@ -282,8 +282,8 @@ public sealed class AccountService(AutoDbContext context) : BaseService
         }
     }
 
-    private static async Task<(bool isValid, string username, string password)> ValidatePacketAsync(
-        IPacket packet, IConnection connection)
+    private static async Task<(bool isValid, string username, string password)>
+        ValidatePacketAsync(IPacket packet, IConnection connection)
     {
         string username, password;
 
@@ -304,7 +304,7 @@ public sealed class AccountService(AutoDbContext context) : BaseService
         }
         else if (packet.Type == (byte)PacketType.Json)
         {
-            AccountDto? acc = JsonBinary.DeserializeFromBytes(
+            AccountDto? acc = JsonBuffer.DeserializeFromBytes(
                 packet.Payload.Span, JsonContext.Default.AccountDto);
 
             if (acc == null ||

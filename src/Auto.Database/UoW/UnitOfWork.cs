@@ -1,5 +1,6 @@
 ﻿using Auto.Database.Repositories;
 using Microsoft.EntityFrameworkCore.Storage;
+using Notio.Common.Repositories.Async;
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -10,7 +11,7 @@ namespace Auto.Database.UoW;
 /// <summary>
 /// Triển khai Unit of Work pattern để quản lý transaction
 /// </summary>
-public class UnitOfWork(AutoDbContext context) : IUnitOfWork
+public class UnitOfWork(AutoDbContext context) : IUnitOfWorkAsync
 {
     private readonly AutoDbContext _context = context ?? throw new ArgumentNullException(nameof(context));
     private IDbContextTransaction _transaction;
@@ -18,9 +19,7 @@ public class UnitOfWork(AutoDbContext context) : IUnitOfWork
     private bool _disposed;
 
     public async Task BeginTransactionAsync(CancellationToken cancellationToken = default)
-    {
-        _transaction = await _context.Database.BeginTransactionAsync(cancellationToken);
-    }
+        => _transaction = await _context.Database.BeginTransactionAsync(cancellationToken);
 
     public async Task CommitTransactionAsync(CancellationToken cancellationToken = default)
     {
@@ -52,23 +51,8 @@ public class UnitOfWork(AutoDbContext context) : IUnitOfWork
         }
     }
 
-    public IRepository<T> GetRepository<T>() where T : class
-    {
-        var type = typeof(T);
-
-        if (!_repositories.TryGetValue(type, out object value))
-        {
-            value = new Repository<T>(_context);
-            _repositories[type] = value;
-        }
-
-        return (IRepository<T>)value;
-    }
-
     public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
-    {
-        return await _context.SaveChangesAsync(cancellationToken);
-    }
+        => await _context.SaveChangesAsync(cancellationToken);
 
     public void Dispose()
     {
@@ -88,5 +72,16 @@ public class UnitOfWork(AutoDbContext context) : IUnitOfWork
 
             _disposed = true;
         }
+    }
+
+    public IRepositoryAsync<T> GetRepositoryAsync<T>() where T : class
+    {
+        if (!_repositories.TryGetValue(typeof(T), out var repository))
+        {
+            repository = new Repository<T>(_context);
+            _repositories.Add(typeof(T), repository);
+        }
+
+        return (IRepositoryAsync<T>)repository;
     }
 }

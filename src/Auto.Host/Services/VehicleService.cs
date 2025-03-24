@@ -1,8 +1,9 @@
-﻿using Auto.Common.Entities.Vehicles;
+﻿using Auto.Common.Entities.Customers;
+using Auto.Common.Entities.Vehicles;
 using Auto.Common.Enums;
 using Auto.Common.Enums.Cars;
 using Auto.Database;
-using Microsoft.EntityFrameworkCore;
+using Auto.Database.Repositories;
 using Notio.Common.Attributes;
 using Notio.Common.Connection;
 using Notio.Common.Package;
@@ -20,7 +21,8 @@ namespace Auto.Host.Services;
 /// </summary>
 public sealed class VehicleService(AutoDbContext context) : Base.BaseService
 {
-    private readonly AutoDbContext _context = context;
+    private readonly Repository<Vehicle> _vehicleRepository = new(context);
+    private readonly Repository<Customer> _customerRepository = new(context);
 
     /// <summary>
     /// Thêm một phương tiện mới vào hệ thống.
@@ -95,29 +97,31 @@ public sealed class VehicleService(AutoDbContext context) : Base.BaseService
         }
 
         // Kiểm tra quyền sở hữu (giả sử Metadata lưu CustomerId của người dùng)
-        if (!connection.Metadata.TryGetValue("CustomerId", out object? value) || value is not int userCustomerId || userCustomerId != customerId)
+        if (!connection.Metadata.TryGetValue("CustomerId", out object? value) ||
+            value is not int userCustomerId || userCustomerId != customerId)
         {
-            await connection.SendAsync(CreateErrorPacket("You are not authorized to add a vehicle for this customer."));
+            await connection.SendAsync(CreateErrorPacket(
+                "You are not authorized to add a vehicle for this customer."));
             return;
         }
 
-        if (!await _context.Customers.AnyAsync(c => c.Id == customerId))
+        if (!await _customerRepository.AnyAsync(c => c.Id == customerId))
         {
             await connection.SendAsync(CreateErrorPacket("Customer not found."));
             return;
         }
 
-        if (await _context.Vehicles.AnyAsync(v => v.CarLicensePlate == licensePlate))
+        if (await _vehicleRepository.AnyAsync(v => v.CarLicensePlate == licensePlate))
         {
             await connection.SendAsync(CreateErrorPacket("Vehicle already exists with the same license plate."));
             return;
         }
-        if (await _context.Vehicles.AnyAsync(v => v.FrameNumber == frameNumber))
+        if (await _vehicleRepository.AnyAsync(v => v.FrameNumber == frameNumber))
         {
             await connection.SendAsync(CreateErrorPacket("Vehicle already exists with the same frame number."));
             return;
         }
-        if (await _context.Vehicles.AnyAsync(v => v.EngineNumber == engineNumber))
+        if (await _vehicleRepository.AnyAsync(v => v.EngineNumber == engineNumber))
         {
             await connection.SendAsync(CreateErrorPacket("Vehicle already exists with the same engine number."));
             return;
@@ -139,8 +143,8 @@ public sealed class VehicleService(AutoDbContext context) : Base.BaseService
 
         try
         {
-            _context.Vehicles.Add(vehicle);
-            await _context.SaveChangesAsync();
+            _vehicleRepository.Add(vehicle);
+            await _vehicleRepository.SaveChangesAsync();
             CLogging.Instance.Info($"Vehicle added successfully for CustomerId: {customerId}");
             await connection.SendAsync(CreateSuccessPacket("Vehicle added successfully."));
         }
@@ -226,7 +230,7 @@ public sealed class VehicleService(AutoDbContext context) : Base.BaseService
             return;
         }
 
-        Vehicle? vehicle = await _context.Vehicles.FindAsync(vehicleId);
+        Vehicle? vehicle = await _vehicleRepository.GetByIdAsync(vehicleId);
         if (vehicle == null)
         {
             await connection.SendAsync(CreateErrorPacket("Vehicle not found."));
@@ -240,7 +244,7 @@ public sealed class VehicleService(AutoDbContext context) : Base.BaseService
             return;
         }
 
-        if (await _context.Vehicles.AnyAsync(v =>
+        if (await _vehicleRepository.AnyAsync(v =>
             v.Id != vehicleId &&
             (v.CarLicensePlate == licensePlate || v.FrameNumber == frameNumber || v.EngineNumber == engineNumber)))
         {
@@ -260,7 +264,7 @@ public sealed class VehicleService(AutoDbContext context) : Base.BaseService
             vehicle.EngineNumber = engineNumber;
             vehicle.Mileage = mileage;
 
-            await _context.SaveChangesAsync();
+            await _vehicleRepository.SaveChangesAsync();
             CLogging.Instance.Info($"Vehicle updated successfully. VehicleId: {vehicleId}");
             await connection.SendAsync(CreateSuccessPacket("Vehicle updated successfully."));
         }
@@ -312,9 +316,9 @@ public sealed class VehicleService(AutoDbContext context) : Base.BaseService
 
         try
         {
-            int deleted = await _context.Vehicles.Where(v => v.Id == vehicleId).ExecuteDeleteAsync();
-            if (deleted > 0)
+            if (_vehicleRepository.Exists(vehicleId))
             {
+                _vehicleRepository.Delete(vehicleId);
                 CLogging.Instance.Info($"Vehicle removed successfully. VehicleId: {vehicleId}");
                 await connection.SendAsync(CreateSuccessPacket("Vehicle removed successfully."));
             }
@@ -336,6 +340,7 @@ public sealed class VehicleService(AutoDbContext context) : Base.BaseService
     private static bool TryGetVehicleId(IPacket packet, out int vehicleId)
     {
         vehicleId = -1;
-        return TryParsePayload(packet, 1, out string[] parts) && int.TryParse(parts[0], out vehicleId);
+        return TryParsePayload(packet, 1, out string[] parts) &&
+               int.TryParse(parts[0], out vehicleId);
     }
 }

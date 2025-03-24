@@ -1,6 +1,7 @@
 ﻿using Auto.Common.Entities.Customers;
 using Auto.Common.Enums;
 using Auto.Database;
+using Auto.Database.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Notio.Common.Attributes;
 using Notio.Common.Connection;
@@ -28,7 +29,7 @@ namespace Auto.Host.Services;
 [PacketController]
 public sealed class CustomerService(AutoDbContext context) : Base.BaseService
 {
-    private readonly AutoDbContext _context = context;
+    private readonly Repository<Customer> _customerRepository = new(context);
 
     /// <summary>
     /// Thêm khách hàng mới vào cơ sở dữ liệu.
@@ -60,8 +61,7 @@ public sealed class CustomerService(AutoDbContext context) : Base.BaseService
         }
         else if (packet.Type == (byte)PacketType.Json)
         {
-            Customer? customerData = JsonSerializer.Deserialize(
-                packet.Payload.Span, JsonContext.Default.Customer);
+            Customer? customerData = JsonSerializer.Deserialize(packet.Payload.Span, JsonContext.Default.Customer);
             if (customerData == null ||
                 string.IsNullOrWhiteSpace(customerData.Name) ||
                 string.IsNullOrWhiteSpace(customerData.PhoneNumber) ||
@@ -84,7 +84,7 @@ public sealed class CustomerService(AutoDbContext context) : Base.BaseService
         }
 
         // Kiểm tra khách hàng đã tồn tại chưa
-        if (await _context.Customers.AnyAsync(c => c.PhoneNumber == phone || c.Email == email))
+        if (await _customerRepository.AnyAsync(c => c.PhoneNumber == phone || c.Email == email))
         {
             CLogging.Instance.Warn($"Attempt to add customer with existing phone {phone} or email {email} from connection {connection.Id}");
             await connection.SendAsync(CreateErrorPacket("Customer with this phone or email already exists."));
@@ -103,8 +103,8 @@ public sealed class CustomerService(AutoDbContext context) : Base.BaseService
                 Type = type
             };
 
-            _context.Customers.Add(customer);
-            await _context.SaveChangesAsync();
+            _customerRepository.Add(customer);
+            await _customerRepository.SaveChangesAsync();
             CLogging.Instance.Info($"Customer {name} (Phone: {phone}) added successfully by connection {connection.Id}");
             await connection.SendAsync(CreateSuccessPacket("Customer added successfully."));
         }
@@ -143,8 +143,7 @@ public sealed class CustomerService(AutoDbContext context) : Base.BaseService
         }
         else if (packet.Type == (byte)PacketType.Json)
         {
-            Customer? customerData = JsonSerializer.Deserialize(
-                packet.Payload.Span, JsonContext.Default.Customer);
+            Customer? customerData = JsonSerializer.Deserialize(packet.Payload.Span, JsonContext.Default.Customer);
             if (customerData == null || customerData.Id <= 0)
             {
                 await connection.SendAsync(CreateErrorPacket("Invalid JSON data or customer ID."));
@@ -163,7 +162,7 @@ public sealed class CustomerService(AutoDbContext context) : Base.BaseService
             return;
         }
 
-        Customer? customer = await _context.Customers.FindAsync(customerId);
+        Customer? customer = await _customerRepository.GetByIdAsync(customerId);
         if (customer == null)
         {
             CLogging.Instance.Warn($"Attempt to update non-existent customer ID {customerId} from connection {connection.Id}");
@@ -179,7 +178,7 @@ public sealed class CustomerService(AutoDbContext context) : Base.BaseService
             if (!string.IsNullOrEmpty(address)) customer.Address = address;
             if (!string.IsNullOrEmpty(taxCode)) customer.TaxCode = taxCode;
 
-            await _context.SaveChangesAsync();
+            await _customerRepository.SaveChangesAsync();
             CLogging.Instance.Info($"Customer ID {customerId} updated successfully by connection {connection.Id}");
             await connection.SendAsync(CreateSuccessPacket("Customer updated successfully."));
         }
@@ -211,8 +210,7 @@ public sealed class CustomerService(AutoDbContext context) : Base.BaseService
         }
         else if (packet.Type == (byte)PacketType.Json)
         {
-            Customer? customerData = JsonSerializer.Deserialize(
-                packet.Payload.Span, JsonContext.Default.Customer);
+            Customer? customerData = JsonSerializer.Deserialize(packet.Payload.Span, JsonContext.Default.Customer);
             if (customerData == null || customerData.Id <= 0)
             {
                 await connection.SendAsync(CreateErrorPacket("Invalid JSON data or customer ID."));
@@ -226,7 +224,7 @@ public sealed class CustomerService(AutoDbContext context) : Base.BaseService
             return;
         }
 
-        Customer? customer = await _context.Customers.FindAsync(customerId);
+        Customer? customer = await _customerRepository.GetByIdAsync(customerId);
         if (customer == null)
         {
             CLogging.Instance.Warn($"Attempt to remove non-existent customer ID {customerId} from connection {connection.Id}");
@@ -235,7 +233,7 @@ public sealed class CustomerService(AutoDbContext context) : Base.BaseService
         }
 
         // Kiểm tra khách hàng có đơn hàng liên quan không
-        if (await _context.Customers.AnyAsync(o => o.Id == customerId))
+        if (await _customerRepository.AnyAsync(o => o.Id == customerId))
         {
             CLogging.Instance.Warn($"Attempt to remove customer ID {customerId} with existing orders from connection {connection.Id}");
             await connection.SendAsync(CreateErrorPacket("Cannot remove customer with existing orders."));
@@ -244,8 +242,8 @@ public sealed class CustomerService(AutoDbContext context) : Base.BaseService
 
         try
         {
-            _context.Customers.Remove(customer);
-            await _context.SaveChangesAsync();
+            _customerRepository.Delete(customer);
+            await _customerRepository.SaveChangesAsync();
             CLogging.Instance.Info($"Customer ID {customerId} removed successfully by connection {connection.Id}");
             await connection.SendAsync(CreateSuccessPacket("Customer removed successfully."));
         }
@@ -281,8 +279,7 @@ public sealed class CustomerService(AutoDbContext context) : Base.BaseService
         }
         else if (packet.Type == (byte)PacketType.Json)
         {
-            var searchData = JsonSerializer.Deserialize(
-                packet.Payload.Span, JsonContext.Default.SearchDto);
+            var searchData = JsonSerializer.Deserialize(packet.Payload.Span, JsonContext.Default.SearchDto);
             if (searchData == null || string.IsNullOrWhiteSpace(searchData.Keyword) || searchData.PageIndex < 0 || searchData.PageSize <= 0)
             {
                 await connection.SendAsync(CreateErrorPacket("Invalid JSON search parameters."));
@@ -300,7 +297,7 @@ public sealed class CustomerService(AutoDbContext context) : Base.BaseService
 
         try
         {
-            var query = _context.Customers.AsNoTracking()
+            var query = _customerRepository.AsQueryable()
                 .Where(c => c.Name.Contains(keyword) ||
                             c.PhoneNumber.Contains(keyword) ||
                             c.Email.Contains(keyword));
@@ -368,7 +365,7 @@ public sealed class CustomerService(AutoDbContext context) : Base.BaseService
 
         try
         {
-            Customer? customer = await _context.Customers.AsNoTracking().SingleOrDefaultAsync(c => c.Id == customerId);
+            Customer? customer = await _customerRepository.AsQueryable().SingleOrDefaultAsync(c => c.Id == customerId);
             if (customer == null)
             {
                 CLogging.Instance.Warn($"Customer ID {customerId} not found by connection {connection.Id}");
