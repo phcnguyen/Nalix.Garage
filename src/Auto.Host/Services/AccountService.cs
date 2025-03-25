@@ -83,7 +83,7 @@ public sealed class AccountService(AutoDbContext context) : BaseService
     /// <param name="packet">Gói dữ liệu chứa thông tin đăng nhập.</param>
     /// <param name="connection">Kết nối với client để gửi phản hồi và cập nhật phiên.</param>
     /// <returns>Task đại diện cho quá trình xử lý bất đồng bộ.</param>
-    [PacketCommand((int)Command.Login, AuthorityLevel.Guest)]
+    [PacketCommand((int)Command.LoginAccount, AuthorityLevel.Guest)]
     public async Task LoginAsync(IPacket packet, IConnection connection)
     {
         var (isValid, username, password) = await ValidatePacketAsync(packet, connection);
@@ -92,7 +92,7 @@ public sealed class AccountService(AutoDbContext context) : BaseService
         Account? account = await _accountRepository.GetFirstOrDefaultAsync(a => a.Username == username);
         if (account == null)
         {
-            CLogging.Instance.Warn($"Login attempt with non-existent username {username} from connection {connection.Id}");
+            CLogging.Instance.Warn($"LoginAccount attempt with non-existent username {username} from connection {connection.Id}");
             await connection.SendAsync(CreateErrorPacket("Username does not exist."));
             return;
         }
@@ -117,7 +117,7 @@ public sealed class AccountService(AutoDbContext context) : BaseService
 
         if (!account.IsActive)
         {
-            CLogging.Instance.Warn($"Login attempt on disabled account {username} from connection {connection.Id}");
+            CLogging.Instance.Warn($"LoginAccount attempt on disabled account {username} from connection {connection.Id}");
             await connection.SendAsync(CreateErrorPacket("Account is disabled."));
             return;
         }
@@ -131,7 +131,7 @@ public sealed class AccountService(AutoDbContext context) : BaseService
             connection.Authority = account.Role;
             connection.Metadata["Username"] = account.Username;
             CLogging.Instance.Info($"User {username} logged in successfully from connection {connection.Id}");
-            await connection.SendAsync(CreateSuccessPacket("Login successful."));
+            await connection.SendAsync(CreateSuccessPacket("LoginAccount successful."));
         }
         catch (Exception ex)
         {

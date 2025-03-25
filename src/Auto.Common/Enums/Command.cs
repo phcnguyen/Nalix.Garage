@@ -12,14 +12,14 @@ public enum Command : ushort
     UpdateCustomer = 101,
     RemoveCustomer = 102,
     SearchCustomer = 103,
-    GetCustomerById = 104,
+    GetIdByCustomer = 104,
 
     AddVehicle = 201,
     UpdateVehicle = 202,
     RemoveVehicle = 203,
 
     RegisterAccount = 301,
-    Login = 302,
+    LoginAccount = 302,
     UpdatePassword = 303,
     DeleteAccount = 304,
 }

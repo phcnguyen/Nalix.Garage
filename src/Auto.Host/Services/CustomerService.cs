@@ -334,7 +334,7 @@ public sealed class CustomerService(AutoDbContext context) : Base.BaseService
     /// - String: "{customerId}"
     /// - JSON: Customer { Id }
     /// </summary>
-    [PacketCommand((int)Command.GetCustomerById, AuthorityLevel.User)]
+    [PacketCommand((int)Command.GetIdByCustomer, AuthorityLevel.User)]
     public async Task GetCustomerByIdAsync(IPacket packet, IConnection connection)
     {
         int customerId;
@@ -375,7 +375,7 @@ public sealed class CustomerService(AutoDbContext context) : Base.BaseService
 
             await connection.SendAsync(new Packet(
                 PacketType.Json, PacketFlags.None, PacketPriority.Low,
-                (int)Command.GetCustomerById, Encoding.UTF8.GetBytes(JsonSerializer.Serialize(customer))).Serialize());
+                (int)Command.GetIdByCustomer, Encoding.UTF8.GetBytes(JsonSerializer.Serialize(customer))).Serialize());
             CLogging.Instance.Info($"Customer ID {customerId} retrieved successfully by connection {connection.Id}");
         }
         catch (Exception ex)
