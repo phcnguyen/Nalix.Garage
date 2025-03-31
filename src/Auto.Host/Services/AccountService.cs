@@ -3,7 +3,6 @@ using Auto.Common.Entities.Authentication;
 using Auto.Common.Enums;
 using Auto.Database;
 using Auto.Database.Repositories;
-using Auto.Host.Services.Base;
 using Notio.Common.Attributes;
 using Notio.Common.Connection;
 using Notio.Common.Package;
@@ -37,6 +36,7 @@ public sealed class AccountService(AutoDbContext context) : BaseService
     /// <param name="packet">Gói dữ liệu chứa thông tin đăng ký.</param>
     /// <param name="connection">Kết nối với client để gửi phản hồi.</param>
     /// <returns>Task đại diện cho quá trình xử lý bất đồng bộ.</returns>
+    [PacketAccess(AccessLevel.User)]
     [PacketCommand((int)Command.RegisterAccount)]
     public async Task RegisterAccountAsync(IPacket packet, IConnection connection)
     {
@@ -83,6 +83,7 @@ public sealed class AccountService(AutoDbContext context) : BaseService
     /// <param name="packet">Gói dữ liệu chứa thông tin đăng nhập.</param>
     /// <param name="connection">Kết nối với client để gửi phản hồi và cập nhật phiên.</param>
     /// <returns>Task đại diện cho quá trình xử lý bất đồng bộ.</param>
+    [PacketAccess(AccessLevel.User)]
     [PacketCommand((int)Command.LoginAccount)]
     public async Task LoginAsync(IPacket packet, IConnection connection)
     {
@@ -201,6 +202,7 @@ public sealed class AccountService(AutoDbContext context) : BaseService
     /// <param name="packet">Gói dữ liệu chứa mật khẩu cũ và mới.</param>
     /// <param name="connection">Kết nối với client để xác thực và gửi phản hồi.</param>
     /// <returns>Task đại diện cho quá trình xử lý bất đồng bộ.</returns>
+    [PacketAccess(AccessLevel.User)]
     [PacketCommand((int)Command.UpdatePassword)]
     public async Task UpdatePasswordAsync(IPacket packet, IConnection connection)
     {

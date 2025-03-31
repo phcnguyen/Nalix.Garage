@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Notio.Common.Attributes;
 using Notio.Common.Connection;
 using Notio.Common.Package;
+using Notio.Common.Security;
 using Notio.Logging;
 using Notio.Network.Package;
 using Notio.Network.Package.Extensions;
@@ -26,7 +27,7 @@ namespace Auto.Host.Services;
 /// </remarks>
 /// <param name="context">Context của cơ sở dữ liệu để thao tác với bảng Customers.</param>
 [PacketController]
-public sealed class CustomerService(AutoDbContext context) : Base.BaseService
+public sealed class CustomerService(AutoDbContext context) : BaseService
 {
     private readonly Repository<Customer> _customerRepository = new(context);
 
@@ -37,6 +38,7 @@ public sealed class CustomerService(AutoDbContext context) : Base.BaseService
     /// - JSON: Customer { Name, PhoneNumber, Email, Address, TaxCode, Type }
     /// Yêu cầu: Phone và Email không được trùng với khách hàng hiện có.
     /// </summary>
+    [PacketAccess(AccessLevel.User)]
     [PacketCommand((int)Command.AddCustomer)]
     public async Task AddCustomerAsync(IPacket packet, IConnection connection)
     {
@@ -120,6 +122,7 @@ public sealed class CustomerService(AutoDbContext context) : Base.BaseService
     /// - String: "{customerId}:{name}:{phone}:{email}:{address}:{taxCode}"
     /// - JSON: Customer { Id, Name, PhoneNumber, Email, Address, TaxCode }
     /// </summary>
+    [PacketAccess(AccessLevel.User)]
     [PacketCommand((int)Command.UpdateCustomer)]
     public async Task UpdateCustomerAsync(IPacket packet, IConnection connection)
     {
@@ -194,6 +197,7 @@ public sealed class CustomerService(AutoDbContext context) : Base.BaseService
     /// - String: "{customerId}"
     /// - JSON: Customer { Id }
     /// </summary>
+    [PacketAccess(AccessLevel.User)]
     [PacketCommand((int)Command.RemoveCustomer)]
     public async Task RemoveCustomerAsync(IPacket packet, IConnection connection)
     {
@@ -259,6 +263,7 @@ public sealed class CustomerService(AutoDbContext context) : Base.BaseService
     /// - String: "{keyword}:{pageIndex}:{pageSize}"
     /// - JSON: { "Keyword": string, "PageIndex": int, "PageSize": int }
     /// </summary>
+    [PacketAccess(AccessLevel.User)]
     [PacketCommand((int)Command.SearchCustomer)]
     public async Task SearchCustomerAsync(IPacket packet, IConnection connection)
     {
@@ -333,6 +338,7 @@ public sealed class CustomerService(AutoDbContext context) : Base.BaseService
     /// - String: "{customerId}"
     /// - JSON: Customer { Id }
     /// </summary>
+    [PacketAccess(AccessLevel.User)]
     [PacketCommand((int)Command.GetIdByCustomer)]
     public async Task GetCustomerByIdAsync(IPacket packet, IConnection connection)
     {

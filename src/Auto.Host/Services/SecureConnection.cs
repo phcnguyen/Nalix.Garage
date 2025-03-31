@@ -17,7 +17,7 @@ namespace Auto.Host.Services;
 /// Dịch vụ xử lý kết nối bảo mật bằng X25519 và SHA-256.
 /// </summary>
 [PacketController]
-internal sealed class SecureConnection : Base.BaseService
+internal sealed class SecureConnection : BaseService
 {
     /// <summary>
     /// Khởi tạo kết nối bảo mật bằng thuật toán X25519.
@@ -25,6 +25,7 @@ internal sealed class SecureConnection : Base.BaseService
     /// </summary>
     /// <param name="packet">Gói tin chứa khóa công khai X25519 của client.</param>
     /// <param name="connection">Đối tượng kết nối với client.</param>
+    [PacketAccess(AccessLevel.User)]
     [PacketCommand((int)Command.InitiateSecureConnection)]
     public static void InitiateSecureConnection(IPacket packet, IConnection connection)
     {
@@ -80,6 +81,7 @@ internal sealed class SecureConnection : Base.BaseService
     /// </summary>
     /// <param name="packet">Gói tin chứa khóa công khai X25519 của client.</param>
     /// <param name="connection">Đối tượng kết nối với client.</param>
+    [PacketAccess(AccessLevel.User)]
     [PacketCommand((int)Command.FinalizeSecureConnection)]
     public static void FinalizeSecureConnection(IPacket packet, IConnection connection)
     {

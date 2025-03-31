@@ -7,6 +7,7 @@ using Auto.Database.Repositories;
 using Notio.Common.Attributes;
 using Notio.Common.Connection;
 using Notio.Common.Package;
+using Notio.Common.Security;
 using Notio.Logging;
 using System;
 using System.Linq;
@@ -18,7 +19,7 @@ namespace Auto.Host.Services;
 /// <summary>
 /// Dịch vụ quản lý thông tin phương tiện của khách hàng.
 /// </summary>
-public sealed class VehicleService(AutoDbContext context) : Base.BaseService
+public sealed class VehicleService(AutoDbContext context) : BaseService
 {
     private readonly Repository<Vehicle> _vehicleRepository = new(context);
     private readonly Repository<Customer> _customerRepository = new(context);
@@ -33,6 +34,7 @@ public sealed class VehicleService(AutoDbContext context) : Base.BaseService
     /// <param name="packet">Gói dữ liệu chứa thông tin phương tiện.</param>
     /// <param name="connection">Kết nối với client để gửi phản hồi.</param>
     /// <returns>Task đại diện cho quá trình xử lý bất đồng bộ.</returns>
+    [PacketAccess(AccessLevel.User)]
     [PacketCommand((int)Command.AddVehicle)]
     public async Task AddVehicleAsync(IPacket packet, IConnection connection)
     {
@@ -164,6 +166,7 @@ public sealed class VehicleService(AutoDbContext context) : Base.BaseService
     /// <param name="packet">Gói dữ liệu chứa thông tin cập nhật.</param>
     /// <param name="connection">Kết nối với client để gửi phản hồi.</param>
     /// <returns>Task đại diện cho quá trình xử lý bất đồng bộ.</returns>
+    [PacketAccess(AccessLevel.User)]
     [PacketCommand((int)Command.UpdateVehicle)]
     public async Task UpdateVehicleAsync(IPacket packet, IConnection connection)
     {
@@ -283,6 +286,7 @@ public sealed class VehicleService(AutoDbContext context) : Base.BaseService
     /// <param name="packet">Gói dữ liệu chứa ID phương tiện cần xóa.</param>
     /// <param name="connection">Kết nối với client để gửi phản hồi.</param>
     /// <returns>Task đại diện cho quá trình xử lý bất đồng bộ.</returns>
+    [PacketAccess(AccessLevel.User)]
     [PacketCommand((int)Command.RemoveVehicle)]
     public async Task RemoveVehicleAsync(IPacket packet, IConnection connection)
     {

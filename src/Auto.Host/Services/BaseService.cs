@@ -7,7 +7,7 @@ using System.Buffers.Text;
 using System.Runtime.InteropServices;
 using System.Text;
 
-namespace Auto.Host.Services.Base;
+namespace Auto.Host.Services;
 
 /// <summary>
 /// Lớp cơ sở cung cấp các phương thức hỗ trợ cho các dịch vụ xử lý gói tin.
