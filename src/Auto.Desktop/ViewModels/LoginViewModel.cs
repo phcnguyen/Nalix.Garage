@@ -63,7 +63,7 @@ public sealed class LoginViewModel : ViewModelBase
             {
                 NewWindow?.Invoke();
             }
-            else if (packetReceive.Type == (byte)PacketType.String)
+            else if (packetReceive.Type == PacketType.String)
             {
                 MessageBox?.Invoke(Encoding.UTF8.GetString(packetReceive.Payload.Span), "Error", MessageBoxImage.Warning);
             }

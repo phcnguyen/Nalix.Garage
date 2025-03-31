@@ -3,6 +3,7 @@ using Notio.Logging;
 using Notio.Network.PacketProcessing;
 using Notio.Network.Protocols;
 using System;
+using System.Threading;
 
 namespace Auto.Host.Network;
 
@@ -12,9 +13,9 @@ public sealed class ServerProtocol(IPacketDispatcher packetDispatcher) : Protoco
 
     public override bool KeepConnectionOpen => true;
 
-    public override void OnAccept(IConnection connection)
+    public override void OnAccept(IConnection connection, CancellationToken cancellationToken = default)
     {
-        base.OnAccept(connection);
+        base.OnAccept(connection, cancellationToken);
         CLogging.Instance.Info($"[OnAccept] Connection accepted from {connection.RemoteEndPoint}");
     }
 

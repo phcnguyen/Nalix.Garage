@@ -2,6 +2,7 @@
 using Notio.Common.Package;
 using Notio.Common.Security;
 using Notio.Cryptography.Asymmetric;
+using Notio.Cryptography.Hashing;
 using Notio.Network.Package;
 using Notio.Network.Package.Extensions;
 using Notio.Shared.Injection.DI;

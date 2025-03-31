@@ -7,7 +7,6 @@ using Auto.Database.Repositories;
 using Notio.Common.Attributes;
 using Notio.Common.Connection;
 using Notio.Common.Package;
-using Notio.Common.Security;
 using Notio.Logging;
 using System;
 using System.Linq;
@@ -34,7 +33,7 @@ public sealed class VehicleService(AutoDbContext context) : Base.BaseService
     /// <param name="packet">Gói dữ liệu chứa thông tin phương tiện.</param>
     /// <param name="connection">Kết nối với client để gửi phản hồi.</param>
     /// <returns>Task đại diện cho quá trình xử lý bất đồng bộ.</returns>
-    [PacketCommand((int)Command.AddVehicle, AuthorityLevel.User)]
+    [PacketCommand((int)Command.AddVehicle)]
     public async Task AddVehicleAsync(IPacket packet, IConnection connection)
     {
         int customerId;
@@ -45,7 +44,7 @@ public sealed class VehicleService(AutoDbContext context) : Base.BaseService
         string carModel, licensePlate, frameNumber, engineNumber;
         double mileage;
 
-        if (packet.Type == (byte)PacketType.String)
+        if (packet.Type == PacketType.String)
         {
             if (!TryParsePayload(packet, 10, out string[] parts) || parts.Any(string.IsNullOrWhiteSpace))
             {
@@ -69,7 +68,7 @@ public sealed class VehicleService(AutoDbContext context) : Base.BaseService
             engineNumber = parts[8].Trim();
             mileage = ParseDouble(parts[9], 0);
         }
-        else if (packet.Type == (byte)PacketType.Json)
+        else if (packet.Type == PacketType.Json)
         {
             Vehicle? vehicleData = JsonSerializer.Deserialize<Vehicle>(packet.Payload.Span);
             if (vehicleData == null || string.IsNullOrWhiteSpace(vehicleData.CarLicensePlate) ||
@@ -165,7 +164,7 @@ public sealed class VehicleService(AutoDbContext context) : Base.BaseService
     /// <param name="packet">Gói dữ liệu chứa thông tin cập nhật.</param>
     /// <param name="connection">Kết nối với client để gửi phản hồi.</param>
     /// <returns>Task đại diện cho quá trình xử lý bất đồng bộ.</returns>
-    [PacketCommand((int)Command.UpdateVehicle, AuthorityLevel.User)]
+    [PacketCommand((int)Command.UpdateVehicle)]
     public async Task UpdateVehicleAsync(IPacket packet, IConnection connection)
     {
         int vehicleId;
@@ -176,7 +175,7 @@ public sealed class VehicleService(AutoDbContext context) : Base.BaseService
         string carModel, licensePlate, frameNumber, engineNumber;
         double mileage;
 
-        if (packet.Type == (byte)PacketType.String)
+        if (packet.Type == PacketType.String)
         {
             if (!TryParsePayload(packet, 10, out string[] parts) || parts.Any(string.IsNullOrWhiteSpace))
             {
@@ -200,7 +199,7 @@ public sealed class VehicleService(AutoDbContext context) : Base.BaseService
             engineNumber = parts[8].Trim();
             mileage = ParseDouble(parts[9], 0);
         }
-        else if (packet.Type == (byte)PacketType.Json)
+        else if (packet.Type == PacketType.Json)
         {
             Vehicle? vehicleData = JsonSerializer.Deserialize(
                 packet.Payload.Span, JsonContext.Default.Vehicle);
@@ -284,12 +283,12 @@ public sealed class VehicleService(AutoDbContext context) : Base.BaseService
     /// <param name="packet">Gói dữ liệu chứa ID phương tiện cần xóa.</param>
     /// <param name="connection">Kết nối với client để gửi phản hồi.</param>
     /// <returns>Task đại diện cho quá trình xử lý bất đồng bộ.</returns>
-    [PacketCommand((int)Command.RemoveVehicle, AuthorityLevel.Administrator)]
+    [PacketCommand((int)Command.RemoveVehicle)]
     public async Task RemoveVehicleAsync(IPacket packet, IConnection connection)
     {
         int vehicleId;
 
-        if (packet.Type == (byte)PacketType.String)
+        if (packet.Type == PacketType.String)
         {
             if (!TryGetVehicleId(packet, out vehicleId))
             {
@@ -297,7 +296,7 @@ public sealed class VehicleService(AutoDbContext context) : Base.BaseService
                 return;
             }
         }
-        else if (packet.Type == (byte)PacketType.Json)
+        else if (packet.Type == PacketType.Json)
         {
             Vehicle? vehicleData = JsonSerializer.Deserialize(
                 packet.Payload.Span, JsonContext.Default.Vehicle);

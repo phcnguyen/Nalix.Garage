@@ -6,7 +6,6 @@ using Microsoft.EntityFrameworkCore;
 using Notio.Common.Attributes;
 using Notio.Common.Connection;
 using Notio.Common.Package;
-using Notio.Common.Security;
 using Notio.Logging;
 using Notio.Network.Package;
 using Notio.Network.Package.Extensions;
@@ -38,13 +37,13 @@ public sealed class CustomerService(AutoDbContext context) : Base.BaseService
     /// - JSON: Customer { Name, PhoneNumber, Email, Address, TaxCode, Type }
     /// Yêu cầu: Phone và Email không được trùng với khách hàng hiện có.
     /// </summary>
-    [PacketCommand((int)Command.AddCustomer, AuthorityLevel.User)]
+    [PacketCommand((int)Command.AddCustomer)]
     public async Task AddCustomerAsync(IPacket packet, IConnection connection)
     {
         string name, phone, email, address, taxCode;
         CustomerType type;
 
-        if (packet.Type == (byte)PacketType.String)
+        if (packet.Type == PacketType.String)
         {
             if (!TryParsePayload(packet, 6, out string[] parts) || parts.Any(string.IsNullOrWhiteSpace))
             {
@@ -59,7 +58,7 @@ public sealed class CustomerService(AutoDbContext context) : Base.BaseService
             taxCode = parts[4].Trim();
             type = ParseEnum(parts[5], CustomerType.Individual);
         }
-        else if (packet.Type == (byte)PacketType.Json)
+        else if (packet.Type == PacketType.Json)
         {
             Customer? customerData = JsonSerializer.Deserialize(packet.Payload.Span, JsonContext.Default.Customer);
             if (customerData == null ||
@@ -121,13 +120,13 @@ public sealed class CustomerService(AutoDbContext context) : Base.BaseService
     /// - String: "{customerId}:{name}:{phone}:{email}:{address}:{taxCode}"
     /// - JSON: Customer { Id, Name, PhoneNumber, Email, Address, TaxCode }
     /// </summary>
-    [PacketCommand((int)Command.UpdateCustomer, AuthorityLevel.User)]
+    [PacketCommand((int)Command.UpdateCustomer)]
     public async Task UpdateCustomerAsync(IPacket packet, IConnection connection)
     {
         int customerId;
         string name, phone, email, address, taxCode;
 
-        if (packet.Type == (byte)PacketType.String)
+        if (packet.Type == PacketType.String)
         {
             if (!TryParsePayload(packet, 6, out string[] parts) || !int.TryParse(parts[0], out customerId))
             {
@@ -141,7 +140,7 @@ public sealed class CustomerService(AutoDbContext context) : Base.BaseService
             address = parts[4].Trim();
             taxCode = parts[5].Trim();
         }
-        else if (packet.Type == (byte)PacketType.Json)
+        else if (packet.Type == PacketType.Json)
         {
             Customer? customerData = JsonSerializer.Deserialize(packet.Payload.Span, JsonContext.Default.Customer);
             if (customerData == null || customerData.Id <= 0)
@@ -195,12 +194,12 @@ public sealed class CustomerService(AutoDbContext context) : Base.BaseService
     /// - String: "{customerId}"
     /// - JSON: Customer { Id }
     /// </summary>
-    [PacketCommand((int)Command.RemoveCustomer, AuthorityLevel.Administrator)]
+    [PacketCommand((int)Command.RemoveCustomer)]
     public async Task RemoveCustomerAsync(IPacket packet, IConnection connection)
     {
         int customerId;
 
-        if (packet.Type == (byte)PacketType.String)
+        if (packet.Type == PacketType.String)
         {
             if (!TryGetCustomerId(packet, out customerId))
             {
@@ -208,7 +207,7 @@ public sealed class CustomerService(AutoDbContext context) : Base.BaseService
                 return;
             }
         }
-        else if (packet.Type == (byte)PacketType.Json)
+        else if (packet.Type == PacketType.Json)
         {
             Customer? customerData = JsonSerializer.Deserialize(packet.Payload.Span, JsonContext.Default.Customer);
             if (customerData == null || customerData.Id <= 0)
@@ -260,13 +259,13 @@ public sealed class CustomerService(AutoDbContext context) : Base.BaseService
     /// - String: "{keyword}:{pageIndex}:{pageSize}"
     /// - JSON: { "Keyword": string, "PageIndex": int, "PageSize": int }
     /// </summary>
-    [PacketCommand((int)Command.SearchCustomer, AuthorityLevel.User)]
+    [PacketCommand((int)Command.SearchCustomer)]
     public async Task SearchCustomerAsync(IPacket packet, IConnection connection)
     {
         string keyword;
         int pageIndex, pageSize;
 
-        if (packet.Type == (byte)PacketType.String)
+        if (packet.Type == PacketType.String)
         {
             if (!TryParsePayload(packet, 3, out string[] parts) ||
                 !int.TryParse(parts[1], out pageIndex) ||
@@ -277,7 +276,7 @@ public sealed class CustomerService(AutoDbContext context) : Base.BaseService
             }
             keyword = parts[0].Trim();
         }
-        else if (packet.Type == (byte)PacketType.Json)
+        else if (packet.Type == PacketType.Json)
         {
             var searchData = JsonSerializer.Deserialize(packet.Payload.Span, JsonContext.Default.SearchDto);
             if (searchData == null || string.IsNullOrWhiteSpace(searchData.Keyword) || searchData.PageIndex < 0 || searchData.PageSize <= 0)
@@ -334,12 +333,12 @@ public sealed class CustomerService(AutoDbContext context) : Base.BaseService
     /// - String: "{customerId}"
     /// - JSON: Customer { Id }
     /// </summary>
-    [PacketCommand((int)Command.GetIdByCustomer, AuthorityLevel.User)]
+    [PacketCommand((int)Command.GetIdByCustomer)]
     public async Task GetCustomerByIdAsync(IPacket packet, IConnection connection)
     {
         int customerId;
 
-        if (packet.Type == (byte)PacketType.String)
+        if (packet.Type == PacketType.String)
         {
             if (!TryGetCustomerId(packet, out customerId))
             {
@@ -347,7 +346,7 @@ public sealed class CustomerService(AutoDbContext context) : Base.BaseService
                 return;
             }
         }
-        else if (packet.Type == (byte)PacketType.Json)
+        else if (packet.Type == PacketType.Json)
         {
             Customer? customerData = JsonSerializer.Deserialize(packet.Payload.Span, JsonContext.Default.Customer);
             if (customerData == null || customerData.Id <= 0)

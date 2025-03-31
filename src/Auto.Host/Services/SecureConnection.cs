@@ -4,7 +4,7 @@ using Notio.Common.Connection;
 using Notio.Common.Package;
 using Notio.Common.Security;
 using Notio.Cryptography.Asymmetric;
-using Notio.Cryptography.Hash;
+using Notio.Cryptography.Hashing;
 using Notio.Logging;
 using Notio.Network.Package;
 using Notio.Network.Package.Extensions;
@@ -25,10 +25,10 @@ internal sealed class SecureConnection : Base.BaseService
     /// </summary>
     /// <param name="packet">Gói tin chứa khóa công khai X25519 của client.</param>
     /// <param name="connection">Đối tượng kết nối với client.</param>
-    [PacketCommand((int)Command.InitiateSecureConnection, AuthorityLevel.Guest)]
+    [PacketCommand((int)Command.InitiateSecureConnection)]
     public static void InitiateSecureConnection(IPacket packet, IConnection connection)
     {
-        if (packet.Type != (byte)PacketType.Binary)
+        if (packet.Type != PacketType.Binary)
         {
             connection.Send(CreateErrorPacket("Unsupported packet type."));
             return;
@@ -59,7 +59,7 @@ internal sealed class SecureConnection : Base.BaseService
                 (int)Command.Success, publicKey).Serialize()))
             {
                 // Nâng quyền user
-                connection.Authority = AuthorityLevel.User;
+                connection.Authority = AccessLevel.User;
                 CLogging.Instance.Info($"Secure connection initiated successfully for connection {connection.Id}");
             }
             else
@@ -80,10 +80,10 @@ internal sealed class SecureConnection : Base.BaseService
     /// </summary>
     /// <param name="packet">Gói tin chứa khóa công khai X25519 của client.</param>
     /// <param name="connection">Đối tượng kết nối với client.</param>
-    [PacketCommand((int)Command.FinalizeSecureConnection, AuthorityLevel.Guest)]
+    [PacketCommand((int)Command.FinalizeSecureConnection)]
     public static void FinalizeSecureConnection(IPacket packet, IConnection connection)
     {
-        if (packet.Type != (byte)PacketType.Binary)
+        if (packet.Type != PacketType.Binary)
         {
             connection.Send(CreateErrorPacket("Unsupported packet type."));
             return;
