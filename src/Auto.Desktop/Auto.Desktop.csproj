@@ -19,11 +19,9 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\Auto.Common\Auto.Common.csproj" />
-		<PackageReference Include="MahApps.Metro" Version="2.4.10" />
-		<PackageReference Include="MahApps.Metro.IconPacks" Version="5.1.0" />
 
-		<PackageReference Include="Notio.Shared" Version="0.4.13" />
-		<PackageReference Include="Notio.Network.Package" Version="0.4.13" />
+		<PackageReference Include="Notio.Shared" Version="0.4.71" />
+		<PackageReference Include="Notio.Network.Package" Version="0.4.71" />
 	</ItemGroup>
 
 </Project>

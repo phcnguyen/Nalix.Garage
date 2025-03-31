@@ -1,6 +1,6 @@
 ﻿using Notio.Common.Connection;
 using Notio.Logging;
-using Notio.Network.Handlers;
+using Notio.Network.PacketProcessing;
 using Notio.Network.Protocols;
 using System;
 

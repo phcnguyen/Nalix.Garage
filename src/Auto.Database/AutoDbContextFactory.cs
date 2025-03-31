@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Configuration;
-using Notio;
+using Notio.Defaults;
 using Notio.Logging;
 using Npgsql;
 using System;
@@ -84,7 +84,7 @@ public class AutoDbContextFactory : IDesignTimeDbContextFactory<AutoDbContext>
             else if (dbType.Equals("SQLite", StringComparison.OrdinalIgnoreCase))
             {
                 optionsBuilder.UseSqlite(
-                    $"Data Source={DirectoriesDefault.DatabasePath}\\Auto.db",
+                    $"Data Source={DefaultDirectories.DatabasePath}\\Auto.db",
                     sqliteOptions =>
                 {
                     sqliteOptions.CommandTimeout(60);

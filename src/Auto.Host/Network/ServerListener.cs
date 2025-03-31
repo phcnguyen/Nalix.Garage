@@ -1,5 +1,5 @@
-﻿using Notio.Common.Logging;
-using Notio.Common.Memory;
+﻿using Notio.Common.Caching;
+using Notio.Common.Logging;
 using Notio.Network.Listeners;
 using Notio.Network.Protocols;
 

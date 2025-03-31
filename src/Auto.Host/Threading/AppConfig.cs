@@ -1,15 +1,16 @@
 ﻿using Auto.Database;
 using Auto.Host.Network;
 using Auto.Host.Services;
-using Notio;
-using Notio.Common.Enums;
 using Notio.Common.Logging;
+using Notio.Common.Package;
+using Notio.Defaults;
 using Notio.Logging;
 using Notio.Logging.Internal.File;
 using Notio.Logging.Targets;
-using Notio.Network.Handlers;
 using Notio.Network.Package;
-using Notio.Network.Package.Helpers;
+using Notio.Network.Package.Security;
+using Notio.Network.Package.Serialization;
+using Notio.Network.PacketProcessing;
 using Notio.Reflection;
 using Notio.Shared.Memory.Buffers;
 using System;
@@ -82,12 +83,12 @@ public static class AppConfig
         FileLoggerOptions options = new()
         {
             LogFileName = "Auto",
-            LogDirectory = DirectoriesDefault.LogsPath,
+            LogDirectory = DefaultDirectories.LogsPath,
         };
 
         return new CLogging(cfg =>
         {
-            cfg.SetMinLevel(LoggingLevel.Information)
+            cfg.SetMinLevel(LogLevel.Information)
                .AddTarget(new FileLoggingTarget(options))
                .AddTarget(new ConsoleLoggingTarget());
         });
@@ -101,16 +102,17 @@ public static class AppConfig
         }
 
         return new(new ServerProtocol(
-            new PacketDispatcher(cfg => cfg.WithLogging(Logger)
-               .WithPacketSerialization(
-                    packet => new Memory<byte>(PackageSerializeHelper.Serialize((Packet)packet)),
-                    data => PackageSerializeHelper.Deserialize(data.Span))
+            new PacketDispatcher(cfg => cfg
+               .WithLogging(Logger)
                .WithErrorHandler((exception, command) =>
-                   Logger.Error($"Error handling command: {command}", exception))
-               .WithPacketCrypto(
-                    (packet, connect) => PacketEncryptionHelper.EncryptPayload((Packet)packet, connect.EncryptionKey, connect.Mode),
-                    (packet, connect) => PacketEncryptionHelper.DecryptPayload((Packet)packet, connect.EncryptionKey, connect.Mode))
-               .WithPacketCompression(null, null)
+                    Logger.Error($"Error handling command: {command}", exception))
+               .WithTypedDecryption<IPacket>(
+                   (p, c) => PacketEncryption.DecryptPayload((Packet)p, c.EncryptionKey, c.Mode))
+               .WithTypedEncryption<IPacket>(
+                    (p, c) => PacketEncryption.EncryptPayload((Packet)p, c.EncryptionKey, c.Mode))
+               .WithTypedDeserializer<IPacket>(data => PacketSerializationHelper.Deserialize(data.Span))
+               .WithTypedSerializer<IPacket>(
+                    packet => new Memory<byte>(PacketSerializationHelper.Serialize((Packet)packet)))
                .WithHandler<SecureConnection>()
                .WithHandler(() => new AccountService(DbContext))
                .WithHandler(() => new VehicleService(DbContext))

@@ -16,7 +16,7 @@
 		<ProjectReference Include="..\Auto.Common\Auto.Common.csproj" />
 		<ProjectReference Include="..\Auto.Database\Auto.Database.csproj" />
 		
-		<PackageReference Include="Notio.Network" Version="0.4.13" />
+		<PackageReference Include="Notio.Network" Version="0.4.71" />
 	</ItemGroup>
 
 </Project>
