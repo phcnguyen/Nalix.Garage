@@ -93,7 +93,6 @@ public static class AppConfig
                .AddTarget(new ConsoleLoggingTarget());
         });
     }
-    }
 
     public static ServerListener InitializeServer()
     {
