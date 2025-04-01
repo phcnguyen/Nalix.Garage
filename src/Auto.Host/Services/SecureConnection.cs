@@ -25,7 +25,7 @@ internal sealed class SecureConnection : BaseService
     /// </summary>
     /// <param name="packet">Gói tin chứa khóa công khai X25519 của client.</param>
     /// <param name="connection">Đối tượng kết nối với client.</param>
-    [PacketAccess(AccessLevel.User)]
+    [PacketAccess(AccessLevel.Guest)]
     [PacketCommand((int)Command.InitiateSecureConnection)]
     public static void InitiateSecureConnection(IPacket packet, IConnection connection)
     {
@@ -81,7 +81,7 @@ internal sealed class SecureConnection : BaseService
     /// </summary>
     /// <param name="packet">Gói tin chứa khóa công khai X25519 của client.</param>
     /// <param name="connection">Đối tượng kết nối với client.</param>
-    [PacketAccess(AccessLevel.User)]
+    [PacketAccess(AccessLevel.Guest)]
     [PacketCommand((int)Command.FinalizeSecureConnection)]
     public static void FinalizeSecureConnection(IPacket packet, IConnection connection)
     {

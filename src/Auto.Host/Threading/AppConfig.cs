@@ -93,6 +93,7 @@ public static class AppConfig
                .AddTarget(new ConsoleLoggingTarget());
         });
     }
+    }
 
     public static ServerListener InitializeServer()
     {
@@ -149,10 +150,10 @@ public static class AppConfig
     private static void ShowHelp()
     {
         Logger.Info(@"Available shortcuts:
-                                            Ctrl+H → Show help
-                                            Ctrl+Q → Exit application
-                                            Ctrl+R → Restart server
-                                            Ctrl+P → Stop server
+                        Ctrl+H → Show help
+                        Ctrl+Q → Exit application
+                        Ctrl+R → Restart server
+                        Ctrl+P → Stop server
         ");
     }
 
