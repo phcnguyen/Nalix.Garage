@@ -34,8 +34,8 @@ public sealed class VehicleService(AutoDbContext context) : BaseService
     /// <param name="packet">Gói dữ liệu chứa thông tin phương tiện.</param>
     /// <param name="connection">Kết nối với client để gửi phản hồi.</param>
     /// <returns>Task đại diện cho quá trình xử lý bất đồng bộ.</returns>
-    [PacketAccess(AccessLevel.User)]
-    [PacketCommand((int)Command.AddVehicle)]
+    [PacketId((int)Command.AddVehicle)]
+    [PacketPermission(PermissionLevel.User)]
     public async Task AddVehicleAsync(IPacket packet, IConnection connection)
     {
         int customerId;
@@ -166,8 +166,8 @@ public sealed class VehicleService(AutoDbContext context) : BaseService
     /// <param name="packet">Gói dữ liệu chứa thông tin cập nhật.</param>
     /// <param name="connection">Kết nối với client để gửi phản hồi.</param>
     /// <returns>Task đại diện cho quá trình xử lý bất đồng bộ.</returns>
-    [PacketAccess(AccessLevel.User)]
-    [PacketCommand((int)Command.UpdateVehicle)]
+    [PacketId((int)Command.UpdateVehicle)]
+    [PacketPermission(PermissionLevel.User)]
     public async Task UpdateVehicleAsync(IPacket packet, IConnection connection)
     {
         int vehicleId;
@@ -286,8 +286,8 @@ public sealed class VehicleService(AutoDbContext context) : BaseService
     /// <param name="packet">Gói dữ liệu chứa ID phương tiện cần xóa.</param>
     /// <param name="connection">Kết nối với client để gửi phản hồi.</param>
     /// <returns>Task đại diện cho quá trình xử lý bất đồng bộ.</returns>
-    [PacketAccess(AccessLevel.User)]
-    [PacketCommand((int)Command.RemoveVehicle)]
+    [PacketId((int)Command.RemoveVehicle)]
+    [PacketPermission(PermissionLevel.User)]
     public async Task RemoveVehicleAsync(IPacket packet, IConnection connection)
     {
         int vehicleId;

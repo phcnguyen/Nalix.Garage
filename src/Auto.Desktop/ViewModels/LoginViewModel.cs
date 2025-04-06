@@ -54,12 +54,13 @@ public sealed class LoginViewModel : ViewModelBase
         try
         {
             NetworkClient.Instance.Send(new Packet(
-                PacketType.Json, PacketFlags.None, PacketPriority.None,
-                (ushort)Command.LoginAccount, JsonBuffer.SerializeToBytes(account, JsonContext.Default.AccountDto)));
+                (ushort)Command.LoginAccount,
+                PacketCode.Success, PacketType.Json, PacketFlags.None, PacketPriority.None,
+                JsonBuffer.SerializeToBytes(account, JsonContext.Default.AccountDto)));
 
             IPacket packetReceive = NetworkClient.Instance.Receive();
 
-            if (packetReceive.Command == 1)
+            if (packetReceive.Code == PacketCode.Success)
             {
                 NewWindow?.Invoke();
             }
