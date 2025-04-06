@@ -65,7 +65,7 @@ public class Account
     /// Vai trò của tài khoản trong hệ thống.
     /// </summary>
     [Required]
-    public AccessLevel Role { get; set; } = AccessLevel.Guest;
+    public PermissionLevel Role { get; set; } = PermissionLevel.Guest;
 
     /// <summary>
     /// Trạng thái hoạt động của tài khoản.

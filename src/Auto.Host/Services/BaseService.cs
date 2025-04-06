@@ -1,7 +1,5 @@
-﻿using Auto.Common.Enums;
-using Notio.Common.Package;
+﻿using Notio.Common.Package;
 using Notio.Network.Package;
-using Notio.Network.Package.Extensions;
 using System;
 using System.Buffers.Text;
 using System.Runtime.InteropServices;
@@ -27,20 +25,20 @@ public abstract class BaseService
     /// <summary>
     /// Tạo gói tin chứa lỗi.
     /// </summary>
-    protected static byte[] CreateErrorPacket(string message)
-        => new Packet(PacketFlags.None, PacketPriority.None, (ushort)Command.Error, message).Serialize();
+    protected static Memory<byte> CreateErrorPacket(string message)
+        => new Packet(0, PacketCode.UnknownError, PacketFlags.None, PacketPriority.None, message).Serialize();
 
     /// <summary>
     /// Tạo gói tin chứa lỗi.
     /// </summary>
-    protected static byte[] InvalidDataPacket()
+    protected static Memory<byte> InvalidDataPacket()
         => CreateErrorPacket("Invalid data format.");
 
     /// <summary>
     /// Tạo gói tin phản hồi thành công.
     /// </summary>
-    protected static byte[] CreateSuccessPacket(string message)
-        => new Packet(PacketFlags.None, PacketPriority.None, (ushort)Command.Success, message).Serialize();
+    protected static Memory<byte> CreateSuccessPacket(string message)
+        => new Packet(0, PacketCode.Success, PacketFlags.None, PacketPriority.None, message).Serialize();
 
     /// <summary>
     /// Chuyển đổi chuỗi thành số nguyên, nếu không hợp lệ thì trả về giá trị mặc định.

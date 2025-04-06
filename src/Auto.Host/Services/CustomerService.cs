@@ -9,7 +9,6 @@ using Notio.Common.Package;
 using Notio.Common.Security;
 using Notio.Logging;
 using Notio.Network.Package;
-using Notio.Network.Package.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -38,8 +37,8 @@ public sealed class CustomerService(AutoDbContext context) : BaseService
     /// - JSON: Customer { Name, PhoneNumber, Email, Address, TaxCode, Type }
     /// Yêu cầu: Phone và Email không được trùng với khách hàng hiện có.
     /// </summary>
-    [PacketAccess(AccessLevel.User)]
-    [PacketCommand((int)Command.AddCustomer)]
+    [PacketId((int)Command.AddCustomer)]
+    [PacketPermission(PermissionLevel.User)]
     public async Task AddCustomerAsync(IPacket packet, IConnection connection)
     {
         string name, phone, email, address, taxCode;
@@ -122,8 +121,8 @@ public sealed class CustomerService(AutoDbContext context) : BaseService
     /// - String: "{customerId}:{name}:{phone}:{email}:{address}:{taxCode}"
     /// - JSON: Customer { Id, Name, PhoneNumber, Email, Address, TaxCode }
     /// </summary>
-    [PacketAccess(AccessLevel.User)]
-    [PacketCommand((int)Command.UpdateCustomer)]
+    [PacketId((int)Command.UpdateCustomer)]
+    [PacketPermission(PermissionLevel.User)]
     public async Task UpdateCustomerAsync(IPacket packet, IConnection connection)
     {
         int customerId;
@@ -197,8 +196,8 @@ public sealed class CustomerService(AutoDbContext context) : BaseService
     /// - String: "{customerId}"
     /// - JSON: Customer { Id }
     /// </summary>
-    [PacketAccess(AccessLevel.User)]
-    [PacketCommand((int)Command.RemoveCustomer)]
+    [PacketId((int)Command.RemoveCustomer)]
+    [PacketPermission(PermissionLevel.User)]
     public async Task RemoveCustomerAsync(IPacket packet, IConnection connection)
     {
         int customerId;
@@ -263,8 +262,8 @@ public sealed class CustomerService(AutoDbContext context) : BaseService
     /// - String: "{keyword}:{pageIndex}:{pageSize}"
     /// - JSON: { "Keyword": string, "PageIndex": int, "PageSize": int }
     /// </summary>
-    [PacketAccess(AccessLevel.User)]
-    [PacketCommand((int)Command.SearchCustomer)]
+    [PacketId((int)Command.SearchCustomer)]
+    [PacketPermission(PermissionLevel.User)]
     public async Task SearchCustomerAsync(IPacket packet, IConnection connection)
     {
         string keyword;
@@ -320,9 +319,9 @@ public sealed class CustomerService(AutoDbContext context) : BaseService
                 return;
             }
 
-            await connection.SendAsync(new Packet(
-                PacketType.List, PacketFlags.None, PacketPriority.Low,
-                (int)Command.SearchCustomer, Encoding.UTF8.GetBytes(JsonSerializer.Serialize(customers))).Serialize());
+            await connection.SendAsync(new Packet((int)Command.SearchCustomer,
+                 PacketCode.Success, PacketType.List, PacketFlags.None, PacketPriority.Low,
+                 Encoding.UTF8.GetBytes(JsonSerializer.Serialize(customers))).Serialize());
             CLogging.Instance.Info($"Found {customers.Count} customers for keyword '{keyword}' by connection {connection.Id}");
         }
         catch (Exception ex)
@@ -338,8 +337,8 @@ public sealed class CustomerService(AutoDbContext context) : BaseService
     /// - String: "{customerId}"
     /// - JSON: Customer { Id }
     /// </summary>
-    [PacketAccess(AccessLevel.User)]
-    [PacketCommand((int)Command.GetIdByCustomer)]
+    [PacketId((int)Command.GetIdByCustomer)]
+    [PacketPermission(PermissionLevel.User)]
     public async Task GetCustomerByIdAsync(IPacket packet, IConnection connection)
     {
         int customerId;
@@ -378,9 +377,10 @@ public sealed class CustomerService(AutoDbContext context) : BaseService
                 return;
             }
 
-            await connection.SendAsync(new Packet(
-                PacketType.Json, PacketFlags.None, PacketPriority.Low,
-                (int)Command.GetIdByCustomer, Encoding.UTF8.GetBytes(JsonSerializer.Serialize(customer))).Serialize());
+            await connection.SendAsync(new Packet((int)Command.GetIdByCustomer,
+                PacketCode.Success, PacketType.Json, PacketFlags.None, PacketPriority.Low,
+                Encoding.UTF8.GetBytes(JsonSerializer.Serialize(customer))).Serialize());
+
             CLogging.Instance.Info($"Customer ID {customerId} retrieved successfully by connection {connection.Id}");
         }
         catch (Exception ex)

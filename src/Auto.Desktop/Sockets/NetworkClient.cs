@@ -1,6 +1,6 @@
 ﻿using Auto.Common.Enums;
+using Notio.Common.Cryptography;
 using Notio.Common.Package;
-using Notio.Common.Security;
 using Notio.Cryptography.Asymmetric;
 using Notio.Cryptography.Hashing;
 using Notio.Network.Package;
@@ -102,8 +102,8 @@ public sealed class NetworkClient : SingletonBase<NetworkClient>, IDisposable, I
 
             // Gửi public key cho server
             Packet packet = new(
-                PacketType.Binary, PacketFlags.None, PacketPriority.None,
-                (ushort)Command.InitiateSecureConnection, publicKey
+                (ushort)Command.InitiateSecureConnection, PacketCode.Success,
+                PacketType.Binary, PacketFlags.None, PacketPriority.None, publicKey
             );
 
             await Instance.SendAsync(packet);
@@ -185,11 +185,7 @@ public sealed class NetworkClient : SingletonBase<NetworkClient>, IDisposable, I
 
         try
         {
-            if (packet is not Packet concretePacket)
-                throw new ArgumentException("Invalid packet type.", nameof(packet));
-
-            Console.WriteLine($"Sending packet: {concretePacket}");
-            _stream!.Write(concretePacket.Serialize());
+            _stream!.Write(packet.Serialize().ToArray());
             _stream.Flush();
         }
         catch (Exception ex) when (ex is IOException || ex is SocketException)

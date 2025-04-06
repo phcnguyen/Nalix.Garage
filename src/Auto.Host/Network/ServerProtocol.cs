@@ -1,15 +1,16 @@
 ﻿using Notio.Common.Connection;
 using Notio.Logging;
-using Notio.Network.PacketProcessing;
+using Notio.Network.Dispatcher;
+using Notio.Network.Package;
 using Notio.Network.Protocols;
 using System;
 using System.Threading;
 
 namespace Auto.Host.Network;
 
-public sealed class ServerProtocol(IPacketDispatcher packetDispatcher) : Protocol
+public sealed class ServerProtocol(IPacketDispatcher<Packet> packetDispatcher) : Protocol
 {
-    private readonly IPacketDispatcher _packetDispatcher = packetDispatcher;
+    private readonly IPacketDispatcher<Packet> _packetDispatcher = packetDispatcher;
 
     public override bool KeepConnectionOpen => true;
 

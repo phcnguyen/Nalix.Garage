@@ -36,8 +36,8 @@ public sealed class AccountService(AutoDbContext context) : BaseService
     /// <param name="packet">Gói dữ liệu chứa thông tin đăng ký.</param>
     /// <param name="connection">Kết nối với client để gửi phản hồi.</param>
     /// <returns>Task đại diện cho quá trình xử lý bất đồng bộ.</returns>
-    [PacketAccess(AccessLevel.User)]
-    [PacketCommand((int)Command.RegisterAccount)]
+    [PacketId((int)Command.RegisterAccount)]
+    [PacketPermission(PermissionLevel.User)]
     public async Task RegisterAccountAsync(IPacket packet, IConnection connection)
     {
         var (isValid, username, password) = await ValidatePacketAsync(packet, connection);
@@ -58,7 +58,7 @@ public sealed class AccountService(AutoDbContext context) : BaseService
                 Username = username,
                 Salt = salt,
                 Hash = hash,
-                Role = AccessLevel.User,
+                Role = PermissionLevel.User,
                 CreatedAt = DateTime.UtcNow
             };
 
@@ -83,8 +83,8 @@ public sealed class AccountService(AutoDbContext context) : BaseService
     /// <param name="packet">Gói dữ liệu chứa thông tin đăng nhập.</param>
     /// <param name="connection">Kết nối với client để gửi phản hồi và cập nhật phiên.</param>
     /// <returns>Task đại diện cho quá trình xử lý bất đồng bộ.</param>
-    [PacketAccess(AccessLevel.User)]
-    [PacketCommand((int)Command.LoginAccount)]
+    [PacketId((int)Command.LoginAccount)]
+    [PacketPermission(PermissionLevel.User)]
     public async Task LoginAsync(IPacket packet, IConnection connection)
     {
         var (isValid, username, password) = await ValidatePacketAsync(packet, connection);
@@ -129,7 +129,7 @@ public sealed class AccountService(AutoDbContext context) : BaseService
             account.LastLogin = DateTime.UtcNow;
             await _accountRepository.SaveChangesAsync();
 
-            connection.Authority = account.Role;
+            connection.Level = account.Role;
             connection.Metadata["Username"] = account.Username;
             CLogging.Instance.Info($"User {username} logged in successfully from connection {connection.Id}");
             await connection.SendAsync(CreateSuccessPacket("LoginAccount successful."));
@@ -150,8 +150,8 @@ public sealed class AccountService(AutoDbContext context) : BaseService
     /// <param name="packet">Gói dữ liệu chứa ID tài khoản cần xóa.</param>
     /// <param name="connection">Kết nối với client để gửi phản hồi.</param>
     /// <returns>Task đại diện cho quá trình xử lý bất đồng bộ.</returns>
-    [PacketAccess(AccessLevel.Administrator)]
-    [PacketCommand((int)Command.DeleteAccount)]
+    [PacketId((int)Command.DeleteAccount)]
+    [PacketPermission(PermissionLevel.User)]
     public async Task DeleteAccountAsync(IPacket packet, IConnection connection)
     {
         int accountId;
@@ -202,8 +202,8 @@ public sealed class AccountService(AutoDbContext context) : BaseService
     /// <param name="packet">Gói dữ liệu chứa mật khẩu cũ và mới.</param>
     /// <param name="connection">Kết nối với client để xác thực và gửi phản hồi.</param>
     /// <returns>Task đại diện cho quá trình xử lý bất đồng bộ.</returns>
-    [PacketAccess(AccessLevel.User)]
-    [PacketCommand((int)Command.UpdatePassword)]
+    [PacketId((int)Command.UpdatePassword)]
+    [PacketPermission(PermissionLevel.User)]
     public async Task UpdatePasswordAsync(IPacket packet, IConnection connection)
     {
         string oldPassword, newPassword;

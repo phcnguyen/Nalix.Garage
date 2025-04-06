@@ -2,16 +2,18 @@
 using Auto.Host.Network;
 using Auto.Host.Services;
 using Notio.Common.Logging;
-using Notio.Common.Package;
+using Notio.Cryptography.Asymmetric;
+using Notio.Cryptography.Hashing;
 using Notio.Defaults;
 using Notio.Logging;
-using Notio.Logging.Internal.File;
+using Notio.Logging.Options;
 using Notio.Logging.Targets;
+using Notio.Network.Dispatcher;
+using Notio.Network.Dispatcher.BuiltIn;
 using Notio.Network.Package;
 using Notio.Network.Package.Security;
 using Notio.Network.Package.Serialization;
-using Notio.Network.PacketProcessing;
-using Notio.Reflection;
+using Notio.Runtime.Assemblies;
 using Notio.Shared.Memory.Buffers;
 using System;
 using System.Collections.Concurrent;
@@ -33,7 +35,7 @@ public static class AppConfig
     public static readonly ManualResetEventSlim ExitEvent = new(false);
 
     public static string VersionInfo =>
-        $"Version {AssemblyMetadata.GetAssemblyInformationalVersion()} | {(IsDebug ? "Debug" : "Release")}";
+        $"Version {AssemblyInspector.GetAssemblyInformationalVersion()} | {(IsDebug ? "Debug" : "Release")}";
 
     private static readonly ConcurrentDictionary<ConsoleKey, Action> Shortcuts = new()
     {
@@ -101,22 +103,18 @@ public static class AppConfig
             throw new InvalidOperationException("Database context is not initialized.");
         }
 
-        return new(new ServerProtocol(
-            new PacketDispatcher(cfg => cfg
-               .WithLogging(Logger)
-               .WithErrorHandler((exception, command) =>
-                    Logger.Error($"Error handling command: {command}", exception))
-               .WithTypedDecryption<IPacket>(
-                   (p, c) => PacketEncryption.DecryptPayload((Packet)p, c.EncryptionKey, c.Mode))
-               .WithTypedEncryption<IPacket>(
-                    (p, c) => PacketEncryption.EncryptPayload((Packet)p, c.EncryptionKey, c.Mode))
-               .WithTypedDeserializer<IPacket>(data => PacketSerializationHelper.Deserialize(data.Span))
-               .WithTypedSerializer<IPacket>(
-                    packet => new Memory<byte>(PacketSerializationHelper.Serialize((Packet)packet)))
-               .WithHandler<SecureConnection>()
-               .WithHandler(() => new AccountService(DbContext))
-               .WithHandler(() => new VehicleService(DbContext))
-               .WithHandler(() => new CustomerService(DbContext))
+        return new ServerListener(
+               new ServerProtocol(new PacketDispatcher<Packet>(cfg => cfg
+                   .WithLogging(Logger)
+                   .WithErrorHandling((exception, command) =>
+                        Logger.Error($"Error handling command: {command}", exception))
+                   .WithDecryption((p, c) => PacketEncryption.DecryptPayload(p, c.EncryptionKey, c.Mode))
+                   .WithEncryption((p, c) => PacketEncryption.EncryptPayload(p, c.EncryptionKey, c.Mode))
+                   .WithDeserializer(data => PacketSerializer.Deserialize(data.Span))
+                   .WithHandler(() => new Handshake(new Sha256(), new X25519(), Logger))
+                   .WithHandler(() => new AccountService(DbContext))
+                   .WithHandler(() => new VehicleService(DbContext))
+                   .WithHandler(() => new CustomerService(DbContext))
         )), new BufferAllocator(), Logger);
     }
 

@@ -1,7 +1,7 @@
 ﻿using Notio.Common.Caching;
 using Notio.Common.Logging;
+using Notio.Network.Core;
 using Notio.Network.Listeners;
-using Notio.Network.Protocols;
 
 namespace Auto.Host.Network;
 
