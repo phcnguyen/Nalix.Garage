@@ -1,0 +1,27 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<UseWPF>true</UseWPF>
+		<Nullable>enable</Nullable>
+		<OutputType>WinExe</OutputType>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<StartupObject>Auto.Desktop.App</StartupObject>
+		<TargetFramework>net9.0-windows</TargetFramework>
+
+		<!-- Đặt icon cho file .exe -->
+		<ApplicationIcon>..\..\assets\Automation.ico</ApplicationIcon>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<Folder Include="Resources\Fonts\" />
+		<Folder Include="Resources\Images\" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\NalixGarage.Common\NalixGarage.Common.csproj" />
+
+		<PackageReference Include="Notio.Shared" Version="0.5.11" />
+		<PackageReference Include="Notio.Network.Package" Version="0.5.11" />
+	</ItemGroup>
+
+</Project>
