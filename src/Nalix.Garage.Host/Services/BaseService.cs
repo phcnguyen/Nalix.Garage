@@ -1,5 +1,6 @@
-﻿using Notio.Common.Package;
-using Notio.Network.Package;
+﻿using Nalix.Common.Package;
+using Nalix.Common.Package.Enums;
+using Nalix.Network.Package;
 using System;
 using System.Buffers.Text;
 using System.Runtime.InteropServices;
@@ -26,7 +27,7 @@ public abstract class BaseService
     /// Tạo gói tin chứa lỗi.
     /// </summary>
     protected static Memory<byte> CreateErrorPacket(string message)
-        => new Packet(0, PacketCode.UnknownError, PacketFlags.None, PacketPriority.None, message).Serialize();
+        => new Packet(0, PacketCode.UnknownError, PacketFlags.None, PacketPriority.Low, message).Serialize();
 
     /// <summary>
     /// Tạo gói tin chứa lỗi.
@@ -38,7 +39,7 @@ public abstract class BaseService
     /// Tạo gói tin phản hồi thành công.
     /// </summary>
     protected static Memory<byte> CreateSuccessPacket(string message)
-        => new Packet(0, PacketCode.Success, PacketFlags.None, PacketPriority.None, message).Serialize();
+        => new Packet(0, PacketCode.Success, PacketFlags.None, PacketPriority.Low, message).Serialize();
 
     /// <summary>
     /// Chuyển đổi chuỗi thành số nguyên, nếu không hợp lệ thì trả về giá trị mặc định.

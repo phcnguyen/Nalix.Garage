@@ -1,15 +1,17 @@
-﻿using Nalix.Garage.Common.Dto;
+﻿using Nalix.Common.Connection;
+using Nalix.Common.Package;
+using Nalix.Common.Package.Attributes;
+using Nalix.Common.Package.Enums;
+using Nalix.Common.Security;
+using Nalix.Cryptography.Security;
+using Nalix.Garage.Common;
+using Nalix.Garage.Common.Dto;
 using Nalix.Garage.Common.Entities.Authentication;
 using Nalix.Garage.Common.Enums;
 using Nalix.Garage.Database;
 using Nalix.Garage.Database.Repositories;
-using Notio.Common.Attributes;
-using Notio.Common.Connection;
-using Notio.Common.Package;
-using Notio.Common.Security;
-using Notio.Cryptography.Security;
-using Notio.Logging;
-using Notio.Utilities;
+using Nalix.Logging;
+using Nalix.Serialization;
 using System;
 using System.Threading.Tasks;
 
@@ -45,14 +47,14 @@ public sealed class AccountService(AutoDbContext context) : BaseService
 
         if (await _accountRepository.AnyAsync(a => a.Username == username))
         {
-            CLogging.Instance.Warn($"Username {username} already exists from connection {connection.Id}");
+            NLogix.Host.Instance.Warn($"Username {username} already exists from connection {connection.Id}");
             await connection.SendAsync(CreateErrorPacket("Username already existed."));
             return;
         }
 
         try
         {
-            PasswordSecurity.HashPassword(password, out byte[] salt, out byte[] hash);
+            SecureCredentials.GenerateCredentialHash(password, out byte[] salt, out byte[] hash);
             Account newAccount = new()
             {
                 Username = username,
@@ -64,12 +66,12 @@ public sealed class AccountService(AutoDbContext context) : BaseService
 
             _accountRepository.Add(newAccount);
             await _accountRepository.SaveChangesAsync();
-            CLogging.Instance.Info($"Account {username} registered successfully from connection {connection.Id}");
+            NLogix.Host.Instance.Info($"Account {username} registered successfully from connection {connection.Id}");
             await connection.SendAsync(CreateSuccessPacket("Account registered successfully."));
         }
         catch (Exception ex)
         {
-            CLogging.Instance.Error($"Failed to register account {username} from connection {connection.Id}", ex);
+            NLogix.Host.Instance.Error($"Failed to register account {username} from connection {connection.Id}", ex);
             await connection.SendAsync(CreateErrorPacket("Failed to register account due to an internal error."));
         }
     }
@@ -93,7 +95,7 @@ public sealed class AccountService(AutoDbContext context) : BaseService
         Account? account = await _accountRepository.GetFirstOrDefaultAsync(a => a.Username == username);
         if (account == null)
         {
-            CLogging.Instance.Warn($"LoginAccount attempt with non-existent username {username} from connection {connection.Id}");
+            NLogix.Host.Instance.Warn($"LoginAccount attempt with non-existent username {username} from connection {connection.Id}");
             await connection.SendAsync(CreateErrorPacket("Username does not exist."));
             return;
         }
@@ -101,24 +103,24 @@ public sealed class AccountService(AutoDbContext context) : BaseService
         if (account.FailedLoginAttempts >= 5 && account.LastFailedLogin.HasValue &&
             DateTime.UtcNow < account.LastFailedLogin.Value.AddMinutes(15))
         {
-            CLogging.Instance.Warn($"Account {username} locked due to too many failed attempts from connection {connection.Id}");
+            NLogix.Host.Instance.Warn($"Account {username} locked due to too many failed attempts from connection {connection.Id}");
             await connection.SendAsync(CreateErrorPacket("Account locked due to too many failed attempts."));
             return;
         }
 
-        if (!PasswordSecurity.VerifyPassword(password, account.Salt, account.Hash))
+        if (!SecureCredentials.VerifyCredentialHash(password, account.Salt, account.Hash))
         {
             account.FailedLoginAttempts++;
             account.LastFailedLogin = DateTime.UtcNow;
             await _accountRepository.SaveChangesAsync();
-            CLogging.Instance.Warn($"Incorrect password for {username}, attempt {account.FailedLoginAttempts} from connection {connection.Id}");
+            NLogix.Host.Instance.Warn($"Incorrect password for {username}, attempt {account.FailedLoginAttempts} from connection {connection.Id}");
             await connection.SendAsync(CreateErrorPacket("Incorrect password."));
             return;
         }
 
         if (!account.IsActive)
         {
-            CLogging.Instance.Warn($"LoginAccount attempt on disabled account {username} from connection {connection.Id}");
+            NLogix.Host.Instance.Warn($"LoginAccount attempt on disabled account {username} from connection {connection.Id}");
             await connection.SendAsync(CreateErrorPacket("Account is disabled."));
             return;
         }
@@ -131,12 +133,12 @@ public sealed class AccountService(AutoDbContext context) : BaseService
 
             connection.Level = account.Role;
             connection.Metadata["Username"] = account.Username;
-            CLogging.Instance.Info($"User {username} logged in successfully from connection {connection.Id}");
+            NLogix.Host.Instance.Info($"User {username} logged in successfully from connection {connection.Id}");
             await connection.SendAsync(CreateSuccessPacket("LoginAccount successful."));
         }
         catch (Exception ex)
         {
-            CLogging.Instance.Error($"Failed to complete login for {username} from connection {connection.Id}", ex);
+            NLogix.Host.Instance.Error($"Failed to complete login for {username} from connection {connection.Id}", ex);
             await connection.SendAsync(CreateErrorPacket("Failed to login due to an internal error."));
         }
     }
@@ -173,7 +175,7 @@ public sealed class AccountService(AutoDbContext context) : BaseService
         Account? account = await _accountRepository.GetByIdAsync(accountId);
         if (account == null)
         {
-            CLogging.Instance.Warn($"Attempt to delete non-existent account ID {accountId} from connection {connection.Id}");
+            NLogix.Host.Instance.Warn($"Attempt to delete non-existent account ID {accountId} from connection {connection.Id}");
             await connection.SendAsync(CreateErrorPacket("Account not found."));
             return;
         }
@@ -182,12 +184,12 @@ public sealed class AccountService(AutoDbContext context) : BaseService
         {
             _accountRepository.Delete(account);
             await _accountRepository.SaveChangesAsync();
-            CLogging.Instance.Info($"Account ID {accountId} (Username: {account.Username}) deleted successfully by connection {connection.Id}");
+            NLogix.Host.Instance.Info($"Account ID {accountId} (Username: {account.Username}) deleted successfully by connection {connection.Id}");
             await connection.SendAsync(CreateSuccessPacket("Account deleted successfully."));
         }
         catch (Exception ex)
         {
-            CLogging.Instance.Error($"Failed to delete account ID {accountId} from connection {connection.Id}", ex);
+            NLogix.Host.Instance.Error($"Failed to delete account ID {accountId} from connection {connection.Id}", ex);
             await connection.SendAsync(CreateErrorPacket("Failed to delete account due to an internal error."));
         }
     }
@@ -222,7 +224,7 @@ public sealed class AccountService(AutoDbContext context) : BaseService
         }
         else if (packet.Type == PacketType.Json)
         {
-            PasswordChangeDto? acc = JsonBuffer.DeserializeFromBytes(
+            PasswordChangeDto? acc = JsonCodec.DeserializeFromBytes(
                 packet.Payload.Span, JsonContext.Default.PasswordChangeDto);
 
             if (acc == null ||
@@ -249,7 +251,7 @@ public sealed class AccountService(AutoDbContext context) : BaseService
 
         if (!connection.Metadata.TryGetValue("Username", out object? value) || value is not string sessionUsername)
         {
-            CLogging.Instance.Warn($"Unauthorized password update attempt from connection {connection.Id}");
+            NLogix.Host.Instance.Warn($"Unauthorized password update attempt from connection {connection.Id}");
             await connection.SendAsync(CreateErrorPacket("You are not allowed to change this password."));
             return;
         }
@@ -257,30 +259,30 @@ public sealed class AccountService(AutoDbContext context) : BaseService
         Account? account = await _accountRepository.GetFirstOrDefaultAsync(a => a.Username == sessionUsername);
         if (account == null)
         {
-            CLogging.Instance.Warn($"Account not found for username {sessionUsername} from connection {connection.Id}");
+            NLogix.Host.Instance.Warn($"Account not found for username {sessionUsername} from connection {connection.Id}");
             await connection.SendAsync(CreateErrorPacket("Account not found."));
             return;
         }
 
-        if (!PasswordSecurity.VerifyPassword(oldPassword, account.Salt, account.Hash))
+        if (!SecureCredentials.VerifyCredentialHash(oldPassword, account.Salt, account.Hash))
         {
-            CLogging.Instance.Warn($"Incorrect old password for {sessionUsername} from connection {connection.Id}");
+            NLogix.Host.Instance.Warn($"Incorrect old password for {sessionUsername} from connection {connection.Id}");
             await connection.SendAsync(CreateErrorPacket("Incorrect old password."));
             return;
         }
 
         try
         {
-            PasswordSecurity.HashPassword(newPassword, out byte[] salt, out byte[] hash);
+            SecureCredentials.GenerateCredentialHash(newPassword, out byte[] salt, out byte[] hash);
             account.Salt = salt;
             account.Hash = hash;
             await _accountRepository.SaveChangesAsync();
-            CLogging.Instance.Info($"Password updated successfully for {sessionUsername} from connection {connection.Id}");
+            NLogix.Host.Instance.Info($"Password updated successfully for {sessionUsername} from connection {connection.Id}");
             await connection.SendAsync(CreateSuccessPacket("Password updated successfully."));
         }
         catch (Exception ex)
         {
-            CLogging.Instance.Error($"Failed to update password for {sessionUsername} from connection {connection.Id}", ex);
+            NLogix.Host.Instance.Error($"Failed to update password for {sessionUsername} from connection {connection.Id}", ex);
             await connection.SendAsync(CreateErrorPacket("Failed to update password due to an internal error."));
         }
     }
@@ -307,7 +309,7 @@ public sealed class AccountService(AutoDbContext context) : BaseService
         }
         else if (packet.Type == PacketType.Json)
         {
-            AccountDto? acc = JsonBuffer.DeserializeFromBytes(
+            AccountDto? acc = JsonCodec.DeserializeFromBytes(
                 packet.Payload.Span, JsonContext.Default.AccountDto);
 
             if (acc == null ||

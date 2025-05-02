@@ -9,7 +9,7 @@
 		
 		<AssemblyName>NalixHost</AssemblyName>
 		<ApplicationIcon>..\..\assets\SwitchHost.ico</ApplicationIcon>
-		<StartupObject>NalixGarage.Host.Threading.Program</StartupObject>
+		<StartupObject>Nalix.Garage.Host.Threading.Program</StartupObject>
 	</PropertyGroup>
 
 	<ItemGroup>

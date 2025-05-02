@@ -1,14 +1,16 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Nalix.Common.Connection;
+using Nalix.Common.Package;
+using Nalix.Common.Package.Attributes;
+using Nalix.Common.Package.Enums;
+using Nalix.Common.Security;
+using Nalix.Garage.Common;
 using Nalix.Garage.Common.Entities.Customers;
 using Nalix.Garage.Common.Enums;
 using Nalix.Garage.Database;
 using Nalix.Garage.Database.Repositories;
-using Notio.Common.Attributes;
-using Notio.Common.Connection;
-using Notio.Common.Package;
-using Notio.Common.Security;
-using Notio.Logging;
-using Notio.Network.Package;
+using Nalix.Logging;
+using Nalix.Network.Package;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -86,7 +88,7 @@ public sealed class CustomerService(AutoDbContext context) : BaseService
         // Kiểm tra khách hàng đã tồn tại chưa
         if (await _customerRepository.AnyAsync(c => c.PhoneNumber == phone || c.Email == email))
         {
-            CLogging.Instance.Warn($"Attempt to add customer with existing phone {phone} or email {email} from connection {connection.Id}");
+            NLogix.Host.Instance.Warn($"Attempt to add customer with existing phone {phone} or email {email} from connection {connection.Id}");
             await connection.SendAsync(CreateErrorPacket("Customer with this phone or email already exists."));
             return;
         }
@@ -105,12 +107,12 @@ public sealed class CustomerService(AutoDbContext context) : BaseService
 
             _customerRepository.Add(customer);
             await _customerRepository.SaveChangesAsync();
-            CLogging.Instance.Info($"Customer {name} (Phone: {phone}) added successfully by connection {connection.Id}");
+            NLogix.Host.Instance.Info($"Customer {name} (Phone: {phone}) added successfully by connection {connection.Id}");
             await connection.SendAsync(CreateSuccessPacket("Customer added successfully."));
         }
         catch (Exception ex)
         {
-            CLogging.Instance.Error($"Failed to add customer {name} (Phone: {phone}) from connection {connection.Id}", ex);
+            NLogix.Host.Instance.Error($"Failed to add customer {name} (Phone: {phone}) from connection {connection.Id}", ex);
             await connection.SendAsync(CreateErrorPacket("Failed to add customer due to an internal error."));
         }
     }
@@ -166,7 +168,7 @@ public sealed class CustomerService(AutoDbContext context) : BaseService
         Customer? customer = await _customerRepository.GetByIdAsync(customerId);
         if (customer == null)
         {
-            CLogging.Instance.Warn($"Attempt to update non-existent customer ID {customerId} from connection {connection.Id}");
+            NLogix.Host.Instance.Warn($"Attempt to update non-existent customer ID {customerId} from connection {connection.Id}");
             await connection.SendAsync(CreateErrorPacket("Customer not found."));
             return;
         }
@@ -180,12 +182,12 @@ public sealed class CustomerService(AutoDbContext context) : BaseService
             if (!string.IsNullOrEmpty(taxCode)) customer.TaxCode = taxCode;
 
             await _customerRepository.SaveChangesAsync();
-            CLogging.Instance.Info($"Customer ID {customerId} updated successfully by connection {connection.Id}");
+            NLogix.Host.Instance.Info($"Customer ID {customerId} updated successfully by connection {connection.Id}");
             await connection.SendAsync(CreateSuccessPacket("Customer updated successfully."));
         }
         catch (Exception ex)
         {
-            CLogging.Instance.Error($"Failed to update customer ID {customerId} from connection {connection.Id}", ex);
+            NLogix.Host.Instance.Error($"Failed to update customer ID {customerId} from connection {connection.Id}", ex);
             await connection.SendAsync(CreateErrorPacket("Failed to update customer due to an internal error."));
         }
     }
@@ -229,7 +231,7 @@ public sealed class CustomerService(AutoDbContext context) : BaseService
         Customer? customer = await _customerRepository.GetByIdAsync(customerId);
         if (customer == null)
         {
-            CLogging.Instance.Warn($"Attempt to remove non-existent customer ID {customerId} from connection {connection.Id}");
+            NLogix.Host.Instance.Warn($"Attempt to remove non-existent customer ID {customerId} from connection {connection.Id}");
             await connection.SendAsync(CreateErrorPacket("Customer not found."));
             return;
         }
@@ -237,7 +239,7 @@ public sealed class CustomerService(AutoDbContext context) : BaseService
         // Kiểm tra khách hàng có đơn hàng liên quan không
         if (await _customerRepository.AnyAsync(o => o.Id == customerId))
         {
-            CLogging.Instance.Warn($"Attempt to remove customer ID {customerId} with existing orders from connection {connection.Id}");
+            NLogix.Host.Instance.Warn($"Attempt to remove customer ID {customerId} with existing orders from connection {connection.Id}");
             await connection.SendAsync(CreateErrorPacket("Cannot remove customer with existing orders."));
             return;
         }
@@ -246,12 +248,12 @@ public sealed class CustomerService(AutoDbContext context) : BaseService
         {
             _customerRepository.Delete(customer);
             await _customerRepository.SaveChangesAsync();
-            CLogging.Instance.Info($"Customer ID {customerId} removed successfully by connection {connection.Id}");
+            NLogix.Host.Instance.Info($"Customer ID {customerId} removed successfully by connection {connection.Id}");
             await connection.SendAsync(CreateSuccessPacket("Customer removed successfully."));
         }
         catch (Exception ex)
         {
-            CLogging.Instance.Error($"Failed to remove customer ID {customerId} from connection {connection.Id}", ex);
+            NLogix.Host.Instance.Error($"Failed to remove customer ID {customerId} from connection {connection.Id}", ex);
             await connection.SendAsync(CreateErrorPacket("Failed to remove customer due to an internal error."));
         }
     }
@@ -314,7 +316,7 @@ public sealed class CustomerService(AutoDbContext context) : BaseService
 
             if (customers.Count == 0)
             {
-                CLogging.Instance.Info($"No customers found for keyword '{keyword}' by connection {connection.Id}");
+                NLogix.Host.Instance.Info($"No customers found for keyword '{keyword}' by connection {connection.Id}");
                 await connection.SendAsync(CreateErrorPacket("No customers found."));
                 return;
             }
@@ -322,11 +324,11 @@ public sealed class CustomerService(AutoDbContext context) : BaseService
             await connection.SendAsync(new Packet((int)Command.SearchCustomer,
                  PacketCode.Success, PacketType.List, PacketFlags.None, PacketPriority.Low,
                  Encoding.UTF8.GetBytes(JsonSerializer.Serialize(customers))).Serialize());
-            CLogging.Instance.Info($"Found {customers.Count} customers for keyword '{keyword}' by connection {connection.Id}");
+            NLogix.Host.Instance.Info($"Found {customers.Count} customers for keyword '{keyword}' by connection {connection.Id}");
         }
         catch (Exception ex)
         {
-            CLogging.Instance.Error($"Failed to search customers with keyword '{keyword}' from connection {connection.Id}", ex);
+            NLogix.Host.Instance.Error($"Failed to search customers with keyword '{keyword}' from connection {connection.Id}", ex);
             await connection.SendAsync(CreateErrorPacket("Failed to search customers due to an internal error."));
         }
     }
@@ -372,7 +374,7 @@ public sealed class CustomerService(AutoDbContext context) : BaseService
             Customer? customer = await _customerRepository.AsQueryable().SingleOrDefaultAsync(c => c.Id == customerId);
             if (customer == null)
             {
-                CLogging.Instance.Warn($"Customer ID {customerId} not found by connection {connection.Id}");
+                NLogix.Host.Instance.Warn($"Customer ID {customerId} not found by connection {connection.Id}");
                 await connection.SendAsync(CreateErrorPacket("Customer not found."));
                 return;
             }
@@ -381,11 +383,11 @@ public sealed class CustomerService(AutoDbContext context) : BaseService
                 PacketCode.Success, PacketType.Json, PacketFlags.None, PacketPriority.Low,
                 Encoding.UTF8.GetBytes(JsonSerializer.Serialize(customer))).Serialize());
 
-            CLogging.Instance.Info($"Customer ID {customerId} retrieved successfully by connection {connection.Id}");
+            NLogix.Host.Instance.Info($"Customer ID {customerId} retrieved successfully by connection {connection.Id}");
         }
         catch (Exception ex)
         {
-            CLogging.Instance.Error($"Failed to retrieve customer ID {customerId} from connection {connection.Id}", ex);
+            NLogix.Host.Instance.Error($"Failed to retrieve customer ID {customerId} from connection {connection.Id}", ex);
             await connection.SendAsync(CreateErrorPacket("Failed to retrieve customer due to an internal error."));
         }
     }

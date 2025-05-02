@@ -1,14 +1,17 @@
-﻿using Nalix.Garage.Common.Entities.Customers;
+﻿using Nalix.Common.Connection;
+using Nalix.Common.Package;
+using Nalix.Common.Package.Attributes;
+using Nalix.Common.Package.Enums;
+using Nalix.Common.Security;
+using Nalix.Garage.Common;
+using Nalix.Garage.Common.Entities.Customers;
 using Nalix.Garage.Common.Entities.Vehicles;
 using Nalix.Garage.Common.Enums;
 using Nalix.Garage.Common.Enums.Cars;
 using Nalix.Garage.Database;
 using Nalix.Garage.Database.Repositories;
-using Notio.Common.Attributes;
-using Notio.Common.Connection;
-using Notio.Common.Package;
-using Notio.Common.Security;
-using Notio.Logging;
+using Nalix.Logging;
+using Nalix.Serialization;
 using System;
 using System.Linq;
 using System.Text.Json;
@@ -146,12 +149,12 @@ public sealed class VehicleService(AutoDbContext context) : BaseService
         {
             _vehicleRepository.Add(vehicle);
             await _vehicleRepository.SaveChangesAsync();
-            CLogging.Instance.Info($"Vehicle added successfully for CustomerId: {customerId}");
+            NLogix.Host.Instance.Info($"Vehicle added successfully for CustomerId: {customerId}");
             await connection.SendAsync(CreateSuccessPacket("Vehicle added successfully."));
         }
         catch (Exception ex)
         {
-            CLogging.Instance.Error($"Failed to add vehicle for CustomerId: {customerId}", ex);
+            NLogix.Host.Instance.Error($"Failed to add vehicle for CustomerId: {customerId}", ex);
             await connection.SendAsync(CreateErrorPacket("Failed to add vehicle due to an internal error."));
         }
     }
@@ -204,7 +207,7 @@ public sealed class VehicleService(AutoDbContext context) : BaseService
         }
         else if (packet.Type == PacketType.Json)
         {
-            Vehicle? vehicleData = JsonSerializer.Deserialize(
+            Vehicle? vehicleData = JsonCodec.DeserializeFromBytes(
                 packet.Payload.Span, JsonContext.Default.Vehicle);
             if (vehicleData == null ||
                 string.IsNullOrWhiteSpace(vehicleData.CarLicensePlate) ||
@@ -267,12 +270,12 @@ public sealed class VehicleService(AutoDbContext context) : BaseService
             vehicle.Mileage = mileage;
 
             await _vehicleRepository.SaveChangesAsync();
-            CLogging.Instance.Info($"Vehicle updated successfully. VehicleId: {vehicleId}");
+            NLogix.Host.Instance.Info($"Vehicle updated successfully. VehicleId: {vehicleId}");
             await connection.SendAsync(CreateSuccessPacket("Vehicle updated successfully."));
         }
         catch (Exception ex)
         {
-            CLogging.Instance.Error($"Failed to update vehicle. VehicleId: {vehicleId}", ex);
+            NLogix.Host.Instance.Error($"Failed to update vehicle. VehicleId: {vehicleId}", ex);
             await connection.SendAsync(CreateErrorPacket("Failed to update vehicle due to an internal error."));
         }
     }
@@ -322,7 +325,7 @@ public sealed class VehicleService(AutoDbContext context) : BaseService
             if (_vehicleRepository.Exists(vehicleId))
             {
                 _vehicleRepository.Delete(vehicleId);
-                CLogging.Instance.Info($"Vehicle removed successfully. VehicleId: {vehicleId}");
+                NLogix.Host.Instance.Info($"Vehicle removed successfully. VehicleId: {vehicleId}");
                 await connection.SendAsync(CreateSuccessPacket("Vehicle removed successfully."));
             }
             else
@@ -332,7 +335,7 @@ public sealed class VehicleService(AutoDbContext context) : BaseService
         }
         catch (Exception ex)
         {
-            CLogging.Instance.Error($"Failed to remove vehicle. VehicleId: {vehicleId}", ex);
+            NLogix.Host.Instance.Error($"Failed to remove vehicle. VehicleId: {vehicleId}", ex);
             await connection.SendAsync(CreateErrorPacket("Failed to remove vehicle due to an internal error."));
         }
     }

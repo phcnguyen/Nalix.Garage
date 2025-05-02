@@ -1,7 +1,7 @@
-﻿using Notio.Common.Caching;
-using Notio.Common.Logging;
-using Notio.Network.Core;
-using Notio.Network.Listeners;
+﻿using Nalix.Common.Caching;
+using Nalix.Common.Logging;
+using Nalix.Network.Listeners;
+using Nalix.Network.Protocols;
 
 namespace Nalix.Garage.Host.Network;
 

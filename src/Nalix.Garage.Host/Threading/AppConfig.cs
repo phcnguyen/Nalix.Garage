@@ -1,21 +1,18 @@
-﻿using Nalix.Garage.Database;
+﻿using Nalix.Assemblies;
+using Nalix.Common.Logging;
+using Nalix.Cryptography.Asymmetric;
+using Nalix.Cryptography.Hashing;
+using Nalix.Environment;
+using Nalix.Garage.Database;
 using Nalix.Garage.Host.Network;
-using NalixGarage.Database;
-using NalixGarage.Host.Network;
-using Notio.Common.Logging;
-using Notio.Cryptography.Asymmetric;
-using Notio.Cryptography.Hashing;
-using Notio.Defaults;
-using Notio.Logging;
-using Notio.Logging.Options;
-using Notio.Logging.Targets;
-using Notio.Network.Dispatcher;
-using Notio.Network.Dispatcher.BuiltIn;
-using Notio.Network.Package;
-using Notio.Network.Package.Security;
-using Notio.Network.Package.Serialization;
-using Notio.Runtime.Assemblies;
-using Notio.Shared.Memory.Buffers;
+using Nalix.Garage.Host.Services;
+using Nalix.Logging;
+using Nalix.Logging.Options;
+using Nalix.Logging.Targets;
+using Nalix.Network.Dispatch;
+using Nalix.Network.Dispatch.BuiltIn;
+using Nalix.Network.Package;
+using Nalix.Shared.Memory.Buffers;
 using System;
 using System.Collections.Concurrent;
 using System.Diagnostics;
@@ -29,7 +26,7 @@ public static class AppConfig
 {
     private static ServerListener? Server;
     private static AutoDbContext? DbContext;
-    private static ILogger Logger = CLogging.Instance;
+    private static ILogger Logger = NLogix.Host.Instance;
 
     public static readonly bool IsDebug = Debugger.IsAttached;
     public static readonly CancellationTokenSource CTokenSrc = new();
@@ -44,7 +41,7 @@ public static class AppConfig
         [ConsoleKey.Q] = () =>
         {
             Logger.Info("Ctrl+Q pressed: Exiting application...");
-            Environment.Exit(0);
+            System.Environment.Exit(0);
         },
         [ConsoleKey.R] = () =>
         {
@@ -83,17 +80,17 @@ public static class AppConfig
 
     public static ILogger InitializeLogging()
     {
-        FileLoggerOptions options = new()
+        FileLogOptions options = new()
         {
             LogFileName = "Auto",
-            LogDirectory = DefaultDirectories.LogsPath,
+            LogDirectory = Directories.LogsPath,
         };
 
-        return new CLogging(cfg =>
+        return new NLogix(cfg =>
         {
             cfg.SetMinLevel(LogLevel.Information)
-               .AddTarget(new FileLoggingTarget(options))
-               .AddTarget(new ConsoleLoggingTarget());
+               .AddTarget(new FileLogTarget(options))
+               .AddTarget(new ConsoleLogTarget());
         });
     }
 
@@ -105,14 +102,11 @@ public static class AppConfig
         }
 
         return new ServerListener(
-               new ServerProtocol(new PacketDispatcher<Packet>(cfg => cfg
+               new ServerProtocol(new PacketDispatch<Packet>(cfg => cfg
                    .WithLogging(Logger)
                    .WithErrorHandling((exception, command) =>
                         Logger.Error($"Error handling command: {command}", exception))
-                   .WithDecryption((p, c) => PacketEncryption.DecryptPayload(p, c.EncryptionKey, c.Mode))
-                   .WithEncryption((p, c) => PacketEncryption.EncryptPayload(p, c.EncryptionKey, c.Mode))
-                   .WithDeserializer(data => PacketSerializer.Deserialize(data.Span))
-                   .WithHandler(() => new Handshake(new Sha256(), new X25519(), Logger))
+                   .WithHandler(() => new HandshakeController<Packet>(new SHA256(), new X25519(), Logger))
                    .WithHandler(() => new AccountService(DbContext))
                    .WithHandler(() => new VehicleService(DbContext))
                    .WithHandler(() => new CustomerService(DbContext))
