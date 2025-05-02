@@ -1,6 +1,6 @@
 ﻿using Nalix.Garage.Desktop.Sockets;
 using Nalix.Garage.Desktop.ViewModels;
-using Notio.Logging;
+using Nalix.Logging.Extensions;
 using System;
 using System.Threading.Tasks;
 using System.Windows;
@@ -10,6 +10,7 @@ namespace Auto.Desktop.Views.Login;
 public partial class LoginWindow : Window
 {
     public static readonly ProgressWindow ProgressWindow = new();
+
     public LoginWindow()
     {
         InitializeComponent();
@@ -83,6 +84,7 @@ public partial class LoginWindow : Window
             txtPass.Focus();
         }
     }
+
     private void TxtPass_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
     {
         if (e.Key == System.Windows.Input.Key.Enter)

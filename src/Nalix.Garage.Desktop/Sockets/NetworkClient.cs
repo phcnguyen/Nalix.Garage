@@ -1,15 +1,16 @@
-﻿using Nalix.Garage.Common.Enums;
-using Notio.Common.Cryptography;
-using Notio.Common.Package;
-using Notio.Cryptography.Asymmetric;
-using Notio.Cryptography.Hashing;
-using Notio.Network.Package;
-using Notio.Network.Package.Extensions;
-using Notio.Shared.Injection.DI;
+﻿using Nalix.Common.Cryptography;
+using Nalix.Common.Package;
+using Nalix.Common.Package.Enums;
+using Nalix.Cryptography.Asymmetric;
+using Nalix.Garage.Common.Enums;
+using Nalix.Network.Package;
+using Nalix.Network.Package.Extensions;
+using Nalix.Shared.Injection.DI;
 using System;
 using System.Buffers;
 using System.IO;
 using System.Net.Sockets;
+using System.Security.Cryptography;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -30,7 +31,7 @@ public sealed class NetworkClient : SingletonBase<NetworkClient>, IDisposable, I
     /// <summary>
     /// Gets or sets the encryption mode used.
     /// </summary>
-    public EncryptionMode Mode { get; set; }
+    public EncryptionType Mode { get; set; }
 
     /// <summary>
     /// Gets the encryption key used for securing communication.
@@ -103,7 +104,7 @@ public sealed class NetworkClient : SingletonBase<NetworkClient>, IDisposable, I
             // Gửi public key cho server
             Packet packet = new(
                 (ushort)Command.InitiateSecureConnection, PacketCode.Success,
-                PacketType.Binary, PacketFlags.None, PacketPriority.None, publicKey
+                PacketType.Binary, PacketFlags.None, PacketPriority.Low, publicKey
             );
 
             await Instance.SendAsync(packet);
@@ -118,7 +119,7 @@ public sealed class NetworkClient : SingletonBase<NetworkClient>, IDisposable, I
 
             // Tính toán shared secret và đặt khóa mã hóa
             byte[] sharedSecret = X25519.ComputeSharedSecret(privateKey, packetReceive.Payload.ToArray());
-            Instance.EncryptionKey = Sha256.HashData(sharedSecret);
+            Instance.EncryptionKey = SHA256.HashData(sharedSecret);
 
             return (true, "Secure connection established successfully.");
         }

@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore.Storage;
-using Notio.Common.Repositories.Async;
+using Nalix.Common.Repositories.Async;
+using Nalix.Garage.Database.Repositories;
 using System;
 using System.Collections.Generic;
 using System.Threading;

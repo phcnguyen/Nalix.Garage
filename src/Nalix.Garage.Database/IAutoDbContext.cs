@@ -1,14 +1,14 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using NalixGarage.Common.Entities.Authentication;
-using NalixGarage.Common.Entities.Bill;
-using NalixGarage.Common.Entities.Customers;
-using NalixGarage.Common.Entities.Employees;
-using NalixGarage.Common.Entities.Part;
-using NalixGarage.Common.Entities.Repair;
-using NalixGarage.Common.Entities.Service;
-using NalixGarage.Common.Entities.Suppliers;
-using NalixGarage.Common.Entities.Transactions;
-using NalixGarage.Common.Entities.Vehicles;
+using Nalix.Garage.Common.Entities.Authentication;
+using Nalix.Garage.Common.Entities.Bill;
+using Nalix.Garage.Common.Entities.Customers;
+using Nalix.Garage.Common.Entities.Employees;
+using Nalix.Garage.Common.Entities.Part;
+using Nalix.Garage.Common.Entities.Repair;
+using Nalix.Garage.Common.Entities.Service;
+using Nalix.Garage.Common.Entities.Suppliers;
+using Nalix.Garage.Common.Entities.Transactions;
+using Nalix.Garage.Common.Entities.Vehicles;
 
 namespace Nalix.Garage.Database;
 

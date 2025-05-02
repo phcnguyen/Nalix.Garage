@@ -1,9 +1,11 @@
-﻿using Nalix.Garage.Common.Dto;
+﻿using Nalix.Common.Package;
+using Nalix.Common.Package.Enums;
+using Nalix.Garage.Common;
+using Nalix.Garage.Common.Dto;
 using Nalix.Garage.Common.Enums;
 using Nalix.Garage.Desktop.Sockets;
-using Notio.Common.Package;
-using Notio.Network.Package;
-using Notio.Utilities;
+using Nalix.Network.Package;
+using Nalix.Serialization;
 using System;
 using System.Text;
 using System.Windows;
@@ -58,8 +60,12 @@ public sealed class LoginViewModel : ViewModelBase
         {
             NetworkClient.Instance.Send(new Packet(
                 (ushort)Command.LoginAccount,
-                PacketCode.Success, PacketType.Json, PacketFlags.None, PacketPriority.None,
-                JsonBuffer.SerializeToBytes(account, JsonContext.Default.AccountDto)));
+                PacketCode.Success,
+                PacketType.Json,
+                PacketFlags.None,
+                PacketPriority.Low,
+                JsonCodec.SerializeToMemory(account, JsonContext.Default.AccountDto)
+            ));
 
             IPacket packetReceive = NetworkClient.Instance.Receive();
 

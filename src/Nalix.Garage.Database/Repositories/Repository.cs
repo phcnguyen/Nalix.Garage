@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Notio.Common.Repositories.Async;
-using Notio.Common.Repositories.Sync;
+using Nalix.Common.Repositories.Async;
+using Nalix.Common.Repositories.Sync;
 using System;
 using System.Collections.Generic;
 using System.Linq;

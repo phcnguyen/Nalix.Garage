@@ -1,8 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Configuration;
-using Notio.Defaults;
-using Notio.Logging;
+using Nalix.Environment;
+using Nalix.Logging;
 using Npgsql;
 using System;
 using System.IO;
@@ -14,7 +14,7 @@ public class AutoDbContextFactory : IDesignTimeDbContextFactory<AutoDbContext>
 {
     public AutoDbContext CreateDbContext(string[] args)
     {
-        CLogging.Instance.Info("Starting initialization of AutoDbContext.");
+        NLogix.Host.Instance.Info("Starting initialization of AutoDbContext.");
 
         // Load cấu hình từ appsettings.json
         IConfigurationRoot configuration;
@@ -24,13 +24,13 @@ public class AutoDbContextFactory : IDesignTimeDbContextFactory<AutoDbContext>
             configuration = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-                .AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production"}.json", optional: true)
+                .AddJsonFile($"appsettings.{System.Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production"}.json", optional: true)
                 .AddEnvironmentVariables()
                 .Build();
         }
         catch (Exception ex)
         {
-            CLogging.Instance.Error("Error loading configuration from appsettings.json.", ex);
+            NLogix.Host.Instance.Error("Error loading configuration from appsettings.json.", ex);
             throw;
         }
 
@@ -42,7 +42,7 @@ public class AutoDbContextFactory : IDesignTimeDbContextFactory<AutoDbContext>
         if (!dbType.Equals("SQLite", StringComparison.OrdinalIgnoreCase) &&
             !CanConnectToDatabase(connectionString))
         {
-            CLogging.Instance.Error($"Cannot connect to the database at {connectionString}");
+            NLogix.Host.Instance.Error($"Cannot connect to the database at {connectionString}");
             throw new InvalidOperationException($"Cannot connect to the database at {connectionString}");
         }
 
@@ -65,7 +65,7 @@ public class AutoDbContextFactory : IDesignTimeDbContextFactory<AutoDbContext>
                 .EnableDetailedErrors(false)
                 .EnableServiceProviderCaching();
 
-                CLogging.Instance.Info("DbContext configured for PostgreSQL.");
+                NLogix.Host.Instance.Info("DbContext configured for PostgreSQL.");
             }
             else if (dbType.Equals("SqlServer", StringComparison.OrdinalIgnoreCase))
             {
@@ -79,12 +79,12 @@ public class AutoDbContextFactory : IDesignTimeDbContextFactory<AutoDbContext>
                 .EnableThreadSafetyChecks()
                 .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
 
-                CLogging.Instance.Info("DbContext configured for SQL Server.");
+                NLogix.Host.Instance.Info("DbContext configured for SQL Server.");
             }
             else if (dbType.Equals("SQLite", StringComparison.OrdinalIgnoreCase))
             {
                 optionsBuilder.UseSqlite(
-                    $"Data Source={DefaultDirectories.DatabasePath}\\Auto.db",
+                    $"Data Source={Directories.DatabasePath}\\Auto.db",
                     sqliteOptions =>
                 {
                     sqliteOptions.CommandTimeout(60);
@@ -94,22 +94,22 @@ public class AutoDbContextFactory : IDesignTimeDbContextFactory<AutoDbContext>
                 .EnableServiceProviderCaching();
                 //.LogTo(Console.WriteLine, LogLevel.Information);
 
-                CLogging.Instance.Info("DbContext configured for SQLite.");
+                NLogix.Host.Instance.Info("DbContext configured for SQLite.");
             }
             else
             {
-                CLogging.Instance.Warn($"Unsupported database type: {dbType}");
+                NLogix.Host.Instance.Warn($"Unsupported database type: {dbType}");
                 throw new InvalidOperationException($"Unsupported database type: {dbType}");
             }
         }
         catch (Exception ex)
         {
-            CLogging.Instance.Error($"Error configuring DbContext for {dbType}.", ex);
+            NLogix.Host.Instance.Error($"Error configuring DbContext for {dbType}.", ex);
             throw;
         }
 
         AutoDbContext dbContext = new(optionsBuilder.Options);
-        CLogging.Instance.Info("AutoDbContext successfully created.");
+        NLogix.Host.Instance.Info("AutoDbContext successfully created.");
         return dbContext;
     }
 
@@ -121,23 +121,23 @@ public class AutoDbContextFactory : IDesignTimeDbContextFactory<AutoDbContext>
             string host = builder.Host;
             int port = builder.Port;
 
-            CLogging.Instance.Info($"Pinging database server {host}:{port}...");
+            NLogix.Host.Instance.Info($"Pinging database server {host}:{port}...");
 
             using var ping = new Ping();
             PingReply reply = ping.Send(host, 3000); // Timeout 1 giây
 
             if (reply.Status == IPStatus.Success)
             {
-                CLogging.Instance.Info($"Ping to {host} successful.");
+                NLogix.Host.Instance.Info($"Ping to {host} successful.");
                 return true;
             }
 
-            CLogging.Instance.Error($"Ping to {host} failed: {reply.Status}");
+            NLogix.Host.Instance.Error($"Ping to {host} failed: {reply.Status}");
             return false;
         }
         catch (Exception ex)
         {
-            CLogging.Instance.Error("Error pinging database server.", ex);
+            NLogix.Host.Instance.Error("Error pinging database server.", ex);
             return false;
         }
     }

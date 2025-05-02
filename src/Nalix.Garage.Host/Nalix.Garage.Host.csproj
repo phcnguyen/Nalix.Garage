@@ -16,7 +16,7 @@
 		<ProjectReference Include="..\Nalix.Garage.Common\Nalix.Garage.Common.csproj" />
 		<ProjectReference Include="..\Nalix.Garage.Database\Nalix.Garage.Database.csproj" />
 		
-		<PackageReference Include="Notio.Network" Version="0.5.11" />
+		<PackageReference Include="Nalix.Network" Version="0.7.89" />
 	</ItemGroup>
 
 </Project>
